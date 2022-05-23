@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.amirami.simapp.radiostations.ui.MainFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_main">
+
+        <action
+            android:id="@+id/action_mainFragment_to_favoriteRadioFragment"
+            app:destination="@id/favoriteRadioFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_listRadioFragment"
+            app:destination="@id/listRadioFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_radiosFragment"
+            app:destination="@id/radiosFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_infoBottomSheetFragment"
+            app:destination="@id/infoBottomSheetFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/fragmentSetting"
+        android:name="com.amirami.simapp.radiostations.ui.SettingFragment"
+        android:label="fragment_setting"
+        tools:layout="@layout/fragment_setting" >
+        <action
+            android:id="@+id/action_fragmentSetting_to_mainFragment"
+            app:destination="@id/mainFragment" />
+        <action
+            android:id="@+id/action_fragmentSetting_to_statisticBottomSheetFragment"
+            app:destination="@id/statisticBottomSheetFragment" />
+        <action
+            android:id="@+id/action_fragmentSetting_to_licencesBottomSheetFragment"
+            app:destination="@id/licencesBottomSheetFragment" />
+        <action
+            android:id="@+id/action_fragmentSetting_to_infoBottomSheetFragment"
+            app:destination="@id/infoBottomSheetFragment" />
+        <action
+            android:id="@+id/action_fragmentSetting_to_chooseDefBottomSheetFragment"
+            app:destination="@id/chooseDefBottomSheetFragment" />
+
+
+    </fragment>
+    <fragment
+        android:id="@+id/favoriteRadioFragment"
+        android:name="com.amirami.simapp.radiostations.ui.FavoriteRadioFragment"
+        android:label="content_favorite"
+        tools:layout="@layout/fragment_favorite">
+
+
+        <action
+            android:id="@+id/action_favoriteRadioFragment_to_moreBottomSheetFragment"
+            app:destination="@id/moreBottomSheetFragment" />
+        <action
+            android:id="@+id/action_favoriteRadioFragment_to_addDialogueBottomSheetFragment"
+            app:destination="@id/addDialogueBottomSheetFragment" />
+        <deepLink
+            android:id="@+id/deepLink"
+            android:autoVerify="true"
+            app:uri="radiobroadcasting://simappr.com/favoritfrag" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/listRadioFragment"
+        android:name="com.amirami.simapp.radiostations.ui.ListRadioFragment"
+        android:label="ListRadioFragment" >
+
+    <argument
+        android:name="msg"
+        app:argType="string"
+        android:defaultValue="Empty"/>
+        <action
+            android:id="@+id/action_listRadioFragment_to_radiosFragment"
+            app:destination="@id/radiosFragment" />
+        <action
+            android:id="@+id/action_listRadioFragment_to_infoBottomSheetFragment"
+            app:destination="@id/infoBottomSheetFragment" />
+        <action
+            android:id="@+id/action_listRadioFragment_to_addDialogueBottomSheetFragment"
+            app:destination="@id/addDialogueBottomSheetFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/radiosFragment"
+        android:name="com.amirami.simapp.radiostations.ui.RadiosFragment"
+        android:label="content_radios"
+        tools:layout="@layout/fragment_radios" >
+
+    <argument
+        android:name="msg"
+        app:argType="string"
+        android:defaultValue="Empty"/>
+
+        <argument
+            android:name="secondmsg"
+            app:argType="string"
+            android:defaultValue="Empty"/>
+
+        <action
+            android:id="@+id/action_radiosFragment_to_moreBottomSheetFragment"
+            app:destination="@id/moreBottomSheetFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.amirami.simapp.radiostations.ui.SearchFragment"
+        android:label="SearchFragment" >
+
+        <action
+            android:id="@+id/action_searchFragment_to_moreBottomSheetFragment"
+            app:destination="@id/moreBottomSheetFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/statisticBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.StatisticBottomSheetFragment"
+        android:label="StatisticBottomSheetFragment" />
+    <dialog
+        android:id="@+id/licencesBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.LicencesBottomSheetFragment"
+        android:label="LicencesBottomSheetFragment" />
+
+    <dialog
+        android:id="@+id/infoBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.InfoBottomSheetFragment"
+        android:label="InfoBottomSheetFragment" >
+    <argument
+        android:name="title"
+        app:argType="string"
+        android:defaultValue="Empty"/>
+
+        <argument
+            android:name="msg"
+            app:argType="string"
+            android:defaultValue="Empty"/>
+        <argument
+            android:name="recordname"
+            app:argType="string"
+            android:defaultValue="Empty" />
+    </dialog>
+
+
+
+
+    <dialog
+        android:id="@+id/chooseDefBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.ChooseDefBottomSheetFragment"
+        android:label="ChooseDefBottomSheetFragment" >
+        <argument
+            android:name="msg"
+            app:argType="string"
+            android:defaultValue="Empty"/>
+    </dialog>
+
+    <dialog
+        android:id="@+id/moreBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.MoreBottomSheetFragment"
+        android:label="MoreBottomSheetFragment" >
+
+        <action
+            android:id="@+id/action_moreBottomSheetFragment_to_infoBottomSheetFragment"
+            app:destination="@id/infoBottomSheetFragment" />
+        <action
+            android:id="@+id/action_moreBottomSheetFragment_to_setAlarmBottomSheetFragment"
+            app:destination="@id/setAlarmBottomSheetFragment" />
+    </dialog>
+    <dialog
+        android:id="@+id/addDialogueBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.AddDialogueBottomSheetFragment"
+        android:label="AddDialogueBottomSheetFragment">
+    <argument
+        android:name="addDouwnload"
+        app:argType="boolean"
+        android:defaultValue="false"/>
+        </dialog>
+    <dialog
+        android:id="@+id/setTimerBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.ui.SetTimerBottomSheetFragment"
+        android:label="SetTimerBottomSheetFragment" />
+    <dialog
+        android:id="@+id/setAlarmBottomSheetFragment"
+        android:name="com.amirami.simapp.radiostations.alarm.SetAlarmBottomSheetFragment"
+        android:label="SetAlarmBottomSheetFragment" >
+        <argument
+            android:name="stationurl"
+            app:argType="string"
+            android:defaultValue="Empty"/>
+    </dialog>
+</navigation>

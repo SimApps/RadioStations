@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amirami.simapp.radiostations">
+
+    <dist:module dist:instant="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+    <uses-feature
+        android:name="android.hardware.faketouch"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
+
+    <application
+        android:name=".hiltcontainer.RadioApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/mageradio"
+        android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/mageradio_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:label"
+        android:hardwareAccelerated="true"
+        tools:targetApi="m">
+
+
+        <!--   android:clearTaskOnLaunch="true"
+          android:finishOnTaskLaunch="true"-->
+
+        <!--   android:configChanges="keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"-->
+
+
+
+
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5900899997553420~1771300993" /> <!-- android:theme="@style/AppTheme.BrandedLaunch" -->
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/Theme.App.Starting"
+            android:exported="true"
+            android:screenOrientation="fullSensor"
+
+            >
+            <!-- FOR PIC IN PIC
+          android:launchMode="singleTask"
+          android:configChanges="keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"
+          android:resizeableActivity="true"
+          android:supportsPictureInPicture="true"
+          tools:targetApi="n" -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+
+
+
+
+        <service
+            android:name=".NotificationChannelService"
+            android:exported="false"
+            android:stopWithTask="true">
+            <intent-filter>
+                <action android:name="com.amirami.simapp.radiostations.action.PAUSE" />
+                <action android:name="com.amirami.simapp.radiostations.action.PLAYPAUSE" />
+                <action android:name="com.amirami.simapp.radiostations.action.REC" />
+                <action android:name="com.amirami.simapp.radiostations.action.STOP" />
+                <action android:name="com.amirami.simapp.radiostations.action.STOPALL" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".ControlActionsListener" />
+
+        <receiver
+            android:name=".NotificationDismissedReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.amirami.simapp.radiostations.action.NOTIFICATION_DISMISSED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".NotificationDownloadDismissedReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.amirami.simapp.radiostations.action.NOTIFICATION_DOWNLOAD_DISMISSED" />
+            </intent-filter>
+        </receiver>
+
+
+
+
+
+        <receiver android:name="com.amirami.simapp.radiostations.alarm.TimeChangedReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+                <!--  <flag android:name="android.intent.action.TIME_SET" /> -->
+
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.amirami.simapp.radiostations.alarm.BootCompleteReceiver"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+
+        <receiver
+            android:enabled="true"
+            android:exported="false"
+            android:name="com.amirami.simapp.radiostations.alarm.AlarmReceiver"
+            />
+
+
+
+
+        <receiver
+            android:name="com.tappx.sdk.android.TrackInstallReceiver"
+            android:exported="false"> <!-- see if there is proble if yes change it to true -->
+
+        </receiver>
+
+        <!-- AdActivity from Google Play Services, needed by Tappx -->
+        <activity android:name="com.google.android.gms.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:theme="@android:style/Theme.Translucent" />
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+
+    </application>
+
+</manifest>

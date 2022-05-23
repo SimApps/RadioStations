@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/defcountry_relativelay"
+    android:padding="12dp">
+
+
+    <TextView
+        android:id="@+id/choosedefTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="TextView"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleButtonGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/choosedefTitle"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:singleSelection="true">
+
+        <Button
+            android:id="@+id/btnDark"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Dark"
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.Custom.Button" />
+
+        <Button
+            android:id="@+id/btnLight"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Light"
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.Custom.Button" />
+
+        <Button
+            android:id="@+id/btnSysThme"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setbysystem"
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.Custom.Button" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <ProgressBar
+        android:id="@+id/spin_kit_country_fav"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_below="@id/choosedefTitle"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="12dp"
+        android:indeterminateDrawable="@drawable/indeterminate_progress"
+        android:visibility="invisible" />
+
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/listViewCountries"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/choosedefTitle"
+        android:layout_marginTop="12dp"
+        android:background="@android:color/transparent"
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="1500"
+        app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollEnabled="false"
+        app:fastScrollPopupBackgroundSize="40dp"
+        app:fastScrollPopupBgColor="@color/defaultcolor"
+        app:fastScrollPopupPosition="adjacent"
+        app:fastScrollPopupTextColor="@color/transparents"
+        app:fastScrollPopupTextSize="18sp"
+        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
+        app:fastScrollThumbColor="@color/defaultcolor"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="@color/defaultcolor"
+        app:fastScrollTrackColor="@android:color/transparent"
+        app:fastScrollVerticalThumbDrawable="@color/defaultcolor"
+        app:fastScrollVerticalTrackDrawable="@color/defaultcolor" />
+
+
+    <include
+        android:id="@+id/itemErrorMessage"
+        layout="@layout/item_error_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="invisible"
+        android:layout_below="@id/choosedefTitle"/>
+
+</RelativeLayout>

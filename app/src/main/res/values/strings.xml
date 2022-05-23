@@ -1,0 +1,297 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Radio FM AM</string>
+    <string name="RateRadioFMAM">Rate Radio FM AM</string>
+    <string name="title_activity_radios">RadiosActivity</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+
+    <string name="Search">Search Stations</string>
+    <string name="Reset">Reset</string>
+    <string name="Start">Start</string>
+    <string name="Start_alarm">Start Alarm</string>
+    <string name="cancel_alarm">Cancel Current Alarm</string>
+    <string name="Set_Alarm_at">Set Alarm at :</string>
+
+
+    <string name="Deleted_All">Favorite Radio deleted</string>
+    <string name="Cant_beEmpty">Field can\'t be empty!</string>
+    <string name="Radio_is_off">Radio is off. You can\'t set timer!</string>
+    <string name="Radio_will_be_off">Radio will be off in :</string>
+    <string name="minutes">minutes</string>
+    <string name="EnterPosiv_nbr">Please enter a positive number</string>
+    <string name="not_vaid_search">Short String</string>
+    <string name="Favoris">Favorites</string>
+    <string name="shutdown">Stop playing after : </string>
+    <string name="fab_content_desc">Add custom stream.</string>
+
+    <string name="appversion">Version : 2.2.52</string>
+    <string name="version">2.2.52</string>
+
+    <string name="choosefilemanager">Select a file manager (android/data/com.amirami.simapp.radiostations)</string>
+
+    <string name="filemanagernotfound">Did not find any activity capable of opening files.</string>
+    <string name="non">No</string>
+    <string name="oui">Yes</string>
+    <string name="Exit">Exit</string>
+    <string name="Close">Close</string>
+
+    <string name="GO">GO</string>
+    <string name="addname">Add stream name*</string>
+    <string name="addhomepageurl">Add homepage URL</string>
+    <string name="addstreamurl">Add stream URL*</string>
+    <string name="addcountry">Add country name</string>
+    <string name="addbitrate">Add bitrate</string>
+    <string name="addtags">Add tags</string>
+    <string name="addlanguage">Add language</string>
+    <string name="addimageurl">Add image url</string>
+
+    <string name="enternumber">Enter a number!</string>
+
+
+    <string name="click_to_expand">Click/Drag to expand </string>
+    <string name="playernullinfo">Click here to copy/search </string>
+    <string name="BUFFERING">BUFFERING</string>
+    <string name="OoOps_Try_another_station">OoOps! Try another station!</string>
+
+    <string name="Data">Data</string>
+    <string name="MB">MB</string>
+    <string name="Timer">Timer</string>
+    <string name="Minute">Minute</string>
+
+    <string name="empty_fav">Your favoritess radio will appear here</string>
+    <string name="emptu_record">Your recordings will appear here</string>
+
+    <string name="RemindMeLater">Remind Me Later</string>
+    <string name="NoThanks">No, Thanks</string>
+    <string name="RateImage">RateImage</string>
+
+    <string name="search_hint">Search radio Here</string>
+    <string name="deletesall">Delete favorite </string>
+
+    <string name="setting">Setting </string>
+    <string name="IfyouenjoyusingRadioFMAM">If you enjoy using Radio FM AM, please take a moment to rate it. Thanks for your support!</string>
+
+    <string name="deleteallfav">Do you really want to delete all favorite?</string>
+    <string name="deleteallrecording">Do you really want to delete all recordings?</string>
+    <string name="deleterecording">Do you really want to delete this recording?</string>
+
+    <string name="disclaimermessage">This app is a tool for playing online radio. It is not affiliated with any media or radio. We respect the copyright of the owner. Therefore, please do not use illegale content without the permission of the owner. </string>
+
+    <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : android/data/com.amirami.simapp.radiostations </string>
+
+    <string name="batterieoptimisationmessage">If you experience playback interruptions you have to disable battery optimization. Click on "GO" to open setting and search for this app. (there is some brand that require additional settings)  </string>
+
+    <string name="batterieoptimisationmessages">If you experience playback interruptions you have to disable battery optimization. Click on "GO" to open setting and search for this app. (there is some brand that require additional settings) </string>
+
+    <string name="batterieoptimisationmessageson">You have already disabled battery optimization. If you still experience playback interruptions please check you have a strong internet connection(please note that there is some brand that require additional settings)</string>
+
+    <string name="nobatterieoptimisationmessageso">You don\'t need battery optimization. </string>
+
+    <string name="discaimertitle">Disclaimer </string>
+
+    <string name="Keep_in_mind">Keep in mind </string>
+
+    <string name="choose_countrie">Choose countrie </string>
+    <string name="choose_server">Choose server </string>
+    <string name="choose_theme">Choose theme </string>
+
+    <string name="defaultCountry">Default Countrie : %s</string>
+    <string name="currentserver">Server : %s</string>
+    <string name="Theme">Theme</string>
+    <string name="batterisetting">Battery optimisation</string>
+
+    <string name="infoRadioname">Radio Name : %s</string>
+    <string name="infoHomepage">Homepage : %s</string>
+    <string name="infoRadiostreamURL">Radio Stream URL : %s</string>
+    <string name="infoCountry">Country : %s</string>
+    <string name="infoLanguage">Language : %s</string>
+    <string name="infoBitrate">Bitrate : %s Kbps</string>
+    <string name="infoTags">Tags : %s</string>
+
+    <string name="inforecord">Info : %s</string>
+
+
+    <string name="statNbrStation">Stations : %s</string>
+    <string name="statNbrStationBroken">Stations Broken : %s</string>
+    <string name="statNbrLanguage">Languages : %s</string>
+    <string name="statNbrCountries">Countries : %s</string>
+    <string name="statNbrTags">Tags : %s</string>
+
+    <string name="stationinfo">%s kbps, %s , %s</string>
+    <string name="Pop">pop</string>
+    <string name="Hits">hits</string>
+    <string name="Rock">rock</string>
+    <string name="Electronic">electronic</string>
+    <string name="Reggae">reggae</string>
+    <string name="Inspirational">inspirational</string>
+    <string name="International">international</string>
+    <string name="Latin">latin</string>
+    <string name="Country">country</string>
+    <string name="News">news</string>
+
+
+    <string name="languages">languages</string>
+    <string name="stations">stations</string>
+    <string name="states">states</string>
+    <string name="codecs">codecs</string>
+    <string name="tags">tags</string>
+    <string name="topvote">topvote</string>
+    <string name="topclick">topclick</string>
+
+    <string name="Dark">Dark</string>
+    <string name="Light">Light</string>
+    <string name="setbysystem">Set by system</string>
+
+    <string name="countries">countries</string>
+    <string name="No_Homepage">No homepage URL!</string>
+    <string name="Select_radio_toshare">Select a Radio Station to share!</string>
+    <string name="radio_toshare">Share</string>
+    <string name="radio_visithomepage">Website</string>
+
+    <string name="radio_like">Like</string>
+    <string name="radio_dislike">Dislike</string>
+
+
+    <string name="go_recordFiles">Recordings</string>
+    <string name="Countries">Countries</string>
+    <string name="Languages">Languages</string>
+    <string name="States">States</string>
+    <string name="Codecs">Codecs</string>
+    <string name="Tags">Tags</string>
+    <string name="Radio">Radio</string>
+    <string name="Topvote">Top Vote</string>
+    <string name="Topclick">Top Click</string>
+    <string name="Recordings">Recordings</string>
+    <string name="recents">Recents</string>*
+    <string name="recentlyplayed">Recently Played</string>
+    <string name="Remove_ads">Remove ads</string>
+    <string name="More_apps">More Apps</string>
+    <string name="Rcorded_Radio">Recorded files</string>
+    <string name="Rate_Us">Rate this app</string>
+    <string name="Choose_Emailclient">Choose an Email client :</string>
+    <string name="Settings">Settings</string>
+    <string name="Pause">Pause</string>
+    <string name="playpause">Play / Pause</string>
+    <string name="hint">Enter your default countrie</string>
+    <string name="nav_header_title">Radio FM AM</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="ad_attribution">Ad</string>
+    <string name="Statistics">Statistics</string>
+    <string name="Contact_us">Contact us</string>
+    <string name="Licences">Licences</string>
+    <string name="Disclaimer">Disclaimer</string>
+
+    <string name="Enable_Load_radio_images">Enable Load radio images</string>
+    <string name="Disable_Load_radio_images">Disable Load radio images</string>
+
+    <string name="cantadddownloedwhenrecord">You can\'t add download while recording a stream!</string>
+    <string name="cantrecordwhendownload">You can\'t record a stream while downloading!</string>
+    <string name="cantRecordArecordedStream">You can\'t record a recorded stream!</string>
+    <string name="VideoRecordNotAvailable">Video record is not available.</string>
+
+    <string name="Record_folder_empty">Record folder empty</string>
+
+    <string name="StreamInfoCopied">Stream Info Copied</string>
+
+    <string name="Please_click_BACK_again_to_exit">Please click BACK again to exit</string>
+
+    <string name="Permissionsgranted">Permissions granted</string>
+    <string name="PermissionsNotgranted">Permissions not granted</string>
+    <string name="http">http</string>
+    <string name="https">https</string>
+
+
+    <string name="interstial_tappx">pub-58728-android-5176</string> <!--pub-58728-android-5176-->
+
+
+    <string name="interstial_adUnitId">ca-app-pub-5900899997553420/5887052662</string>//real intertial
+    <string name="native_Advanced_adUnitId">ca-app-pub-5900899997553420/8708850645</string> //real native
+    <string name="Mediationadaptive_banner_adUnitId">ca-app-pub-5900899997553420/8940316671</string> //real mediation
+    <string name="adaptive_banner_adUnitId">ca-app-pub-5900899997553420/6212289636</string>//Real smart banner
+
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    ca-app-pub-5900899997553420/8708850645 //test native
+
+
+    <string name="app_describe">33</string>
+
+
+    <string name="track_selection_title">Select tracks</string>
+
+    <string name="unexpected_intent_action">Unexpected intent action: <xliff:g id="action">%1$s</xliff:g></string>
+
+    <string name="error_cleartext_not_permitted">Cleartext HTTP traffic not permitted. See https://exoplayer.dev/issues/cleartext-not-permitted</string>
+
+    <string name="error_generic">Playback failed</string>
+
+    <string name="error_drm_unsupported_before_api_18">DRM content not supported on API levels below 18</string>
+
+    <string name="error_drm_unsupported_scheme">This device does not support the required DRM scheme</string>
+
+    <string name="error_no_decoder">This device does not provide a decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+
+    <string name="error_no_secure_decoder">This device does not provide a secure decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+
+    <string name="error_querying_decoders">Unable to query device decoders</string>
+
+    <string name="error_instantiating_decoder">Unable to instantiate decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
+
+    <string name="error_unsupported_video">Media includes video tracks, but none are playable by this device</string>
+
+    <string name="error_unsupported_audio">Media includes audio tracks, but none are playable by this device</string>
+
+    <string name="storage_permission_denied">Permission to access storage was denied</string>
+
+    <string name="sample_list_load_error">One or more sample lists failed to load</string>
+
+    <string name="unsupported_ads_in_playlist">Playing without ads, as ads are not supported in playlists</string>
+
+    <string name="download_start_error">Failed to start download</string>
+
+    <string name="download_start_error_offline_license">Failed to obtain offline license</string>
+
+    <string name="download_playlist_unsupported">This demo app does not support downloading playlists</string>
+
+    <string name="download_scheme_unsupported">This demo app only supports downloading http streams</string>
+
+    <string name="download_live_unsupported">This demo app does not support downloading live content</string>
+
+    <string name="download_ads_unsupported">IMA does not support offline ads</string>
+
+    <string name="prefer_extension_decoders">Prefer extension decoders</string>
+    <string name="add">Add</string>
+    <string name="todo">TODO</string>
+
+
+    <string name="compose_shortcut_short_label1">Favorites</string>
+    <string name="compose_shortcut_long_label1">Open Favorites</string>
+    <string name="compose_disabled_message1">Favorites</string>
+
+
+    <string name="alarm_backup">Alternative Alarm</string>
+    <string name="alarm_fallback_info">System alarm adopted as selected radio station failed to load</string>
+    <string name="alarm_back_desc">Alternative system alarm adopted when the radio station fails to load</string>
+    <string name="action_alarm">Alarm</string>
+</resources>

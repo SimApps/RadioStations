@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/containermainplayer"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+
+    android:keepScreenOn="true"
+    android:paddingBottom="12dp"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="70dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+
+    <ImageView
+        android:id="@+id/RadioImVFrag"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@id/scrollvw"
+        app:layout_constraintEnd_toStartOf="@id/RadioNameImVFrag"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/radioerror" />
+
+    <TextView
+        android:id="@+id/RadioNameImVFrag"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:fontFamily="casual"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="@string/click_to_expand"
+        android:textAlignment="center"
+        android:textColor="@color/backgroundColor"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@id/radioInfotxV"
+        app:layout_constraintEnd_toStartOf="@id/likeImageView"
+        app:layout_constraintStart_toEndOf="@+id/RadioImVFrag"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/radioInfotxV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="6dp"
+        android:clickable="true"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text=""
+        android:textAlignment="center"
+        android:textColor="@color/backgroundColor"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/scrollvw"
+        app:layout_constraintEnd_toStartOf="@id/likeImageView"
+        app:layout_constraintStart_toEndOf="@id/RadioImVFrag"
+        app:layout_constraintTop_toBottomOf="@id/RadioNameImVFrag" />
+
+    <ImageView
+        android:id="@+id/likeImageView"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_like"
+        app:layout_constraintBottom_toTopOf="@id/datainfotxvw"
+        app:layout_constraintEnd_toStartOf="@+id/stop_button"
+        app:layout_constraintStart_toEndOf="@+id/RadioNameImVFrag"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/stop_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/stop_2"
+        app:layout_constraintBottom_toTopOf="@id/datainfotxvw"
+        app:layout_constraintEnd_toStartOf="@+id/pauseplay_button"
+        app:layout_constraintStart_toEndOf="@+id/likeImageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/pauseplay_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/pause_2"
+        app:layout_constraintBottom_toTopOf="@id/datainfotxvw"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/stop_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/datainfotxvw"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="3dp"
+        android:gravity="center|end"
+        app:layout_constraintBottom_toTopOf="@id/scrollvw"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/radioInfotxV"
+        app:layout_constraintTop_toBottomOf="@+id/pauseplay_button" />
+
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollvw"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="9dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/pauseplay_button_main"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/RadioImVFrag">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/frameImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/RadioImVFragBig"
+                    android:layout_width="210dp"
+                    android:layout_height="210dp"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/radioerror" />
+
+                <com.google.android.exoplayer2.ui.PlayerView
+                    android:id="@+id/video_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="225dp"
+                    app:controller_layout_id="@layout/custom_playback_control"
+                    app:show_timeout="3000" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/ads_frame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/transparents">
+
+            </FrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fav_radio_player_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/transparents"
+                android:orientation="horizontal"
+                android:visibility="invisible" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+    <!--
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/seekBar3"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_above="@id/bottonsholder"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            android:layout_toStartOf="@id/endTime"
+
+            android:layout_toEndOf="@id/StartTime"
+            android:splitTrack="false"
+            android:progressDrawable="@drawable/seekbar_style"
+            android:thumb="@drawable/custom_thumb"
+            android:thumbOffset="0dp"
+            android:visibility="invisible"
+            tools:ignore="UnusedAttribute" />
+
+    -->
+
+    <ImageButton
+        android:id="@+id/recordOffON_button"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="9dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/rec_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/likeImageView_playermain"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollvw"
+        tools:layout_conversion_absoluteHeight="35dp"
+        tools:layout_conversion_absoluteWidth="35dp" />
+
+    <ImageView
+        android:id="@+id/likeImageView_playermain"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginEnd="9dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_like"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pauseplay_button_main"
+        app:layout_constraintStart_toEndOf="@id/recordOffON_button"
+        app:layout_constraintTop_toBottomOf="@id/scrollvw"
+        tools:layout_conversion_absoluteHeight="35dp"
+        tools:layout_conversion_absoluteWidth="35dp" />
+
+    <ImageButton
+        android:id="@+id/pauseplay_button_main"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginEnd="9dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/pause_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/stop_button_main"
+        app:layout_constraintStart_toEndOf="@id/likeImageView_playermain"
+        app:layout_constraintTop_toBottomOf="@id/scrollvw"
+        tools:layout_conversion_absoluteHeight="60dp"
+        tools:layout_conversion_absoluteWidth="60dp" />
+
+    <ImageButton
+        android:id="@+id/stop_button_main"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="9dp"
+
+        android:layout_marginEnd="9dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/stop_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/more_buttons"
+        app:layout_constraintStart_toEndOf="@+id/pauseplay_button_main"
+        app:layout_constraintTop_toBottomOf="@id/scrollvw"
+        tools:layout_conversion_absoluteHeight="35dp"
+        tools:layout_conversion_absoluteWidth="35dp" />
+
+    <ImageButton
+        android:id="@+id/more_buttons"
+
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="9dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_more"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/stop_button_main"
+        app:layout_constraintTop_toBottomOf="@id/scrollvw"
+        tools:layout_conversion_absoluteHeight="35dp"
+        tools:layout_conversion_absoluteWidth="35dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,17 @@
+com/google/admob_advanced_native_recyvlerview/BuildConfig.java
+ com.google.admob_advanced_native_recyvlerview.BuildConfig
+com/google/rvadapter/AdmobNativeAdAdapter.java
+ com.google.rvadapter.AdmobNativeAdAdapter
+ com.google.rvadapter.AdmobNativeAdAdapter$1
+ com.google.rvadapter.AdmobNativeAdAdapter$2
+ com.google.rvadapter.AdmobNativeAdAdapter$AdViewHolder
+ com.google.rvadapter.AdmobNativeAdAdapter$Builder
+ com.google.rvadapter.AdmobNativeAdAdapter$Param
+com/google/nativetemplates/NativeTemplateStyle.java
+ com.google.nativetemplates.NativeTemplateStyle
+ com.google.nativetemplates.NativeTemplateStyle$Builder
+com/google/nativetemplates/TemplateView.java
+ com.google.nativetemplates.TemplateView
+com/google/rvadapter/RecyclerViewAdapterWrapper.java
+ com.google.rvadapter.RecyclerViewAdapterWrapper
+ com.google.rvadapter.RecyclerViewAdapterWrapper$1

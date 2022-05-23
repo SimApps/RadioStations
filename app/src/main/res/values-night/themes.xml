@@ -1,0 +1,173 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/dark_Primary_Backround</item>
+
+        <!-- NAV BAR. -->
+        <item name="colorPrimary">@color/dark_Primary_Backround</item>
+
+        <!-- TOOL BAR.  To CHEJ+K FOR NAV IMAGE BACKROUND -->
+        <item name="colorPrimaryDark">@color/dark_Primary_Backround</item>
+
+        <!-- nav bar text color. -->
+        <item name="android:textColorPrimary">@color/defaultcolor</item>
+
+        <!-- statut bar color. -->
+        <item name="android:colorPrimaryDark">@color/dark_Secondary_Backround</item>
+
+
+        <item name="android:textColorSecondary">@color/songTimerColor</item>
+
+        <item name="android:textColor">@color/defaultcolor</item>
+
+
+        <!-- NAV BAR. -->
+        <item name="android:navigationBarColor" >@color/darks_Search_Opened_backround</item>
+
+        <item name="android:textColorHint">@color/colorPrimaryWhite</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+    </style>
+
+
+
+    <style name="Theme.MyApplication.AdAttribution" >
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">left</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:text">@string/ad_attribution</item>
+        <item name="android:background">#FFCC66</item>
+        <item name="android:width">15dp</item>
+        <item name="android:height">15dp</item>
+    </style>
+
+    <style name="Theme.MyApplication.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- white theme. -->
+
+    <style name="whiteAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/colorPrimaryWhite</item>
+
+        <!-- NAV BAR. -->
+        <item name="colorPrimary">@color/colorPrimaryWhite</item>
+
+        <!-- TOOL BAR.  To CHEJ+K FOR NAV IMAGE BACKROUND -->
+        <item name="colorPrimaryDark">@color/colorPrimaryWhite</item>
+
+        <!-- nav bar text color. -->
+        <item name="android:textColorPrimary">@color/holo_blue_dark</item>
+
+        <!-- statut bar color. -->
+        <item name="android:colorPrimaryDark">@color/gray</item>
+
+
+        <item name="android:textColorSecondary">@color/txtGray</item>
+
+        <item name="android:textColor">@color/holo_blue_dark</item>
+
+        <!-- NAV BAR. -->
+        <item name="android:navigationBarColor" >@color/gray</item>
+        <item name="android:textColorHint">@color/darks_Search_Opened_backround</item>
+    </style>
+
+
+    <style name="whiteAppTheme.AdAttribution">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">left</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:text">@string/ad_attribution</item>
+        <item name="android:background">#FFCC66</item>
+        <item name="android:width">15dp</item>
+        <item name="android:height">15dp</item>
+    </style>
+
+    <style name="whiteAppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TrackSelectionDialogThemeOverlay" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="windowNoTitle">false</item>
+    </style>
+
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/dark_Primary_Ads_Backround</item>
+        <item name="colorControlActivated">@color/orange</item>
+    </style>
+
+
+    <style name="SCBSwitch" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">#46bdbf</item>
+
+        <!-- inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/defaultcolor</item>
+
+        <!-- inactive track color (30% transparency) -->
+        <item name="android:colorForeground">#42221f1f</item>
+
+    </style>
+
+    <style name="ThemeOverlay.Custom.Button" parent="">
+        <item name="colorPrimary">@color/orange</item>
+    </style>
+
+
+    <style name="TextInputLayoutAppearance" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlNormal">@color/primary</item>
+        <item name="colorControlActivated">@color/defaultcolor</item>
+        <item name="colorControlHighlight">@color/orange</item>
+    </style>
+
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        // Set the splash screen background, animated icon, and animation duration.
+        <item name="windowSplashScreenBackground">@color/dark_Primary_Backround</item>
+        // Use windowSplashScreenAnimatedIcon to add either a drawable or an
+        // animated drawable. One of these is required.
+        <item name="windowSplashScreenAnimatedIcon">@drawable/radioerror</item>
+        <item name="windowSplashScreenAnimationDuration">800</item>  # Required for
+        # animated icons
+
+        //set a background behind the splash screen icon. This is useful if there isn’t enough contrast between the window background and the icon
+        <item name="windowSplashScreenIconBackgroundColor">@color/defaultcolor</item>
+
+        // Set the theme of the Activity that directly follows your splash screen.
+        <item name="postSplashScreenTheme">@style/Theme.MyApplication</item>  # Required.
+    </style>
+
+    <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+    </style>
+    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="Button.Orange" parent="Theme.MyApplication">
+        <item name="colorPrimary">@color/orange</item>
+    </style>
+</resources>

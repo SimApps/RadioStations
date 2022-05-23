@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/searchVwframe"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+android:background="@android:color/transparent">
+
+
+<ImageButton
+    android:id="@+id/add_alarm_button"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:layout_alignParentTop="false"
+    android:layout_alignParentBottom="false"
+    android:layout_centerVertical="true"
+    android:layout_marginEnd="12dp"
+    android:layout_toStartOf="@id/setting_button"
+    android:background="?attr/selectableItemBackgroundBorderless"
+    android:clickable="true"
+    android:focusable="true"
+    android:src="@drawable/timeu" />
+
+<ImageView
+    android:id="@+id/setting_button"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:layout_alignParentTop="false"
+    android:layout_alignParentEnd="true"
+    android:layout_centerHorizontal="false"
+    android:layout_centerVertical="true"
+    android:layout_marginEnd="16dp"
+    android:contentDescription="@string/todo"
+    app:srcCompat="@drawable/settings" />
+
+<TextView
+    android:id="@+id/Action_bar_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_centerVertical="true"
+    android:layout_marginStart="3dp"
+    android:layout_marginTop="6dp"
+
+    android:layout_marginEnd="6dp"
+    android:layout_toStartOf="@+id/add_alarm_button"
+    android:layout_toEndOf="@+id/openclose_search_button"
+    android:gravity="center_horizontal"
+    android:text="TextView"
+    android:textAlignment="center"
+    android:textColor="#A1887F"
+    android:textSize="18sp" />
+
+
+<androidx.appcompat.widget.SearchView
+    android:id="@+id/search_input_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_centerVertical="true"
+    android:layout_marginStart="3dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginEnd="6dp"
+    android:layout_toStartOf="@+id/add_alarm_button"
+    android:layout_toEndOf="@+id/openclose_search_button"
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:hint="@string/Search"
+    android:textColorHint="@color/orange_darck"
+    app:endIconMode="clear_text"
+    app:endIconTint="@color/defaultcolor"
+    app:hintTextColor="@color/defaultcolor"
+
+    app:iconifiedByDefault="false"
+    app:queryBackground="@null"
+    app:queryHint="@string/search_hint"
+    app:showDividers="end" />
+
+<ImageView
+    android:id="@+id/openclose_search_button"
+
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentTop="false"
+    android:layout_centerVertical="true"
+    android:layout_marginStart="10dp"
+
+    android:layout_marginEnd="7dp"
+    app:srcCompat="@drawable/search" />
+</RelativeLayout>

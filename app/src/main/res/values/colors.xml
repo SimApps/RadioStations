@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#FF546d79</color>
+
+
+    <color name="colorAccent">#CAEEFF</color>
+
+    <color name="colorPrimaryWhite">#FFFFFF</color>
+    <color name="colorPrimary">#ff4081</color>
+    <color name="redish">#ffbe98</color>
+
+    <color name="violet">#e1c1ff</color>
+    <color name="primary">#C41230</color>
+    <color name="primaryDark">#9E0C24</color>
+    <color name="textPrimary">#000</color>
+    <color name="blue">#02142B</color>
+    <color name="gray">#ABABAB</color>
+    <color name="orange">#ffb067</color>
+    <color name="orange_darck">#FFC0C0</color>
+    <color name="orange_lighte">#ffefc1</color>
+
+    <color name="orange_light">#FFC0C0</color>
+    <color name="green">#67ffae</color>
+
+    <color name="violet_medium">#00C0FF</color>
+    <color name="violet_light">#40C0FF</color>
+    <color name="violet_darck">#40C0FF</color>
+
+    <color name="holo_blue_dark">#0099CC</color>
+    <color name="defaultimagecolor">#607d8b</color>
+
+    <color name="backgroundColor">#FFFFFF</color>
+    <color name="tectColor">#000000</color>
+    <color name="songTimerColor">#484848</color>
+    <color name="light_blue">#FF80D8FF</color>
+    <color name="Hillary">#a9a385</color>
+
+    <color name="light_pink">#FFEA80FC</color>
+    <color name="defaultcolor">#FF546d79</color>
+
+    <color name="txtGray">#BABABA</color>
+    <color name="txt_light">#cce2fd</color>
+
+    <color name="transparents">#00000000</color>
+    <color name="dark_Primary_Backround">#000000</color>
+    <color name="dark_Secondary_Backround">#0E0E0E </color>
+    <color name="darks_Search_Opened_backround">#0E0E0E</color>
+    <color name="darks__backround">#3e432e</color>
+
+    <color name="dialogues_Backroundlight">#F0FFFF</color>
+    <color name="dialogues_Backrounddark">#070326</color>
+
+    <color name="dark_Primary_Ads_Backround">#59a9a385</color>
+
+
+</resources>

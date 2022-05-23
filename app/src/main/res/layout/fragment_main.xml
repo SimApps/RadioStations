@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/containerfragMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparents">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/Radiomain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparents"
+        android:orientation="vertical"
+        android:paddingBottom="45dp">
+
+
+        <ImageView
+            android:id="@+id/localradiomview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:scaleType="centerCrop"
+            android:touchscreenBlocksFocus="false"
+            app:layout_constraintBottom_toTopOf="@id/view_all_fav_radio"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toStartOf="@id/btn_allcountry"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_allcountry"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:touchscreenBlocksFocus="false"
+            app:cardBackgroundColor="@color/colorAccent"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_Recoded_files"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/localradiomview"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_progress="100"
+                app:lottie_rawRes="@raw/worldmap" />
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/view_all_fav_radio"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:touchscreenBlocksFocus="false"
+            app:cardBackgroundColor="@color/orange_lighte"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_Top_Clicks"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toStartOf="@id/btn_Recoded_files"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/localradiomview">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_progress="100"
+                app:lottie_rawRes="@raw/favoritebutton" />
+
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_Recoded_files"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:touchscreenBlocksFocus="false"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_Top_Votes"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/view_all_fav_radio"
+            app:layout_constraintTop_toBottomOf="@+id/btn_allcountry">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_progress="100"
+                app:lottie_rawRes="@raw/recording" />
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_Top_Clicks"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/violet"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintBottom_toTopOf="@id/ads_frame"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toStartOf="@id/btn_Top_Votes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_all_fav_radio">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_progress="100"
+                app:lottie_rawRes="@raw/topvote" />
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_Top_Votes"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/redish"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintBottom_toTopOf="@id/ads_frame"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_Top_Clicks"
+            app:layout_constraintTop_toBottomOf="@+id/btn_Recoded_files">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_progress="50"
+                app:lottie_rawRes="@raw/topclick" />
+
+        </androidx.cardview.widget.CardView>
+
+
+        <FrameLayout
+            android:id="@+id/ads_frame"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:background="@color/transparents"
+            android:paddingTop="12dp"
+            app:layout_constraintBottom_toTopOf="@id/recentrecentlyplayedTxV"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_Top_Votes" />
+
+        <TextView
+            android:id="@+id/recentrecentlyplayedTxV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="9dp"
+            android:drawablePadding="9dp"
+            android:text="@string/recentlyplayed"
+            android:textAlignment="textStart"
+            android:textColor="@color/defaultcolor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/last_played_radio_rv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ads_frame" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/last_played_radio_rv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/transparents"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/tagsTxtVw"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recentrecentlyplayedTxV" />
+
+
+        <TextView
+            android:id="@+id/tagsTxtVw"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="9dp"
+            android:drawablePadding="9dp"
+            android:inputType="textCapWords"
+            android:text="@string/Tags"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/defaultcolor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:drawableEndCompat="@drawable/ic_right_arrow"
+            app:layout_constraintBottom_toTopOf="@id/local_popular_tags_recycle_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/last_played_radio_rv" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/local_popular_tags_recycle_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/transparents"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/ads_frames"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tagsTxtVw" />
+
+
+        <FrameLayout
+            android:id="@+id/ads_frames"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="@color/transparents"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/local_popular_tags_recycle_view" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.core.widget.NestedScrollView>
