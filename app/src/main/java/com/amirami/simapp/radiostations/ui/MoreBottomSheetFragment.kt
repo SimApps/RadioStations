@@ -1,18 +1,12 @@
 package com.amirami.simapp.radiostations.ui
 
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.ComponentName
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,8 +15,6 @@ import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
-import com.amirami.simapp.radiostations.alarm.BootCompleteReceiver
-import com.amirami.simapp.radiostations.alarm.Utils
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentMoreBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
@@ -34,8 +26,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
-import java.text.SimpleDateFormat
-import java.util.*
 
 @AndroidEntryPoint
 class MoreBottomSheetFragment : BottomSheetDialogFragment() {
@@ -131,7 +121,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                         }
                     }
 
-                    RadioFunction.open_record_folder(requireContext())
+                    RadioFunction.openRecordFolder(requireContext())
 
                 }
             }

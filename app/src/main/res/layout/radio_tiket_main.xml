@@ -21,8 +21,7 @@
         app:layout_constraintEnd_toStartOf="@id/mainTxVw"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/radioerror"
-        tools:context="com.appsdeveloperblog.kotlinexample4.LoadGifFromURLUsingGlide" />
+        app:srcCompat="@drawable/radioerror" />
 
 
     <TextView

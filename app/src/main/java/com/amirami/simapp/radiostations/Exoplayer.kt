@@ -24,7 +24,6 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.icybackup
 import com.amirami.simapp.radiostations.MainActivity.Companion.video_on
 import com.amirami.simapp.radiostations.Exoplayer.Observer.Companion.changeImagePlayPause
-import com.amirami.simapp.radiostations.MainActivity.Companion.ff
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector

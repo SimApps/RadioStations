@@ -15,7 +15,6 @@
     <string name="cancel_alarm">Cancel Current Alarm</string>
     <string name="Set_Alarm_at">Set Alarm at :</string>
 
-
     <string name="Deleted_All">Favorite Radio deleted</string>
     <string name="Cant_beEmpty">Field can\'t be empty!</string>
     <string name="Radio_is_off">Radio is off. You can\'t set timer!</string>

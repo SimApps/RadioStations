@@ -84,8 +84,11 @@ class RadioRoomViewModel  @Inject constructor(
 
     fun upsertRadio(item : RadioRoom, msg:String) {
         Coroutines.io(this@RadioRoomViewModel) {
-            sholistRoomBaseRepository.upsert(ConvertRadioClass.toEntity(item))
-            tasksEventChannel.send(ShopListEvents.ProdAddToShopMsg(msg))
+            if(item.name!=""){//prevent add alarm played station
+                sholistRoomBaseRepository.upsert(ConvertRadioClass.toEntity(item))
+                tasksEventChannel.send(ShopListEvents.ProdAddToShopMsg(msg))
+            }
+
         }
     }
 

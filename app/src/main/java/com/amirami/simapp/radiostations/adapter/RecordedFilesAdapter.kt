@@ -87,25 +87,25 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
                 ExpandImageView.setImageResource(R.drawable.delete)
                //  RadioFunction.loadImageInt(R.drawable.delete, imagedefaulterrorurl, ExpandImageView)
 
+                if (recordInfo.name.contains("_ _",true)){
+                    if(mainTxVw.text.isNotEmpty()){
+
+                        mainTxVw.text = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
+
+                    }
+                    if(descriptionTxVw.text.isNotEmpty()){
+                        descriptionTxVw.text = RadioFunction.shortformateDate(
+                            RadioFunction.removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _", true)[0] + 3, recordInfo.name.length), ".mp3")
+                        )//s.name.substring(s.name.indexesOf("_ _", true)[0] + 2, s.name.length)
 
 
-                if(mainTxVw.text.isNotEmpty()){
-                    mainTxVw.text = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
+                    }
                 }
-                if(descriptionTxVw.text.isNotEmpty()){
-                    descriptionTxVw.text = RadioFunction.shortformateDate(
-                        RadioFunction.removeWord(
-                            recordInfo.name.substring(
-                                recordInfo.name.indexesOf(
-                                    "_ _",
-                                    true
-                                )[0] + 3, recordInfo.name.length
-                            ), ".mp3"
-                        )
-                    )//s.name.substring(s.name.indexesOf("_ _", true)[0] + 2, s.name.length)
-
-
+                else {
+                    mainTxVw.text = recordInfo.name
+                    descriptionTxVw.text =""
                 }
+
 
 
                 //  faviconImageView.setImageResource(R.drawable.recordings)

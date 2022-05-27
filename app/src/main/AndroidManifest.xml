@@ -6,6 +6,7 @@
 
     <dist:module dist:instant="true" />
 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -147,7 +148,7 @@
             </intent-filter>
         </receiver>
 
-
+        <!-- AdActivity from Google Play Services, needed by Tappx -->
         <receiver
             android:enabled="true"
             android:exported="false"

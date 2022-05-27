@@ -29,10 +29,11 @@
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="false"
-            android:scaleType="centerCrop"
             android:touchscreenBlocksFocus="false"
             app:layout_constraintBottom_toTopOf="@id/view_all_fav_radio"
             app:layout_constraintDimensionRatio="2:1"
+            android:scaleType="centerCrop"
+
             app:layout_constraintEnd_toStartOf="@id/btn_allcountry"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"

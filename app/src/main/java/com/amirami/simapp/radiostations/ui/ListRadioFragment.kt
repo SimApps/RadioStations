@@ -1,7 +1,11 @@
 package com.amirami.simapp.radiostations.ui
 
+import android.Manifest
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -13,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
-import com.amirami.simapp.radiostations.MainActivity.Companion.REQUEST_CODE_PERMISSIONS
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
@@ -139,27 +142,24 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
 
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (RadioFunction.allPermissionsGranted(requireContext())) {
+    private val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                if (it.value) {
+                    setUpRecord()
 
-                if("https" in GlobalRadiourl) RadioFunction.getCutomDownloader(requireContext(), GlobalRadioName, GlobalRadiourl)
-                else RadioFunction.getCutomDownloader(requireContext(), GlobalRadioName, GlobalRadiourl.replace(Regex(resources.getString(R.string.http)), resources.getString(R.string.https)))
+                    } else {
+                        DynamicToast.makeError(
+                            requireContext(),
+                            getString(R.string.PermissionsNotgranted),
+                            9
+                        ).show()
+                        MainActivity.customdownloader?.cancelDownload()
+                    }
 
-                MainActivity.customdownloader?.download()
-                DynamicToast.makeSuccess(requireContext(), getString(R.string.Permissionsgranted), 9).show()
-
-            }
-            else {
-                DynamicToast.makeError(requireContext(), getString(R.string.PermissionsNotgranted), 9).show()
-                MainActivity.customdownloader?.cancelDownload()
             }
         }
-    }
+
 
     private fun setUpRv() {
         if(argsFrom.msg==getString(R.string.countries)){
@@ -193,10 +193,7 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
 
                 }
             }
-            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
 
-
-            }
         }
         else {
             viewLifecycleOwner.lifecycleScope.launch {
@@ -286,22 +283,34 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
     }
 
     override fun onRecItemClick(recordInfo: RecordInfo) {
-        //  GlobalRadioName = s.name.substring(0, s.name.indexesOf("_ _", true)[0])
-        GlobalRadiourl = recordInfo.uri.toString()
-        Exoplayer.initializePlayerRecodedradio(requireContext())
 
-        val radioVariables=RadioVariables ()
+            GlobalRadiourl = recordInfo.uri.toString()
+            Exoplayer.initializePlayerRecodedradio(requireContext())
 
-        radioVariables.name=recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
-        radioVariables.url_resolved= recordInfo.uri.toString()
+            val radioVariables=RadioVariables ()
 
-        icyandState= shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _",
-                        true)[0] + 3, recordInfo.name.length), ".mp3"))
+        if (recordInfo.name.contains("_ _",true)){
+            radioVariables.name=recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
+            radioVariables.url_resolved= recordInfo.uri.toString()
 
-        // DynamicToast.makeSuccess(requireContext(), "refresh frag PLAYER", 9).show()
-        Exoplayer.startPlayer()
+            icyandState= shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _",
+                true)[0] + 3, recordInfo.name.length), ".mp3"))
+        }
+        else {
+            radioVariables.name=recordInfo.name
+            radioVariables.url_resolved= recordInfo.uri.toString()
 
-        infoViewModel.putRadiopalyerInfo(radioVariables)
+            icyandState= ""
+        }
+
+
+            // DynamicToast.makeSuccess(requireContext(), "refresh frag PLAYER", 9).show()
+            Exoplayer.startPlayer()
+
+            infoViewModel.putRadiopalyerInfo(radioVariables)
+
+
+
     }
 
     override fun onRecMoreItemClick(recordInfo: RecordInfo, position:Int) {
@@ -310,15 +319,19 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
     }
 
     private fun setUpRecord(){
-        if(getRecordedFiles(requireContext()).size==0) {
-            binding.listViewCountriesLiradio.visibility = View.GONE
-            binding.whenemptyrecordImage.visibility = View.VISIBLE
+        if (RadioFunction.allPermissionsGranted(requireContext())){
+            if(getRecordedFiles(requireContext()).size==0) {
+                binding.listViewCountriesLiradio.visibility = View.GONE
+                binding.whenemptyrecordImage.visibility = View.VISIBLE
+            }
+            else{
+                setupRecordedFilesRV()
+                recordedFilesAdapter.setItems(getRecordedFiles(requireContext()))
+                binding.whenemptyrecordImage.visibility = View.GONE
+                binding.listViewCountriesLiradio.visibility = View.VISIBLE
+            }
         }
-        else{
-            setupRecordedFilesRV()
-            recordedFilesAdapter.setItems(getRecordedFiles(requireContext()))
-            binding.whenemptyrecordImage.visibility = View.GONE
-            binding.listViewCountriesLiradio.visibility = View.VISIBLE
-        }
+        else requestMultiplePermissions.launch(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE))
     }
 }

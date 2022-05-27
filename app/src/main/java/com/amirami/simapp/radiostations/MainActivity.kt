@@ -1,6 +1,8 @@
 package com.amirami.simapp.radiostations
 
 import alirezat775.lib.downloader.Downloader
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
@@ -10,12 +12,12 @@ import android.util.DisplayMetrics
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -24,6 +26,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.amirami.simapp.radiostations.RadioFunction.allPermissionsGranted
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.startServices
@@ -296,7 +299,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                                     firstTimeopenRecordfolder
                                 )
                             }
-                            RadioFunction.open_record_folder(this@MainActivity)
+                            RadioFunction.openRecordFolder(this@MainActivity)
 
 
                         }
@@ -456,11 +459,11 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     }
 
                     binding.radioplayer.pauseplayButton.setOnClickListener {
-                        DynamicToast.makeError(
+                       /* DynamicToast.makeError(
                             this@MainActivity,
                             ff+GlobalstateString + Exoplayer.playWhenReady.toString(),
                             3
-                        ).show()
+                        ).show()*/
                          if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED" /*&& GlobalRadiourl!=""*/) {
 
                             Exoplayer.startPlayer()
@@ -526,8 +529,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                             if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
 
                                 if (!isDownloadingCustomurl) {
+                                    if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
+                                    else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
 
-                                    RadioFunction.getDownloader(this@MainActivity)
 
                                     downloader?.download()
 
@@ -671,19 +675,15 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         var time = true
 
         var mInterstitialAd: InterstitialAd? = null
-        const val REQUEST_CODE_PERMISSIONS = 101
-        val REQUIRED_PERMISSIONS = arrayOf(
-            "android.permission.WRITE_EXTERNAL_STORAGE",
-            "android.permission.READ_EXTERNAL_STORAGE"
-        )
+
 
         var isDownloadingCustomurl = false
         var repeat_tryconnect_server = -1
         var server_arraylist = arrayOf(
             "http://91.132.145.114",
-            "http://45.77.62.161",
-            "http://95.179.139.106",
-            "http://all.api.radio-browser.info"
+            "http://89.58.16.19",
+            "http://95.179.139.106"//,
+          //  "http://all.api.radio-browser.info"
         )
         var downloader: Downloader? = null
         var customdownloader: Downloader? = null
@@ -692,20 +692,15 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         var BASE_URL = "http://91.132.145.114"
 
-        //var jsonCall: Call<List<RadioVariables>>? = null
-
 
         var GlobalRadioName = ""
         var GlobalRadiourl = ""
-
-
-        const val argVideoPosition = "VideoActivity.POSITION"
 
         var video_on = false
 
         var GlobalImage = ""
         var GlobalstateString = ""
-var ff=""
+
         const val tag = "MainActivity"
 
         var defaultCountry = ""
@@ -724,20 +719,6 @@ var ff=""
     }
 
 
-    private fun loadBanner() {
-        adViewAdaptiveBanner.adUnitId = resources.getString(R.string.adaptive_banner_adUnitId)
-
-        adViewAdaptiveBanner.adSize = adSize
-        // Create an ad request. Check your logcat output for the hashed device ID to
-        // get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this device."
-        val adRequest = AdRequest
-            .Builder()
-            // .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-            .build()
-        // Start loading the ad in the background.
-        adViewAdaptiveBanner.loadAd(adRequest)
-    }
 
 
     public override fun onResume() {
@@ -822,37 +803,37 @@ var ff=""
     }
 */
 
+    val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                if (it.value) {
+                    RadioFunction.getDownloader(this@MainActivity)
+                    downloader?.download()
+                    DynamicToast.makeSuccess(
+                        this@MainActivity,
+                        getString(R.string.Permissionsgranted),
+                        3
+                    ).show()
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (RadioFunction.allPermissionsGranted(this@MainActivity)) {
-                RadioFunction.getDownloader(this@MainActivity)
-                downloader?.download()
-                DynamicToast.makeSuccess(
-                    this@MainActivity,
-                    getString(R.string.Permissionsgranted),
-                    3
-                ).show()
 
-            } else {
-                DynamicToast.makeError(
-                    this@MainActivity,
-                    getString(R.string.PermissionsNotgranted),
-                    3
-                ).show()
-                downloader?.cancelDownload()
+                    }
+
+                    else {
+                        DynamicToast.makeError(
+                            this,
+                            getString(R.string.PermissionsNotgranted),
+                            9
+                        ).show()
+                        MainActivity.customdownloader?.cancelDownload()
+                    }
 
             }
         }
-    }
 
 
-    fun subsucribers() {
+
+
+    private fun subsucribers() {
         Exoplayer.Observer.subscribe("text view", binding.radioplayer.radioInfotxV)
 
 
@@ -1115,16 +1096,20 @@ var ff=""
     }
 
     private fun loadBannerAD() {
-        // Initialize the Mobile Ads SDK.
-        MobileAds.initialize(this@MainActivity) { }
+
+// Step 1: Create an inline adaptive banner ad size using the activity context.
+   //     val adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 320)
+
+// Step 2: Create banner using activity context and set the inline ad size and
+// ad unit ID.
         adViewAdaptiveBanner = AdView(this@MainActivity)
         binding.adAdaptivebannerMain.addView(adViewAdaptiveBanner)
-        loadBanner()
+        adViewAdaptiveBanner.adUnitId = resources.getString(R.string.adaptive_banner_adUnitId)
+        adViewAdaptiveBanner.setAdSize(adSize)
 
-
-        //  set layout height begin
-        scale = this@MainActivity.resources.displayMetrics.density
-        //  set layout height end
+// Step 3: Load an ad.
+        val adRequest = AdRequest.Builder().build()
+        adViewAdaptiveBanner.loadAd(adRequest)
     }
 
 
@@ -1268,7 +1253,7 @@ var ff=""
     }
 
 
-    fun getPref() {
+    private  fun getPref() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 darkTheme = preferencesViewModel.preferencesFlow.first().dark_theme

@@ -1,9 +1,11 @@
 package com.amirami.simapp.radiostations.ui
 
+import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +20,7 @@ import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -105,90 +108,122 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 else if (binding.RadioNameTXviewadd.text.toString().isNotEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isNotEmpty() && binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
-                        binding.RadioBitrateTXviewadd.text.toString()
-                    )
-                )  {
-
-                    binding.RadioBitrateTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                        binding.RadioBitrateTXviewadd.text.toString()))  {
                     binding.RadioBitrateTXviewadd.text?.clear()
-                    binding.RadioBitrateTXviewadd.hint = getString(R.string.enternumber)
+                    binding.RadioBitrateTXviewaddLayout.error = getString(R.string.enternumber)
 
                 }
                 else if(binding.RadioNameTXviewadd.text.toString().isEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()){
-                    binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
-                    binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioNameTXviewaddLayout.error  = getString(R.string.Cant_beEmpty)
+                    binding.RadioStreamlinkTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
                 }
 
                 else if(binding.RadioNameTXviewadd.text.toString().isEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isEmpty() && binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
-                        binding.RadioBitrateTXviewadd.text.toString()
-                    )
-                ){
-                    binding.RadioBitrateTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                        binding.RadioBitrateTXviewadd.text.toString())){
                     binding.RadioBitrateTXviewadd.text?.clear()
-                    binding.RadioBitrateTXviewadd.hint = getString(R.string.enternumber)
+                    binding.RadioBitrateTXviewaddLayout.error = getString(R.string.enternumber)
 
-                    binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
-                    binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioNameTXviewaddLayout.error  = getString(R.string.Cant_beEmpty)
+                    binding.RadioStreamlinkTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
                 }
 
                 else if (binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
                         binding.RadioBitrateTXviewadd.text.toString()
                     ) &&binding.RadioNameTXviewadd.text.toString().isEmpty() ) {
-                    binding.RadioBitrateTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
                     binding.RadioBitrateTXviewadd.text?.clear()
-                    binding.RadioBitrateTXviewadd.hint = getString(R.string.enternumber)
-                    binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioBitrateTXviewaddLayout.error = getString(R.string.enternumber)
+                    binding.RadioNameTXviewaddLayout.error  = getString(R.string.Cant_beEmpty)
                 }
 
                 else if ( binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
                         binding.RadioBitrateTXviewadd.text.toString()
                     ) && binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()){
-                    binding.RadioBitrateTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioBitrateTXviewaddLayout.error = getString(R.string.enternumber)
                     binding.RadioBitrateTXviewadd.text?.clear()
-                    binding.RadioBitrateTXviewadd.hint = getString(R.string.enternumber)
-                    binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioStreamlinkTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
                 }
                 else if(binding.RadioNameTXviewadd.text.toString().isEmpty()){
-                    binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioNameTXviewaddLayout.error  = getString(R.string.Cant_beEmpty)
                 }
                 else if(binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()){
-                    binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioStreamlinkTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
                 }
             }
 
             // download
             else {
-                binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#00000000"))
-                binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#00000000"))
+                binding.RadioNameTXviewaddLayout.error=null
+                binding.RadioStreamlinkTXviewaddLayout.error=null
                 if(binding.RadioNameTXviewadd.text.toString().isEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()) {
-                    binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
-
-                    binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioNameTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
+                    binding.RadioStreamlinkTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
                 }
                 else if(binding.RadioNameTXviewadd.text.toString().isEmpty()){
-                    binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioNameTXviewaddLayout.error  = getString(R.string.Cant_beEmpty)
                 }
                 else if(binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()){
-                    binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#C41230"))
+                    binding.RadioStreamlinkTXviewaddLayout.error= getString(R.string.Cant_beEmpty)
                 }
                 else if(binding.RadioNameTXviewadd.text.toString().isNotEmpty() && binding.RadioStreamlinkTXviewadd.toString().isNotEmpty()){
-                    //  customurltodownload= StreamURLTXview.text.toString()
-                    if("https" in binding.RadioStreamlinkTXviewadd.text.toString()){
-                        RadioFunction.getCutomDownloader(requireActivity(), binding.RadioNameTXviewadd.text.toString(), binding.RadioStreamlinkTXviewadd.text.toString())
-                    }
-                    else{
-                        RadioFunction.getCutomDownloader(requireActivity(), binding.RadioNameTXviewadd.text.toString(), binding.RadioStreamlinkTXviewadd.text.toString().replace(Regex("http"), "https"))
-                    }
-                    MainActivity.customdownloader?.download()
+                    if (RadioFunction.allPermissionsGranted(requireContext())){
+                        //  customurltodownload= StreamURLTXview.text.toString()
+                        if("https" in binding.RadioStreamlinkTXviewadd.text.toString()){
+                            RadioFunction.getCutomDownloader(requireActivity(), binding.RadioNameTXviewadd.text.toString(), binding.RadioStreamlinkTXviewadd.text.toString())
+                        }
+                        else{
+                            RadioFunction.getCutomDownloader(requireActivity(), binding.RadioNameTXviewadd.text.toString(), binding.RadioStreamlinkTXviewadd.text.toString().replace(Regex("http"), "https"))
+                        }
+                        MainActivity.customdownloader?.download()
 
-                   dismiss()
-                    RadioFunction.interatial_ads_show(requireContext())
+                        dismiss()
+                        RadioFunction.interatial_ads_show(requireContext())
+                    }
+                    else requestMultiplePermissions.launch(arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE))
+
 
                 }
             }
         }
     }
+    private val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                if (it.value) {
 
+                    if ("https" in MainActivity.GlobalRadiourl) RadioFunction.getCutomDownloader(
+                        requireContext(),
+                        MainActivity.GlobalRadioName,
+                        MainActivity.GlobalRadiourl
+                    )
+                    else RadioFunction.getCutomDownloader(
+                        requireContext(),
+                        MainActivity.GlobalRadioName,
+                        MainActivity.GlobalRadiourl.replace(
+                            Regex(resources.getString(R.string.http)),
+                            resources.getString(R.string.https)
+                        )
+                    )
+
+                    MainActivity.customdownloader?.download()
+                    DynamicToast.makeSuccess(
+                        requireContext(),
+                        getString(R.string.Permissionsgranted),
+                        9
+                    ).show()
+
+                } else {
+                    DynamicToast.makeError(
+                        requireContext(),
+                        getString(R.string.PermissionsNotgranted),
+                        9
+                    ).show()
+                    MainActivity.customdownloader?.cancelDownload()
+                }
+
+            }
+        }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding=null

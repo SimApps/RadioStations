@@ -3,12 +3,11 @@ package com.amirami.simapp.radiostations
 
 import alirezat775.lib.downloader.Downloader
 import alirezat775.lib.downloader.core.OnDownloadListener
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.SearchManager
 import android.content.*
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -19,7 +18,10 @@ import android.graphics.drawable.TransitionDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import android.os.Environment
+import android.os.Environment.*
 import android.os.SystemClock
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -28,9 +30,9 @@ import androidx.annotation.NonNull
 import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.*
 import androidx.core.graphics.toColorInt
 import androidx.core.widget.NestedScrollView
@@ -43,11 +45,8 @@ import coil.request.CachePolicy
 import coil.size.Scale
 import coil.transform.RoundedCornersTransformation
 import com.amirami.simapp.radiostations.Exoplayer.player
-import com.amirami.simapp.radiostations.MainActivity.Companion.BASE_URL
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
-import com.amirami.simapp.radiostations.MainActivity.Companion.REQUEST_CODE_PERMISSIONS
-import com.amirami.simapp.radiostations.MainActivity.Companion.REQUIRED_PERMISSIONS
 import com.amirami.simapp.radiostations.MainActivity.Companion.color1
 import com.amirami.simapp.radiostations.MainActivity.Companion.color2
 import com.amirami.simapp.radiostations.MainActivity.Companion.color3
@@ -60,9 +59,8 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.handlers
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
-import com.amirami.simapp.radiostations.MainActivity.Companion.repeat_tryconnect_server
-import com.amirami.simapp.radiostations.MainActivity.Companion.server_arraylist
 import com.amirami.simapp.radiostations.model.RecordInfo
+import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -80,27 +78,6 @@ import java.util.*
 
 
 object RadioFunction {
-
-
-
-
-
-
-
-
-    //Reload activity
-    fun recreateActivityCompat(a: Activity) {
-        val intent = a.intent
-        intent.addFlags((Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION))
-        a.overridePendingTransition(0, 0)
-        a.finish()
-        a.overridePendingTransition(0, 0)
-        a.startActivity(intent)
-    }
-
-
-
-
     fun shareRadio(context: Context, radioName: String, radioHomepage: String, radioStreamURL: String, radioCountry: String, radioLanguage: String, radioBitrate: String) {
         if(radioName!=""){
             if (Exoplayer.is_playing_recorded_file) {
@@ -151,14 +128,6 @@ object RadioFunction {
 
 
 
-
-
-
-
-
-
-
-
     fun startServices(context: Context) {
         try {
             if(player!=null){
@@ -196,14 +165,6 @@ object RadioFunction {
         return scontext as Activity
     }
 
-
-    fun queryText(context: Context, clazz: Class<*>) {
-
-        val intent = Intent(context, clazz)
-
-        context.startActivity(intent)
-
-    }
 
     fun countryCodeToName(GlobalCountriesJsons: String?):String{
         return when (GlobalCountriesJsons) {
@@ -467,23 +428,20 @@ object RadioFunction {
 
     }
 
-    fun isNumber(s: String?): Boolean {
-        return if (s.isNullOrEmpty()) false else s.all { Character.isDigit(it) }
-    }
-
-
-
-
+    fun isNumber(s: String?): Boolean = if (s.isNullOrEmpty()) false else s.all { Character.isDigit(it) }
 
 
     fun getDownloader(context: Context) {
 
-        if (allPermissionsGranted(context)) {
-          //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
-          //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
 
             var recordFileName= GlobalRadioName + "_ _" + icyandState + " " +  System.currentTimeMillis()
             recordFileName=recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
+
+
+          //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
+          //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
+
+
 
 
             downloader = Downloader.Builder(context, GlobalRadiourl).downloadListener(object : OnDownloadListener {
@@ -602,14 +560,7 @@ object RadioFunction {
             build()
 
 
-        }
-        else {
-            ActivityCompat.requestPermissions(
-                context as Activity,
-                REQUIRED_PERMISSIONS,
-                REQUEST_CODE_PERMISSIONS
-            )
-        }
+
 
 
 
@@ -618,7 +569,6 @@ object RadioFunction {
 
     fun getCutomDownloader(context: Context, nameRecord:String, url:String) {
 
-        if (allPermissionsGranted(context)) {
           //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
             // var recordFileName= nameRecord+ "_ _"  + sdfDate.format(Date())
 
@@ -759,17 +709,7 @@ object RadioFunction {
             }).fileName(recordFileName,"" ).downloadDirectory(getDownloadDir(context).toString()).
 
             build()
-        }
-        else {
 
-            GlobalRadioName=nameRecord
-            GlobalRadiourl=url
-            ActivityCompat.requestPermissions(
-                context as Activity,
-                REQUIRED_PERMISSIONS,
-                REQUEST_CODE_PERMISSIONS
-            )
-        }
 
 
 
@@ -836,62 +776,20 @@ object RadioFunction {
         )
     }
 
-    /*
-    fun extentionchooser():String{
-        return if (isDownloadingCustomurl){ ""
-        }else {
-            "mp3"
-        }
-    }
-
-    fun urlchooser():String{
-        return if (isDownloadingCustomurl){
-            customurltodownload
-        }else {
-
-            GlobalRadiourl
-        }
-    }*/
-
-    fun deleteAllRecordedItem(context: Context) {
-        val downloadContentDirectory =getDownloadDir(context)
-
-        try {
-            deleteAllFileAndContents(downloadContentDirectory,context)
-            recreateActivityCompat(unwrap(context))
-
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun deleteRecordedItem( index: Int,  context: Context) {
-
-        //TARGET FOLDER
-        //val downloadContentDirectory = context.getExternalFilesDir(null)
-
-        val downloadContentDirectory =getDownloadDir(context) // context.filesDir
 
 
-        val files = downloadContentDirectory.listFiles()!!
-
-
-        val file = files[index]
-
-        //   val myfile = File(Uri.fromFile(file).toString())//File(recordingUri)
-        //  file.delete()
+    fun deleteRecordedItem(index: Int,  context: Context) {
+        val file = getDownloadDir(context).listFiles()!![index]
 
         try {
             deleteAllFileAndContents(file,context)
-         //   recreateActivityCompat(unwrap(context))
-
 
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
     }
 
-    fun deleteAllFileAndContents(@NonNull file: File, context: Context) {
+    private fun deleteAllFileAndContents(@NonNull file: File, context: Context) {
         if (file.exists()) {
 
             if (file.isDirectory) {
@@ -917,21 +815,22 @@ object RadioFunction {
         } ?: emptyList()
     }
 
-    fun allPermissionsGranted(context: Context): Boolean {
-        for (permission in REQUIRED_PERMISSIONS) {
-            if (checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false
-            }
+
+
+    fun allPermissionsGranted(context: Context):Boolean {
+        if ((checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) &&
+            (checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED))
+        {
+            // Permission is not granted
+            return false
         }
         return true
     }
 
-    fun open_record_folder(context: Context){
+    fun openRecordFolder(context: Context){
 
 
         if (getDownloadDir(context).exists()) {
-
-
 
             // val intent = Intent(Intent.ACTION_GET_CONTENT)
             val intent = Intent(Intent.ACTION_VIEW)
@@ -965,32 +864,74 @@ object RadioFunction {
         }
     }
 
-    fun getDownloadDir(context: Context):File{
+    private fun getDownloadDir(context: Context):File{
 
-        //   return  context.filesDir
-        return    getExternalFilesDirs(context, /*DIRECTORY_DOWNLOADS*/null)[0]
+// Find all audio files on the primary external storage device.
+        val audioCollection =
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+             else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+
+
+        //  val f = File(context.externalCacheDir!!.absolutePath, "/RadioStation_Download")
+     //   val f = File(context.applicationContext.getExternalFilesDir(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString()/*+"/RadioStation_Download"*/)!!/*.absolutePath*/, "/RadioStation_Download")
+      //  val f = File(Environment.getExternalStorageDirectory().toString() + "/RadioStation_Download")
+        // File(context.getExternalFilesDir(DIRECTORY_DOWNLOADS).toString() + File.separator + "RadioStation")
+        //  File(getExternalStorageDirectory(DIRECTORY_DOWNLOADS).toString() + File.separator + "RadioStation")
+        // File(getStorageDirectory().toString() +File.separator  + "RadioStation")
+
+        //File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString() +File.separator  + "RadioStation")
+        // File(context/*.applicationContext*/.getExternalFilesDir(Environment.DIRECTORY_MUSIC.toString()/*+"/RadioStation_Download"*/)!!.absolutePath, "/RadioStation")
+
+
+        val f =     File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString() +File.separator  + "RadioStation")
+
+        return if (f.isDirectory) {
+            f// getExternalFilesDirs(context, /*DIRECTORY_DOWNLOADS*/null)[0]
+        } else {
+
+            // create a File object for the parent directory
+            // val wallpaperDirectory = File("/sdcard/RadioStation_Download/")
+            // have the object build the directory structure, if needed.
+            f.mkdirs()
+            f
+            // create a File object for the output file
+            // val outputFile = File(wallpaperDirectory, filename)
+            // now attach the OutputStream to the file object, instead of a String representation
+            //   val fos = FileOutputStream(outputFile)
+        }        //   return  context.filesDir
+      // return    getExternalFilesDirs(context, /*DIRECTORY_DOWNLOADS*/null)[0]
+
     }
 
     fun getRecordedFiles(context: Context): ArrayList<RecordInfo> {
         val RcordInfo = ArrayList<RecordInfo>()
-        //TARGET FOLDER
-        var s: RecordInfo
-        if (getDownloadDir(context).exists()) {
-            //GET ALL FILES IN DOWNLOAD FOLDER
-            val files = getDownloadDir(context).listFiles()
-            //LOOP THRU THOSE FILES GETTING NAME AND URI
-            for (i in files!!.indices) {
-                val file = files[i]
-                s = RecordInfo()
-                s.name = file.name
-                s.uri = Uri.fromFile(file)
-                RcordInfo.add(s)
+            //TARGET FOLDER
+            var s: RecordInfo
+            if (getDownloadDir(context).exists()) {
+                //GET ALL FILES IN DOWNLOAD FOLDER
+                val files = getDownloadDir(context).listFiles()
+                if (files != null) {
+                    if(files.isNotEmpty()){
+                        //LOOP THRU THOSE FILES GETTING NAME AND URI
+                        for (i in files!!.indices) {
+                            val file = files[i]
+                            s = RecordInfo()
+                            s.name = file.name
+                            s.uri = Uri.fromFile(file)
+                            RcordInfo.add(s)
+                        }
+                    }
+                }
+
+                //  DynamicToast.makeSuccess(context, getDownloadDir(context).toString(), 9).show()
             }
-            //  DynamicToast.makeSuccess(this@Activity_List_Radio, "found", 3).show()
-        }
-        else{
-            DynamicToast.makeError(context, "not found", 3).show()
-        }
+            else{
+                DynamicToast.makeError(context, "not found", 3).show()
+            }
+
+
+
         return RcordInfo
     }
     fun interatial_ads_load(context: Context){
@@ -1051,7 +992,7 @@ object RadioFunction {
 
     fun loadImageString(context: Context,mainiconSting: String, erroricon: Int, imageview: ImageView){
 
-        if(!MainActivity.saveData){
+        if(!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)){
             val imageLoader = ImageLoader.Builder(context)
                 .componentRegistry {
                     // video-support
@@ -1065,7 +1006,7 @@ object RadioFunction {
                 //  .logger(DebugLogger(Log.VERBOSE))
                 .build()
 
-            Coil.setImageLoader(imageLoader)
+           // Coil.setImageLoader(imageLoader)
 
             imageview.load(mainiconSting,imageLoader) {
                 // crossfade(true)
@@ -1082,10 +1023,6 @@ object RadioFunction {
                 //  transformations(BlurTransformation(applicationContext, 5f))
             }
         }
-
-
-
-
     }
 
     fun loadImageInt(mainiconSting: Int, erroricon: Int, imageview: ImageView){
@@ -1697,7 +1634,7 @@ object RadioFunction {
 
 
             if(adView.headlineView!=null){
-                    RadioFunction.nativeadstexViewColor(
+                    nativeadstexViewColor(
                         adView.headlineView as TextView,
                         adView.advertiserView as TextView,
                         adView.bodyView as TextView,
@@ -1985,7 +1922,7 @@ object RadioFunction {
 
 
 
-
+/*
     fun OnfailiurejsonCall(context: Context){
 
         if (repeat_tryconnect_server < server_arraylist.size - 1) {
@@ -2011,7 +1948,7 @@ object RadioFunction {
              BASE_URL = "de1.api.radio-browser.info"*/
         }
     }
-
+*/
 }
 
 

@@ -14,11 +14,14 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.wifi.WifiManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.Exoplayer.notificationManager
-import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
+import androidx.core.content.ContextCompat.getSystemService
+import com.amirami.simapp.radiostations.Exoplayer
+import com.amirami.simapp.radiostations.MainActivity
+import com.amirami.simapp.radiostations.R
+
 
 class AlarmReceiver : BroadcastReceiver() {
     private val backupnotifname = "backup-01"
@@ -30,7 +33,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val am = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Exoplayer.isOreoPlus()) {
 
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -45,7 +48,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         fun handleSTOP() {
             Exoplayer.releaseAlarmPlayer()
-            am.cancel(id)
+         //   am.cancel(id)
         }
 
         when (intent?.action) {
@@ -65,8 +68,12 @@ class AlarmReceiver : BroadcastReceiver() {
 
             Exoplayer.startPlayer()
         }
-        else PlaySystemAlarm(context)
-
+        else{
+            PlaySystemAlarm(context)
+        }
+       /* Enable wifi
+       val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+        wifi!!.isWifiEnabled = true*/
         androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
             .putString("radioURL", "Empty").apply()
