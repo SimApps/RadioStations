@@ -5,6 +5,8 @@
       <map>
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable-hdpi/ic_left_arrow.xml" value="0.1395" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable-mdpi/ic_expand.xml" value="0.206640625" />
+        <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable-v21/ic_signin.xml" value="0.141" />
+        <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable-v21/ic_signout.xml" value="0.141" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable-v24/branded_logo.xml" value="0.1395" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/ad_btn.xml" value="0.1405" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/border_shadow.xml" value="0.2375" />
@@ -32,6 +34,7 @@
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/ic_right_arrow.xml" value="0.2375" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/ic_shop.xml" value="0.2175" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/ic_stats.xml" value="0.129" />
+        <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/ic_sync.xml" value="0.1385" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/ic_thumb_up.xml" value="0.1405" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/indeterminate_progress.xml" value="0.2375" />
         <entry key="..\:/Users/LENOVO/Desktop/CS/MVVM Apps/RadioStations/app/src/main/res/drawable/info.xml" value="0.206640625" />

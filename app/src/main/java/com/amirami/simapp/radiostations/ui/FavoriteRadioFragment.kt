@@ -15,13 +15,18 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.Exoplayer.initializePlayer
 import com.amirami.simapp.radiostations.Exoplayer.startPlayer
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction.getuserid
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentFavoriteBinding
+import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.Status
+import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
+import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -33,9 +38,12 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
     //  private var currentNativeAdFavori:  NativeAd? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
+
     private val radioRoom: MutableList<RadioRoom> = mutableListOf()
     private lateinit var binding: FragmentFavoriteBinding
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterVertical
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFavoriteBinding.bind(view)
@@ -44,6 +52,9 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         infoViewModel.putTitleText(getString(R.string.Favoris))
         setupRadioLisRV()
         getFavRadioRoom()
+
+
+
 
         //  setContentView(R.layout.activity_favorite_main_activity)
 
@@ -88,6 +99,8 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
                 populateRecyclerView(radioRoom)
                 binding.whenemptyfavImage.visibility = View.GONE
                 binding.rv.visibility = View.VISIBLE
+
+
             } else {
                 binding.whenemptyfavImage.visibility = View.VISIBLE
                 binding.rv.visibility = View.INVISIBLE
@@ -97,6 +110,8 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         }
 
     }
+
+
 
     private fun populateRecyclerView(radioRoom: MutableList<RadioRoom>) {
         if (radioRoom.isNotEmpty()) {
@@ -158,4 +173,11 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         infoViewModel.putRadioInfo(radioVariables)
         this@FavoriteRadioFragment.findNavController().navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment) //      NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment)
     }
+
+
+
+
+
+
+
 }

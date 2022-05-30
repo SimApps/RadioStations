@@ -39,8 +39,13 @@ interface ApiService {
     @GET("/json/stations/lastclick/{nbr}")
     suspend fun getLastClickedRadios(@Path("nbr") postId:String):Response<RetrofitRadioResponse>
 
+    @GET("/json/stations/byuuid/{id}")
+    suspend fun getRadioByUID(@Path("id") postId:String):Response<RetrofitRadioResponse>
+
     @GET("/json/stations/byname/{id}")
-    suspend fun getRadioByname(@Path("id") postId:String):Response<RetrofitRadioResponse>
+    suspend fun getRadioByName(@Path("id") postId:String):Response<RetrofitRadioResponse>
+
+
 
 
     @GET("/json/stations/bycountrycodeexact/{id}")

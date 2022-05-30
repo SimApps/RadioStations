@@ -25,6 +25,50 @@
         android:orientation="vertical">
 
 
+        <ProgressBar
+            android:id="@+id/spin_kitSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateDrawable="@drawable/indeterminate_progress"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/signin_out_itxVw"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="9dp"
+            android:foregroundGravity="center_vertical"
+
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+
+            android:text="@string/Connecter"
+            android:textSize="18sp"
+            app:drawableStartCompat="@drawable/ic_signin" />
+
+
+        <TextView
+            android:id="@+id/sync_fav_txVw"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="9dp"
+            android:foregroundGravity="center_vertical"
+
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+
+            android:text="@string/SyncFav"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_sync" />
+
         <TextView
             android:id="@+id/fav_country_txv"
             android:layout_width="match_parent"
@@ -62,20 +106,19 @@
 
 
         <TextView
-            android:id="@+id/StaticsTxV"
+            android:id="@+id/batterisettings"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:drawablePadding="9dp"
-
             android:foregroundGravity="center_vertical"
             android:gravity="center_vertical"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="@string/Statistics"
+            android:text="@string/batterisetting"
             android:textColor="@android:color/white"
             android:textSize="18sp"
-            app:drawableStartCompat="@drawable/ic_stats" />
+            app:drawableStartCompat="@drawable/ic_battery" />
 
 
         <TextView
@@ -89,19 +132,6 @@
             android:text="@string/Theme"
             android:textSize="16sp"
             app:drawableStartCompat="@drawable/ic_theme" />
-
-        <TextView
-            android:id="@+id/removeadsTxvw"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:drawablePadding="9dp"
-            android:gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:text="@string/Remove_ads"
-            android:textSize="16sp"
-            app:drawableStartCompat="@drawable/ic_shop" />
-
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/save_data"
@@ -117,6 +147,35 @@
             android:textSize="16sp"
             android:theme="@style/SCBSwitch"
             app:drawableStartCompat="@drawable/ic_media" />
+
+        <TextView
+            android:id="@+id/StaticsTxV"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="9dp"
+
+            android:foregroundGravity="center_vertical"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/Statistics"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:drawableStartCompat="@drawable/ic_stats" />
+
+        <TextView
+            android:id="@+id/removeadsTxvw"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:drawablePadding="9dp"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/Remove_ads"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/ic_shop" />
+
 
         <TextView
             android:id="@+id/rateTxvw"
@@ -142,21 +201,6 @@
             android:textSize="16sp"
             app:drawableStartCompat="@drawable/ic_baseline_shop_24" />
 
-
-        <TextView
-            android:id="@+id/batterisettings"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
-            android:drawablePadding="9dp"
-            android:foregroundGravity="center_vertical"
-            android:gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:text="@string/batterisetting"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            app:drawableStartCompat="@drawable/ic_battery" />
 
         <TextView
             android:id="@+id/Contact_usTxV"

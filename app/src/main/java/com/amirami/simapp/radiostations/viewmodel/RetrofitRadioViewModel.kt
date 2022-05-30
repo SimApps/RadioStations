@@ -5,8 +5,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities.*
 import android.os.Build
-import android.util.Log
-import androidx.lifecycle.*
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
@@ -19,13 +17,9 @@ import javax.inject.Inject
 import android.net.ConnectivityManager.*
 
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.amirami.simapp.radiostations.model.Status
-import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import java.io.IOException
 
 @HiltViewModel
@@ -57,6 +51,9 @@ constructor(
 
     private val _responseRadioSreach = MutableStateFlow<Resource<*>>(Resource(Status.LOADING, null, ""))
     val responseRadioSreach = _responseRadioSreach.asStateFlow()
+
+    private val _responseRadioUID = MutableStateFlow<Resource<*>>(Resource(Status.LOADING, null, ""))
+    val responseRadioUID = _responseRadioUID.asStateFlow()
 
     private val _responseLocalRadio = MutableStateFlow(Resource(Status.SUCCESS, null, ""))
     val responseLocalRadio = _responseLocalRadio.asStateFlow()
@@ -191,16 +188,44 @@ constructor(
     }
 
     fun getRadiosByName(name: String) = viewModelScope.launch {
-        getRadioByName(name)
+        getRadiosByname(name)
     }
 
-    suspend fun getRadioByName(name: String) = viewModelScope.launch {
+    fun getRadiosByUId(name: String) = viewModelScope.launch {
+        getRadioByUId(name)
+    }
+
+    suspend fun getRadioByUId(UId: String) = viewModelScope.launch {
+        //_responseRadioSreach.emit(Resource.loading(null))
+        _responseRadioUID.value = Resource.loading(null)
+        //    delay(1500)
+        try {
+            if (hasInternetConnection()) {
+                repository.getRadiobyuid(UId).let { response ->
+                    if (response.isSuccessful) _responseRadioUID.value = Resource.success(response.body())//_responseRadioSreach.emit(Resource.success(response.body()))
+
+                    else _responseRadioUID.value = Resource.error(response.code().toString(), response.body())// _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
+                }
+            } else _responseRadioUID.value =Resource.error("No internet connection", null)//_responseRadioSreach.emit(Resource.error("No internet connection", null))
+
+        } catch (t: Throwable) {
+            when (t) {
+                is IOException -> _responseRadioUID.value = Resource.error("Network Failure", null)//_responseRadioSreach.emit(Resource.error("Network Failure", null))
+
+                else -> _responseRadioUID.value = Resource.error("Conversion Error", null)//_responseRadioSreach.emit(Resource.error("Conversion Error", null))
+            }
+        }
+    }
+
+
+
+    suspend fun getRadiosByname(name: String) = viewModelScope.launch {
         //_responseRadioSreach.emit(Resource.loading(null))
         _responseRadioSreach.value = Resource.loading(null)
         //    delay(1500)
         try {
             if (hasInternetConnection()) {
-                repository.getRadiobyName(name).let { response ->
+                repository.getRadioByname(name).let { response ->
                     if (response.isSuccessful) _responseRadioSreach.value = Resource.success(response.body())//_responseRadioSreach.emit(Resource.success(response.body()))
 
                     else _responseRadioSreach.value = Resource.error(response.code().toString(), response.body())// _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
@@ -215,10 +240,6 @@ constructor(
             }
         }
     }
-
-
-
-
 
 
     fun getRadios(msg: String, secondmsg: String) = viewModelScope.launch {

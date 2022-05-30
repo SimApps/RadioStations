@@ -35,6 +35,7 @@ import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
+import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
@@ -43,6 +44,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -68,6 +70,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
     private lateinit var adViewAdaptiveBanner: AdView
+
+    private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by viewModels()
+
 
     private val infoViewModel: InfoViewModel by viewModels()
     private val preferencesViewModel: PreferencesViewModel by viewModels()
@@ -540,7 +545,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                                         binding.radioplayer.stopButton.setImageResource(R.drawable.rec_on)
 
                                     }
-                                    RadioFunction.interatial_ads_show(this@MainActivity)
+                                    RadioFunction.interatialadsShow(this@MainActivity)
                                 } else {
                                     DynamicToast.makeError(
                                         this@MainActivity,
@@ -663,6 +668,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
     companion object {
+        val userRecord = FirebaseAuth.getInstance()
         var color1 = parseColor("#03071e")//-256
         var color2 = parseColor("#03071e")//-65536
         var color3 = parseColor("#03071e")
@@ -918,7 +924,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             binding.radioplayer.adsFrame,
             adViewSmallActivityplayer
         )
-        RadioFunction.interatial_ads_load(this@MainActivity)
+        RadioFunction.interatialadsLoad(this@MainActivity)
     }
 
 
@@ -1224,15 +1230,46 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 urlJson,
                 true
             )
+            addFavoriteRadioIdInArrayFirestore(idListJson)
             radioRoomViewModel.upsertRadio(radioroom, "Radio added")
         } else if (setfavIcons(idListJson)) {
             binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_like)
             binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_like)
-            radioRoomViewModel.delete(/*radioRoom[position].radiouid*/idListJson,
+            radioRoomViewModel.delete(idListJson,
                 true,
                 "Radio Deleted"
             )
+            deleteFavoriteRadioFromArrayinfirestore(idListJson)
             //  radioRoom.removeAll { it.radiouid == idListJson }
+        }
+    }
+
+
+    private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
+        val addFavoritRadioIdInArrayFirestore =
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid)
+        addFavoritRadioIdInArrayFirestore.observe(this) {
+            //if (it != null)  if (it.data!!)  prod name array updated
+            if (it.e != null) {
+                //prod bame array not updated
+                RadioFunction.errorToast(this, it.e!!)
+            }
+
+        }
+
+
+    }
+
+    private fun deleteFavoriteRadioFromArrayinfirestore(radioUid:String){
+
+        val deleteFavoriteRadiofromArrayInFirestore= favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
+        deleteFavoriteRadiofromArrayInFirestore.observe(this) {
+            //if (it != null)  if (it.data!!)  prod name array updated
+            if (it.e != null) {
+                //prod bame array not updated
+                RadioFunction.dynamicToast(this, it.e!!)
+
+            }
         }
     }
 

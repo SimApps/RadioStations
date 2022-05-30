@@ -227,6 +227,12 @@ fun countDownTimer(startingValue:Int) = flow<Int>{
         }
     }
 
+    fun putLogInInfo(id:String){
+        viewModelScope.launch {
+            dialogueEventsChannel.emit(ChooseDefBottomSheetEvents.PutLogInDialogueInfo(id))
+        }
+    }
+
 
     fun putUpdateRecordInfo(update:Boolean,position:Int){
         viewModelScope.launch {
@@ -281,13 +287,13 @@ fun countDownTimer(startingValue:Int) = flow<Int>{
         data class PutDefCountryInfo(val country:String) : ChooseDefBottomSheetEvents()
         data class PutDefServerInfo(val server:String) : ChooseDefBottomSheetEvents()
         data class PutDefThemeInfo(val dark:Boolean, val systheme:Boolean) : ChooseDefBottomSheetEvents()
+        data class PutLogInDialogueInfo(val id:String) : ChooseDefBottomSheetEvents()
     }
 
 
    sealed class RecordInfoEvents {
         data class UpdateRecList(val update:Boolean, val position: Int) : RecordInfoEvents()
     }
-
 
 
 

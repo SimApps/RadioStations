@@ -99,6 +99,14 @@ class InfoBottomSheetFragment: BottomSheetDialogFragment() {
             binding.btnOui.visibility = View.VISIBLE
             binding.btnNon.visibility = View.VISIBLE
         }
+        else if(argsFrom.title=="signinOut"){
+            binding.TitleTxtVw.visibility = View.VISIBLE
+            binding.btnOui.visibility = View.VISIBLE
+            binding.btnNon.visibility = View.VISIBLE
+            binding.yesnoDivider.visibility = View.VISIBLE
+            binding.verticalDividerDialogue.visibility = View.VISIBLE
+            binding.TitleTxtVw.text = getString(R.string.DisconnectMsg)
+        }
 
         binding.btnOui.setSafeOnClickListener{
             if (argsFrom.title=="BatterieOptimisation"){
@@ -120,6 +128,10 @@ class InfoBottomSheetFragment: BottomSheetDialogFragment() {
                     infoViewModel.putUpdateRecordInfo(true,argsFrom.msg.toInt())
 
                 }
+            }
+            else if(argsFrom.title=="signinOut"){
+                infoViewModel.putLogInInfo("signinOut")
+
             }
             dismiss()
         }

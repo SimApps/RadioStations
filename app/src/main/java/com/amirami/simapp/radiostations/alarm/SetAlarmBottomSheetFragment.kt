@@ -11,8 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -23,10 +21,8 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.alarm.Utils.cancelAlarm
 import com.amirami.simapp.radiostations.databinding.BottomsheetAddalarmBinding
-import com.amirami.simapp.radiostations.ui.SetTimerBottomSheetFragment
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -163,7 +159,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
 
             viewsVisibility()
 
-            RadioFunction.interatial_ads_show(requireContext())
+            RadioFunction.interatialadsShow(requireContext())
         }
     }
 

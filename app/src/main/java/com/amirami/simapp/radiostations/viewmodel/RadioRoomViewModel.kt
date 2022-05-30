@@ -1,13 +1,18 @@
 package com.amirami.simapp.radiostations.viewmodel
 
+import androidx.activity.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.firestore.ProductFirestoreRepository
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.repository.RadioRoomBaseRepository
 import com.amirami.simapp.radiostations.utils.ConvertRadioClass
 import com.amirami.simapp.radiostations.utils.Coroutines
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -16,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RadioRoomViewModel  @Inject constructor(
     private val  sholistRoomBaseRepository : RadioRoomBaseRepository
-): ViewModel() {
+    ): ViewModel() {
+
     private val tasksEventChannel = Channel<ShopListEvents>()
     val shopListEvents = tasksEventChannel.receiveAsFlow()
 
@@ -87,6 +93,7 @@ class RadioRoomViewModel  @Inject constructor(
             if(item.name!=""){//prevent add alarm played station
                 sholistRoomBaseRepository.upsert(ConvertRadioClass.toEntity(item))
                 tasksEventChannel.send(ShopListEvents.ProdAddToShopMsg(msg))
+
             }
 
         }
@@ -107,6 +114,15 @@ class RadioRoomViewModel  @Inject constructor(
             tasksEventChannel.send(ShopListEvents.ProdDeleteShopMsg(msg))
         }
     }
+
+
+
+
+
+
+
+
+
     fun deletelistened(fav:Boolean, msg:String) {
         Coroutines.io(this@RadioRoomViewModel) {
             sholistRoomBaseRepository.deletelistened(fav)

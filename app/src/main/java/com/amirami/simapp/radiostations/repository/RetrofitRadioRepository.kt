@@ -1,11 +1,6 @@
 package com.amirami.simapp.radiostations.repository
 
-import androidx.lifecycle.SavedStateHandle
 import com.amirami.simapp.radiostations.api.ApiService
-import com.google.gson.JsonObject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import retrofit2.Response
 import javax.inject.Inject
 
 class RetrofitRadioRepository
@@ -27,7 +22,9 @@ constructor(private val apiService: ApiService) {
 
     suspend fun getClickedLast(nbr:String) = apiService.getLastClickedRadios(nbr)
 
-    suspend fun getRadiobyName(name:String) = apiService.getRadioByname(name)
+    suspend fun getRadiobyuid(Uid:String) = apiService.getRadioByUID(Uid)
+
+    suspend fun getRadioByname(name:String) = apiService.getRadioByName(name)
 
 
     suspend fun getRadiobyCountriesCodeExact(value:String) = apiService.getRadioByCountriesCodeExact(value)

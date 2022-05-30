@@ -173,6 +173,13 @@ dependencies {
 
     //ONLY FOR ALARMS MAYBE FIND HOW TO REMOVE IT??? REPLACE IT ...
     implementation 'androidx.preference:preference-ktx:1.2.0'
+
+
+    //firebase auth
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.0' //remove it and fix the rest
+
+    //firebase firestore
+    implementation 'com.google.firebase:firebase-firestore:24.1.2'
 }
 allprojects {
     repositories {

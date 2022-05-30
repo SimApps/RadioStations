@@ -13,11 +13,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
+import com.amirami.simapp.radiostations.RadioFunction.dynamicToast
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentMoreBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -32,6 +35,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomsheetfragmentMoreBinding? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
+    private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
     private val radioRoom: MutableList<RadioRoom> = mutableListOf()
 
     override fun onCreateView(
@@ -243,18 +247,46 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             )
             radioRoomViewModel.upsertRadio(radioroom, "Radio added")
 
+            addFavoriteRadioIdInArrayFirestore(idListJson)
         }
         else if (idIn) {
             binding.likeImageView.setImageResource(R.drawable.ic_like)
         //    binding.likeTxVw.text = getString(R.string.radio_like)
             radioRoomViewModel.delete(radioRoom[position].radiouid, true, "Radio Deleted")
 
-
+            deleteFavoriteRadioFromArrayinfirestore(idListJson)
         }
     }
 
+    private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
+           val addFavoritRadioIdInArrayFirestore =
+                favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid)
+            addFavoritRadioIdInArrayFirestore.observe(viewLifecycleOwner) {
+                //if (it != null)  if (it.data!!)  prod name array updated
+                if (it.e != null) {
+                    //prod bame array not updated
+                    errorToast(requireContext(),it.e!!)
+                }
 
-    fun setTheme() {
+            }
+
+
+    }
+
+    private fun deleteFavoriteRadioFromArrayinfirestore(radioUid:String){
+
+        val deleteFavoriteRadiofromArrayInFirestore= favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
+        deleteFavoriteRadiofromArrayInFirestore.observe(viewLifecycleOwner) {
+            //if (it != null)  if (it.data!!)  prod name array updated
+            if (it.e != null) {
+                //prod bame array not updated
+                dynamicToast(requireContext(), it.e!!)
+
+            }
+        }
+    }
+
+  private  fun setTheme() {
         collectLatestLifecycleFlow(infoViewModel.putTheme) {
             RadioFunction.gradiancolorNestedScrollViewTransitionseconcolor(binding.linearLayoutHolder, 1,it)
             maintextviewColor(binding.RadioNameTXview,it)
@@ -268,7 +300,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    fun setInfoRadio(it : RadioVariables){
+  private  fun setInfoRadio(it : RadioVariables){
         if (it.stationuuid=="") {
             binding.RadioImage.setImageResource(R.drawable.rec_on)
             //  RadioFunction.loadImageInt(R.drawable.recordings, MainActivity.imagedefaulterrorurl, binding.RadioImage)

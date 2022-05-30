@@ -104,7 +104,7 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                   //  RadioFunction.recreateActivityCompat(RadioFunction.unwrap(requireContext()))
                     dismiss()
 
-                    RadioFunction.interatial_ads_show(requireContext())
+                    RadioFunction.interatialadsShow(requireContext())
                 }
 
                 else if (binding.RadioNameTXviewadd.text.toString().isNotEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isNotEmpty() && binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
@@ -176,7 +176,7 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                         MainActivity.customdownloader?.download()
 
                         dismiss()
-                        RadioFunction.interatial_ads_show(requireContext())
+                        RadioFunction.interatialadsShow(requireContext())
                     }
                     else requestMultiplePermissions.launch(arrayOf(
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,

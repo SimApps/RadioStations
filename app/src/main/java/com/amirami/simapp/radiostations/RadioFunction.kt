@@ -59,6 +59,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.handlers
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
+import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.google.android.gms.ads.*
@@ -934,7 +935,7 @@ object RadioFunction {
 
         return RcordInfo
     }
-    fun interatial_ads_load(context: Context){
+    fun interatialadsLoad(context: Context){
         val adRequest = AdRequest.Builder().build()
 
         InterstitialAd.load(context,context.resources.getString(R.string.interstial_adUnitId), adRequest, object : InterstitialAdLoadCallback() {
@@ -946,18 +947,11 @@ object RadioFunction {
                 mInterstitialAd = interstitialAd
             }
         })
-        /* Activity_Main.mInterstitialAd = InterstitialAd(context)
-         //  if (!mInterstitialAd.isLoaded) {
-         Activity_Main.mInterstitialAd.adUnitId =/*this@PlayerMainActivity.*/context.resources.getString(R.string.interstial_adUnitId)
-         if (!Activity_Main.mInterstitialAd.isLoaded) {
 
-
-             Activity_Main.mInterstitialAd.loadAd(AdRequest.Builder().build())
-         }*/
 
 
     }
-    fun interatial_ads_show(context:Context){
+    fun interatialadsShow(context:Context){
         mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 val adRequest = AdRequest.Builder().build()
@@ -1177,18 +1171,7 @@ object RadioFunction {
         }
     }
 
-    fun adButtonColor(buttoncolor:Button,theme:Boolean){
-        val gdDefault = GradientDrawable()
 
-        if (theme){
-            buttoncolor.setBackgroundResource(R.drawable.ad_btn)
-        }
-        else{
-
-            buttoncolor.setBackgroundResource(R.drawable.ad_btn)
-
-        }
-    }
 
     fun viewColor(view: View,theme:Boolean){
         val gdDefault = GradientDrawable()
@@ -1949,6 +1932,27 @@ object RadioFunction {
         }
     }
 */
+
+
+fun getuserid():String{
+    return if(userRecord.uid!=null) userRecord.uid!!
+    else "no_user"
+}
+
+    fun errorToast(context: Context,message: String) {
+        DynamicToast.make(context, message, 9).show()
+    }
+
+    fun succesToast(context: Context,message: String) {
+        DynamicToast.make(context, message, 9).show()
+    }
+
+    fun warningToast(context: Context,message: String) {
+        DynamicToast.makeWarning(context, message, 9).show()
+    }
+    fun dynamicToast(context: Context,message: String) {
+        DynamicToast.make(context, message, 9).show()
+    }
 }
 
 

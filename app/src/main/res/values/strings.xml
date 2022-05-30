@@ -36,6 +36,14 @@
     <string name="oui">Yes</string>
     <string name="Exit">Exit</string>
     <string name="Close">Close</string>
+    <string name="Déconnecter">Disconnect</string>
+    <string name="Déconnectersuccess">Successfully Disconnected.</string>
+    <string name="connectionsuccess">Successfully Connected.</string>
+    <string name="Connecter">Connect</string>
+
+    <string name="Échec_connexion">Login Failed !</string>
+
+    <string name="SyncFav">Synchronize favorites between devices</string>
 
     <string name="GO">GO</string>
     <string name="addname">Add stream name*</string>
@@ -76,7 +84,7 @@
     <string name="deleteallfav">Do you really want to delete all favorite?</string>
     <string name="deleteallrecording">Do you really want to delete all recordings?</string>
     <string name="deleterecording">Do you really want to delete this recording?</string>
-
+    <string name="DisconnectMsg">Do you really want to Disconnect?</string>
     <string name="disclaimermessage">This app is a tool for playing online radio. It is not affiliated with any media or radio. We respect the copyright of the owner. Therefore, please do not use illegale content without the permission of the owner. </string>
 
     <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : android/data/com.amirami.simapp.radiostations </string>

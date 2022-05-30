@@ -105,12 +105,6 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
 
             }
         }
-
-
-
-
-
-
     }
     fun showErrorConnection(msg:String){
         binding.itemErrorMessage.root.visibility= View.VISIBLE

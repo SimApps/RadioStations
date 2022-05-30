@@ -1,48 +1,46 @@
 package com.amirami.simapp.radiostations.ui
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.*
-import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
-import androidx.appcompat.widget.SearchView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.BASE_URL
-import com.amirami.simapp.radiostations.MainActivity.Companion.darkTheme
 import com.amirami.simapp.radiostations.MainActivity.Companion.saveData
+import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
 import com.amirami.simapp.radiostations.RadioFunction.countryCodeToName
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
+import com.amirami.simapp.radiostations.RadioFunction.getuserid
 import com.amirami.simapp.radiostations.RadioFunction.gradiancolorNestedScrollViewTransition
-import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransition
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
-import com.amirami.simapp.radiostations.alarm.BootCompleteReceiver
-import com.amirami.simapp.radiostations.alarm.Utils
-import com.amirami.simapp.radiostations.alarm.Utils.cancelAlarm
+import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.databinding.FragmentSettingBinding
+import com.amirami.simapp.radiostations.model.FavoriteFirestore
+import com.amirami.simapp.radiostations.model.RadioRoom
+import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
 import com.amirami.simapp.radiostations.utils.exhaustive
+import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
+import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.firebase.ui.auth.AuthUI
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class SettingFragment : Fragment(R.layout.fragment_setting) {
@@ -52,27 +50,70 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val preferencesViewModel : PreferencesViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
+    private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
+    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
 
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+
+            // Successfully signed in
+
+            binding.signinOutItxVw.text=resources.getString(R.string.Déconnecter)
+            // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
+            binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
+
+              succesToast(requireContext(),resources.getString(R.string.connectionsuccess))
+            // ...
+            getRadioUidListFromFirestoreAndITSaveInRoom()
+
+            binding.syncFavTxVw.visibility = View.VISIBLE
+
+        }
+
+        else {
+            binding.syncFavTxVw.visibility = View.GONE
+            errorToast(requireContext(),resources.getString(R.string.Échec_connexion))
+            // Sign in failed. If response is null the user canceled the
+            // sign-in flow using the back button. Otherwise check
+            // response.getError().getErrorCode() and handle the error.
+            // ...
+        }
+    }
+
+    private fun createUserDocument(favoriteFirestore : FavoriteFirestore) {
+        val isProductAddLiveData = favoriteFirestoreViewModel.addUserDocumentInFirestore(favoriteFirestore)
+
+        isProductAddLiveData.observe(viewLifecycleOwner) { dataOrException ->
+            val isProductAdded = dataOrException.data
+            if (isProductAdded != null) {
+                hideProgressBar()
+                /*  if (isProductAdded) {  }*/
+            }
+            /* if (dataOrException.e != null) {
+                 errorToast(requireContext(),dataOrException.e!!)
+                 if(dataOrException.e=="getRadioUID"){
+
+                 }
+
+             }*/
+        }
+    }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding  = FragmentSettingBinding.bind(view)
-
-
+        RadioFunction.interatialadsLoad(requireContext())
         infoViewModel.putTitleText(getString(R.string.Settings))
         themeChange()
 
-
-
+        conectDisconnectBtn()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 binding.favCountryTxv.text = getString(R.string.defaultCountry, countryCodeToName(preferencesViewModel.preferencesFlow.first().default_country))
             }
         }
-
-
 
 
 
@@ -99,6 +140,13 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                         is InfoViewModel.ChooseDefBottomSheetEvents.PutDefThemeInfo -> {
                             run {
                                 themeChange()
+                            }
+
+                        }
+
+                        is InfoViewModel.ChooseDefBottomSheetEvents.PutLogInDialogueInfo -> {
+                            run {
+                                if(event.id=="signinOut")  signOut()
                             }
 
                         }
@@ -137,6 +185,11 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
         }
 
+if(getuserid()!="no_user") binding.syncFavTxVw.visibility = View.VISIBLE
+
+        binding.syncFavTxVw.setSafeOnClickListener {
+            getRadioUidListFromFirestoreAndITSaveInRoom()
+        }
 
         binding.StaticsTxV.setSafeOnClickListener {
             retrofitRadioViewModel.getStatis()
@@ -197,10 +250,35 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             removeAds()        }
     }
 
+    private fun conectDisconnectBtn() {
+        if(userRecord.currentUser!=null) {
+            binding.signinOutItxVw.text=resources.getString(R.string.Déconnecter)
+            binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
+            // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
+        }
+        else{
+            //no one loged in
+            binding.signinOutItxVw.text=resources.getString(R.string.Connecter)
+            binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signin, 0, 0, 0)
+            //    _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signin)
+        }
 
 
 
-    fun themeChange(){
+
+
+
+        binding.signinOutItxVw.setSafeOnClickListener {
+            if(userRecord.currentUser!=null)
+                goToLogInDialog()
+            else
+                createSignInIntent()
+        }
+
+    }
+
+
+    private fun themeChange(){
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 infoViewModel.putTheme.collectLatest {
@@ -220,6 +298,9 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                     maintextviewColor(binding.removeadsTxvw,it)
                     maintextviewColor(binding.rateTxvw,it)
                     maintextviewColor(binding.moreappsTxvw,it)
+                    maintextviewColor(binding.signinOutItxVw,it)
+                    maintextviewColor(binding.syncFavTxVw,it)
+
 
                 }
 
@@ -232,7 +313,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
 
 
-    fun moreApps(){
+    private fun moreApps(){
         val uri = Uri.parse("https://play.google.com/store/apps/developer?id=AmiRami")
         val goToMarket = Intent(Intent.ACTION_VIEW, uri)
         goToMarket.addFlags(
@@ -248,7 +329,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/developer?id=AmiRami")))
         }
     }
-    fun removeAds(){
+
+    private  fun removeAds(){
         val uri = Uri.parse("http://play.google.com/store/apps/details?id=com.amirami.simapp.radiobroadcastpro")
         val goToMarket = Intent(Intent.ACTION_VIEW, uri)
         goToMarket.addFlags(
@@ -264,7 +346,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.amirami.simapp.radiobroadcastpro")))
         }
     }
-    fun rate(){
+
+    private  fun rate(){
         var uri = Uri.parse("market://details?id="  + requireContext().packageName)
         var goToMarket = Intent(Intent.ACTION_VIEW, uri)
         goToMarket.addFlags(
@@ -287,8 +370,172 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
 
 
+    private fun goToLogInDialog(){
+        val action = SettingFragmentDirections.actionFragmentSettingToInfoBottomSheetFragment("signinOut")
+        this@SettingFragment.findNavController().navigate(action) //     NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+    }
+    private fun createSignInIntent() {
+        //when change theme !!! to check
+        //val providers = emptyList<AuthUI.IdpConfig>()
+        // [START auth_fui_create_intent]
+        // Choose authentication providers
+
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            // AuthUI.IdpConfig.PhoneBuilder().build(),
+            // AuthUI.IdpConfig.GoogleBuilder().build(),
+            // AuthUI.IdpConfig.FacebookBuilder().build(),
+            // AuthUI.IdpConfig.TwitterBuilder().build()
+        )
+        // Create and launch sign-in intent
+
+        startForResult.launch(
+            AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            //   .setLogo(R.drawable.my_great_logo) // Set logo drawable
+            //  .setTheme(R.style.MySuperAppTheme) // Set theme
+            .build() )
+        // [END auth_fui_create_intent]
+    }
+
+
+    private fun signOut() {
+        // [START auth_fui_signout]
+        AuthUI.getInstance()
+            .signOut(requireContext())
+            .addOnCompleteListener {
+                // ...
+                binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signin, 0, 0, 0)
+                // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signin)
+                binding.signinOutItxVw.text=resources.getString(R.string.Connecter)
+                errorToast(requireContext(),resources.getString(R.string.Déconnectersuccess))
+                binding.syncFavTxVw.visibility = View.GONE
+
+            }
+            .addOnCanceledListener {
+                binding.signinOutItxVw.text=resources.getString(R.string.Déconnecter)
+                // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
+                binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
+                binding.syncFavTxVw.visibility = View.VISIBLE
+            }
+        // [END auth_fui_signout]
+    }
 
 
 
 
+    private fun getRadioUidListFromFirestoreAndITSaveInRoom() {
+
+
+        displayProgressBar()
+        favoriteFirestoreViewModel.getAllRadioFavoriteListFromFirestore.observe(viewLifecycleOwner) { DataOrExceptionProdNames ->
+            val productList = DataOrExceptionProdNames.data
+            if (productList != null && productList.isNotEmpty()/* && productList[0].size > 0*/) {
+
+                saveFaveRadioFromFirestoreToRoom()
+                for(i in 0 until productList[0].size){
+
+                    retrofitRadioViewModel.getRadiosByUId(productList[0][i])
+                    if(i==productList[0].size-1) getFavRadioRoom()
+
+                }
+                hideProgressBar()
+              //  errorToast( requireContext(),"success")
+            }
+
+            if (DataOrExceptionProdNames.e != null) {
+                getFavRadioRoom()
+
+                hideProgressBar()
+              //  errorToast( requireContext(),DataOrExceptionProdNames.e.toString())
+
+            }
+        }
+
+
+    }
+
+    private fun saveFaveRadioFromFirestoreToRoom() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                retrofitRadioViewModel.responseRadioUID.collectLatest { response ->
+                    when (response.status) {
+                        Status.SUCCESS -> {
+                            if(response.data!=null){
+                                hideProgressBar()
+                                val radio= response.data as MutableList<RadioVariables>// as RadioRoom
+                                val radioroom = RadioRoom(
+                                    radio[0].stationuuid,
+                                    radio[0].name,
+                                    radio[0].bitrate,
+                                    radio[0].homepage,
+                                    radio[0].favicon,
+                                    radio[0].tags,
+                                    radio[0].country,
+                                    radio[0].state,
+                                    //var RadiostateDB: String?,
+                                    radio[0].language,
+                                    radio[0].url_resolved,
+                                    true
+                                )
+                                radioRoomViewModel.upsertRadio(radioroom, "Radio added")
+
+                            }
+                            //else showErrorConnection(response.message!!)
+
+                        }
+                        Status.ERROR -> {
+                            hideProgressBar()
+                            // showErrorConnection(response.message!!)
+                        }
+                        Status.LOADING -> {
+
+                            displayProgressBar()
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+
+    private fun displayProgressBar() {
+        binding.spinKitSetting.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.spinKitSetting.visibility = View.GONE
+        RadioFunction.interatialadsShow(requireContext())
+    }
+
+
+      private fun getFavRadioRoom() {
+        radioRoomViewModel.getAll(true).observe(viewLifecycleOwner) { list ->
+            //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
+            if (list.isNotEmpty() ) {
+                val favoriteFirestore=FavoriteFirestore(list.map { it.radiouid } as ArrayList<String>)
+                createUserDocument(favoriteFirestore)
+            }
+            else createUserDocument(FavoriteFirestore())
+        }
+
+    }
+
+
+    private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
+        val addFavoritRadioIdInArrayFirestore =
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid)
+        addFavoritRadioIdInArrayFirestore.observe(this) {
+            //if (it != null)  if (it.data!!)  prod name array updated
+            if (it.e != null) {
+                //prod bame array not updated
+                errorToast(requireContext(), it.e!!)
+            }
+
+        }
+
+
+    }
 }
