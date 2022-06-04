@@ -3,6 +3,8 @@ package com.amirami.simapp.radiostations.di
 import android.app.Application
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.amirami.simapp.radiostations.alarm.AlarmRadioDAO
+import com.amirami.simapp.radiostations.alarm.AlarmRadioDatabase
 import com.amirami.simapp.radiostations.room.RadioDAO
 import com.amirami.simapp.radiostations.room.RadioDatabase
 import dagger.Module
@@ -30,7 +32,26 @@ object DataModule {
 
 
     @Provides
-    fun provideShopListDAO(radioDatabase : RadioDatabase) : RadioDAO {
+    @Singleton
+    fun provideRadioAlarmDataBase(application : Application, roomCallback : RoomDatabase.Callback) : AlarmRadioDatabase {
+        return Room.databaseBuilder(
+            application.applicationContext,
+            AlarmRadioDatabase::class.java,
+            "radio_alarm_database"
+
+        )
+            .fallbackToDestructiveMigration()
+            .addCallback(roomCallback)
+            .build()
+    }
+
+    @Provides
+    fun provideRadioDAO(radioDatabase : RadioDatabase) : RadioDAO {
+        return radioDatabase.customDao()
+    }
+
+    @Provides
+    fun provideRadioAlarmtDAO(radioDatabase : AlarmRadioDatabase) : AlarmRadioDAO {
         return radioDatabase.customDao()
     }
 

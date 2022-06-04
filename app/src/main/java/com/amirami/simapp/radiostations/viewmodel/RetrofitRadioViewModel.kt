@@ -203,10 +203,10 @@ constructor(
             if (hasInternetConnection()) {
                 repository.getRadiobyuid(UId).let { response ->
                     if (response.isSuccessful) _responseRadioUID.value = Resource.success(response.body())//_responseRadioSreach.emit(Resource.success(response.body()))
-
                     else _responseRadioUID.value = Resource.error(response.code().toString(), response.body())// _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
                 }
-            } else _responseRadioUID.value =Resource.error("No internet connection", null)//_responseRadioSreach.emit(Resource.error("No internet connection", null))
+            }
+            else _responseRadioUID.value =Resource.error("No internet connection", null)//_responseRadioSreach.emit(Resource.error("No internet connection", null))
 
         } catch (t: Throwable) {
             when (t) {

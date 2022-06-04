@@ -15,6 +15,7 @@
         android:foregroundGravity="center"
         android:scaleType="fitCenter"
         android:src="@drawable/play_2"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,6 +31,7 @@
         android:foregroundGravity="center"
         android:scaleType="fitCenter"
         android:src="@drawable/pause_2"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +66,7 @@
         app:layout_constraintEnd_toStartOf="@id/exo_progress"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.exoplayer2.ui.DefaultTimeBar
+    <androidx.media3.ui.DefaultTimeBar
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

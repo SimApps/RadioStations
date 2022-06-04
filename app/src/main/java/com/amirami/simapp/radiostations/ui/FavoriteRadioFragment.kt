@@ -126,7 +126,7 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         try {
             GlobalRadiourl = radioRoom.streamurl
             MainActivity.GlobalImage = radioRoom.favicon
-            initializePlayer(requireContext())
+            initializePlayer(requireContext(),false)
             startPlayer()
             val radioVariables = RadioVariables()
 

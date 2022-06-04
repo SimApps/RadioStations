@@ -64,7 +64,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
               succesToast(requireContext(),resources.getString(R.string.connectionsuccess))
             // ...
-            getRadioUidListFromFirestoreAndITSaveInRoom()
+            getRadioUidListFromFirestoreAndITSaveInRoom(true)
 
             binding.syncFavTxVw.visibility = View.VISIBLE
 
@@ -117,7 +117,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
 
 
-        //  radio_servers_txv.text =prefs.getString("prefered_servers", "http://$BASE_URL")!!
         binding.radioServersTxv.text =   getString(R.string.currentserver, BASE_URL)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -159,14 +158,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
 
 
-
-
-
-
-     /*   viewLifecycleOwner.lifecycleScope.launch {
-            binding.saveData.isChecked = preferencesViewModel.preferencesFlow.first().save_data
-        //    binding.saveData.isEnabled = preferencesViewModel.preferencesFlow.first().save_data
-        }*/
         binding.saveData.isChecked =   saveData
 
         binding.saveData.setOnCheckedChangeListener { _, isChecked ->
@@ -179,16 +170,14 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 binding.saveData.text = getString(R.string.Enable_Load_radio_images)
                 preferencesViewModel.onSaveDataChanged(isChecked)
                 saveData = isChecked
-
-
             }
-
         }
 
-if(getuserid()!="no_user") binding.syncFavTxVw.visibility = View.VISIBLE
+        if(getuserid()!="no_user") binding.syncFavTxVw.visibility = View.VISIBLE
 
         binding.syncFavTxVw.setSafeOnClickListener {
-            getRadioUidListFromFirestoreAndITSaveInRoom()
+            radioRoomViewModel.deleteAll("")
+            getRadioUidListFromFirestoreAndITSaveInRoom(false)
         }
 
         binding.StaticsTxV.setSafeOnClickListener {
@@ -425,35 +414,25 @@ if(getuserid()!="no_user") binding.syncFavTxVw.visibility = View.VISIBLE
 
 
 
-    private fun getRadioUidListFromFirestoreAndITSaveInRoom() {
-
-
+    private fun getRadioUidListFromFirestoreAndITSaveInRoom(saveRoomToFirestore:Boolean) {
         displayProgressBar()
         favoriteFirestoreViewModel.getAllRadioFavoriteListFromFirestore.observe(viewLifecycleOwner) { DataOrExceptionProdNames ->
             val productList = DataOrExceptionProdNames.data
-            if (productList != null && productList.isNotEmpty()/* && productList[0].size > 0*/) {
-
+            if (productList != null && productList.isNotEmpty()) {
                 saveFaveRadioFromFirestoreToRoom()
                 for(i in 0 until productList[0].size){
-
                     retrofitRadioViewModel.getRadiosByUId(productList[0][i])
-                    if(i==productList[0].size-1) getFavRadioRoom()
-
+                    if(i==productList[0].size-1 &&saveRoomToFirestore) getFavRadioRoom()
                 }
                 hideProgressBar()
-              //  errorToast( requireContext(),"success")
             }
 
             if (DataOrExceptionProdNames.e != null) {
-                getFavRadioRoom()
-
+                if(saveRoomToFirestore) getFavRadioRoom()
                 hideProgressBar()
               //  errorToast( requireContext(),DataOrExceptionProdNames.e.toString())
-
             }
         }
-
-
     }
 
     private fun saveFaveRadioFromFirestoreToRoom() {
@@ -512,13 +491,15 @@ if(getuserid()!="no_user") binding.syncFavTxVw.visibility = View.VISIBLE
 
 
       private fun getFavRadioRoom() {
+
         radioRoomViewModel.getAll(true).observe(viewLifecycleOwner) { list ->
             //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
             if (list.isNotEmpty() ) {
-                val favoriteFirestore=FavoriteFirestore(list.map { it.radiouid } as ArrayList<String>)
+                val favoriteFirestore=FavoriteFirestore(getuserid(),
+                    list.map { it.radiouid } as ArrayList<String>)
                 createUserDocument(favoriteFirestore)
             }
-            else createUserDocument(FavoriteFirestore())
+            else createUserDocument(FavoriteFirestore(getuserid()))
         }
 
     }

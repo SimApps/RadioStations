@@ -1,6 +1,14 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Radio FM AM</string>
     <string name="RateRadioFMAM">Rate Radio FM AM</string>
+    <string name="choosefilemanager">Select a file manager Then GO to : Download/Radio FM AM</string>
+    <string name="IfyouenjoyusingRadioFMAM">If you enjoy using Radio FM AM, please take a moment to rate it. Thanks for your support!</string>
+    <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : Download/Radio FM AM </string>
+
+
+
+
+
     <string name="title_activity_radios">RadiosActivity</string>
 
 
@@ -29,7 +37,7 @@
     <string name="appversion">Version : 2.2.52</string>
     <string name="version">2.2.52</string>
 
-    <string name="choosefilemanager">Select a file manager (android/data/com.amirami.simapp.radiostations)</string>
+
 
     <string name="filemanagernotfound">Did not find any activity capable of opening files.</string>
     <string name="non">No</string>
@@ -79,7 +87,6 @@
     <string name="deletesall">Delete favorite </string>
 
     <string name="setting">Setting </string>
-    <string name="IfyouenjoyusingRadioFMAM">If you enjoy using Radio FM AM, please take a moment to rate it. Thanks for your support!</string>
 
     <string name="deleteallfav">Do you really want to delete all favorite?</string>
     <string name="deleteallrecording">Do you really want to delete all recordings?</string>
@@ -87,7 +94,6 @@
     <string name="DisconnectMsg">Do you really want to Disconnect?</string>
     <string name="disclaimermessage">This app is a tool for playing online radio. It is not affiliated with any media or radio. We respect the copyright of the owner. Therefore, please do not use illegale content without the permission of the owner. </string>
 
-    <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : android/data/com.amirami.simapp.radiostations </string>
 
     <string name="batterieoptimisationmessage">If you experience playback interruptions you have to disable battery optimization. Click on "GO" to open setting and search for this app. (there is some brand that require additional settings)  </string>
 
@@ -120,6 +126,10 @@
 
     <string name="inforecord">Info : %s</string>
 
+    <string name="radioAlarmIsSetAT"> Alarm is set at : %s  \n %s : %s</string>
+
+    <string name="RadioStationName">Radio Station Name</string>
+    <string name="RecordedStationName">Recorded Stream Name</string>
 
     <string name="statNbrStation">Stations : %s</string>
     <string name="statNbrStationBroken">Stations Broken : %s</string>
@@ -127,7 +137,11 @@
     <string name="statNbrCountries">Countries : %s</string>
     <string name="statNbrTags">Tags : %s</string>
 
-    <string name="stationinfo">%s kbps, %s , %s</string>
+    <string name="stationinfo">%s  %s %s</string>
+
+    <string name="sucssessDeleteRecord">%s  Deleted successfully</string>
+
+    <string name="errorDeleteRecord">%s  Not Deleted successfully</string>
     <string name="Pop">pop</string>
     <string name="Hits">hits</string>
     <string name="Rock">rock</string>

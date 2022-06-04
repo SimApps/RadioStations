@@ -93,7 +93,8 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             }
 
             binding.addalarmimageView.setSafeOnClickListener {
-                val action = MoreBottomSheetFragmentDirections.actionMoreBottomSheetFragmentToSetAlarmBottomSheetFragment(radioVar.url_resolved)
+                infoViewModel.putRadioalarmInfo(radioVar)
+                val action = MoreBottomSheetFragmentDirections.actionMoreBottomSheetFragmentToSetAlarmBottomSheetFragment()
                 this@MoreBottomSheetFragment.findNavController().navigate(action)
                // Utils.cancelAlarm(requireActivity())
              //   dismiss()
@@ -305,7 +306,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             binding.RadioImage.setImageResource(R.drawable.rec_on)
             //  RadioFunction.loadImageInt(R.drawable.recordings, MainActivity.imagedefaulterrorurl, binding.RadioImage)
             binding.RadioNameTXview.text = getString(R.string.infoRadioname, it.name)
-            binding.RadioHomepageTXview.text = getString(R.string.inforecord, MainActivity.icyandState)
+            binding.RadioHomepageTXview.text = getString(R.string.inforecord, /*MainActivity.icyandState*/it.homepage)
 
             binding.RadioStreamURLTXview.visibility = View.INVISIBLE
             binding.RadioCountryTXview.visibility = View.INVISIBLE

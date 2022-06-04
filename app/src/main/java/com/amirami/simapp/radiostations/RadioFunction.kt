@@ -15,6 +15,8 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.TransitionDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
@@ -60,8 +62,10 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
+import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
+import com.amirami.simapp.radiostations.utils.Constatnts.RECORDS_FILE_NAME
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -74,6 +78,8 @@ import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import java.io.File
 import java.io.IOException
 import java.lang.reflect.Field
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -793,20 +799,30 @@ object RadioFunction {
     private fun deleteAllFileAndContents(@NonNull file: File, context: Context) {
         if (file.exists()) {
 
-            if (file.isDirectory) {
+         /*
+           // if (file.isDirectory) {
                 val contents = file.listFiles()
                 if (contents != null) {
                     for (content in contents) {
                         deleteAllFileAndContents(content,context)
                     }
                 }
-            }
-            file.delete()
+          //  }
+            */
+
+
+           val result = file.delete()
+            if (result) errorToast(context,context.getString(R.string.sucssessDeleteRecord,shortRecordFileName(file)))
+            else errorToast(context,context.getString(R.string.errorDeleteRecord,shortRecordFileName(file)))
+
         }
     }
 
 
-
+ fun  shortRecordFileName(@NonNull file: File):String{
+    return if (file.name.contains("_ _",true)) file.name.substring(0, file.name.indexesOf("_ _", true)[0])
+     else file.name
+   }
 
 
     fun String?.indexesOf(substr: String, ignoreCase: Boolean = true): List<Int> {
@@ -866,43 +882,14 @@ object RadioFunction {
     }
 
     private fun getDownloadDir(context: Context):File{
+        val f =  File(getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString()
+                +File.separator  + RECORDS_FILE_NAME)
 
-// Find all audio files on the primary external storage device.
-        val audioCollection =
-             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-             else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-
-
-
-        //  val f = File(context.externalCacheDir!!.absolutePath, "/RadioStation_Download")
-     //   val f = File(context.applicationContext.getExternalFilesDir(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString()/*+"/RadioStation_Download"*/)!!/*.absolutePath*/, "/RadioStation_Download")
-      //  val f = File(Environment.getExternalStorageDirectory().toString() + "/RadioStation_Download")
-        // File(context.getExternalFilesDir(DIRECTORY_DOWNLOADS).toString() + File.separator + "RadioStation")
-        //  File(getExternalStorageDirectory(DIRECTORY_DOWNLOADS).toString() + File.separator + "RadioStation")
-        // File(getStorageDirectory().toString() +File.separator  + "RadioStation")
-
-        //File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString() +File.separator  + "RadioStation")
-        // File(context/*.applicationContext*/.getExternalFilesDir(Environment.DIRECTORY_MUSIC.toString()/*+"/RadioStation_Download"*/)!!.absolutePath, "/RadioStation")
-
-
-        val f =     File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString() +File.separator  + "RadioStation")
-
-        return if (f.isDirectory) {
-            f// getExternalFilesDirs(context, /*DIRECTORY_DOWNLOADS*/null)[0]
-        } else {
-
-            // create a File object for the parent directory
-            // val wallpaperDirectory = File("/sdcard/RadioStation_Download/")
-            // have the object build the directory structure, if needed.
+        return if (f.isDirectory) f
+        else {
             f.mkdirs()
             f
-            // create a File object for the output file
-            // val outputFile = File(wallpaperDirectory, filename)
-            // now attach the OutputStream to the file object, instead of a String representation
-            //   val fos = FileOutputStream(outputFile)
-        }        //   return  context.filesDir
-      // return    getExternalFilesDirs(context, /*DIRECTORY_DOWNLOADS*/null)[0]
-
+        }
     }
 
     fun getRecordedFiles(context: Context): ArrayList<RecordInfo> {
@@ -915,7 +902,7 @@ object RadioFunction {
                 if (files != null) {
                     if(files.isNotEmpty()){
                         //LOOP THRU THOSE FILES GETTING NAME AND URI
-                        for (i in files!!.indices) {
+                        for (i in files.indices) {
                             val file = files[i]
                             s = RecordInfo()
                             s.name = file.name
@@ -1953,6 +1940,10 @@ fun getuserid():String{
     fun dynamicToast(context: Context,message: String) {
         DynamicToast.make(context, message, 9).show()
     }
+
+
+
+
 }
 
 

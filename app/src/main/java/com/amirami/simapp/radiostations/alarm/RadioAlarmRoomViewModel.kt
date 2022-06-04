@@ -1,4 +1,4 @@
-package com.amirami.simapp.radiostations.viewmodel
+package com.amirami.simapp.radiostations.alarm
 
 import androidx.activity.viewModels
 import androidx.lifecycle.LiveData
@@ -9,6 +9,7 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.firestore.ProductFirestoreRepository
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.repository.RadioRoomBaseRepository
+import com.amirami.simapp.radiostations.utils.ConvertRadioAlarmClass
 import com.amirami.simapp.radiostations.utils.ConvertRadioClass
 import com.amirami.simapp.radiostations.utils.Coroutines
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,19 +20,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class RadioRoomViewModel  @Inject constructor(
-    private val  sholistRoomBaseRepository : RadioRoomBaseRepository
+class RadioAlarmRoomViewModel  @Inject constructor(
+    private val  sholistRoomBaseRepository : RadioAlarmRoomBaseRepository
     ): ViewModel() {
 
     private val tasksEventChannel = Channel<ShopListEvents>()
     val shopListEvents = tasksEventChannel.receiveAsFlow()
 
-    private val liveList : MutableLiveData<MutableList<RadioRoom>> by lazy(LazyThreadSafetyMode.NONE, initializer = {
-        MutableLiveData<MutableList<RadioRoom>>()
-    })
-    private val liveUpdate : MutableLiveData<RadioRoom> by lazy(LazyThreadSafetyMode.NONE, initializer = {
-        MutableLiveData<RadioRoom>()
-    })
 
 
 
@@ -42,7 +37,7 @@ class RadioRoomViewModel  @Inject constructor(
     fun getRepositoryInstance() : String {
         return sholistRoomBaseRepository.giveRepository()
     }
-
+/*
     @Deprecated("For Static Data")
     fun setItems() {
         Coroutines.default {
@@ -53,7 +48,7 @@ class RadioRoomViewModel  @Inject constructor(
 
         }
     }
-
+*/
 
 // NEVER NEVER DONT DELTE AND SEE IF IT POSSIBLE TO USE IT
 /*
@@ -81,10 +76,10 @@ class RadioRoomViewModel  @Inject constructor(
 
 
 
-    fun upsertRadio(item : RadioRoom, msg:String) {
-        Coroutines.io(this@RadioRoomViewModel) {
+    fun upsertRadioAlarm(item : RadioAlarmRoom, msg:String) {
+        Coroutines.io(this@RadioAlarmRoomViewModel) {
             if(item.name!=""){//prevent add alarm played station
-                sholistRoomBaseRepository.upsert(ConvertRadioClass.toEntity(item))
+                sholistRoomBaseRepository.upsert(ConvertRadioAlarmClass.toEntity(item))
                 tasksEventChannel.send(ShopListEvents.ProdAddToShopMsg(msg))
 
             }
@@ -101,9 +96,9 @@ class RadioRoomViewModel  @Inject constructor(
     }*/
 
 
-    fun delete(raduiuid : String?, fav:Boolean, msg:String) {
-        Coroutines.io(this@RadioRoomViewModel) {
-            sholistRoomBaseRepository.delete(raduiuid,fav)
+    fun delete(raduiuid : String?, msg:String) {
+        Coroutines.io(this@RadioAlarmRoomViewModel) {
+            sholistRoomBaseRepository.delete(raduiuid)
             tasksEventChannel.send(ShopListEvents.ProdDeleteShopMsg(msg))
         }
     }
@@ -116,25 +111,20 @@ class RadioRoomViewModel  @Inject constructor(
 
 
 
-    fun deletelistened(fav:Boolean, msg:String) {
-        Coroutines.io(this@RadioRoomViewModel) {
-            sholistRoomBaseRepository.deletelistened(fav)
-            tasksEventChannel.send(ShopListEvents.ProdDeleteShopMsg(msg))
-        }
-    }
+
 
 
     fun deleteAll(msg:String) {
-        Coroutines.io(this@RadioRoomViewModel) {
+        Coroutines.io(this@RadioAlarmRoomViewModel) {
             sholistRoomBaseRepository.deleteAll()
             tasksEventChannel.send(ShopListEvents.ProdDeleteShopMsg(msg))
 
         }
     }
 
-     fun getAll(fav: Boolean) : LiveData<MutableList<RadioRoom>> { //return  liveList
-        return ConvertRadioClass.toLiveDataListModel(
-            sholistRoomBaseRepository.getAll(fav)
+     fun getAll() : LiveData<MutableList<RadioAlarmRoom>> { //return  liveList
+        return ConvertRadioAlarmClass.toLiveDataListModel(
+            sholistRoomBaseRepository.getAll()
         )
     }
 

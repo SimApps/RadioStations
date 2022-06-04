@@ -95,11 +95,16 @@ class ProductFirestoreRepository @Inject constructor(
     }
 
 
-     fun adduserDocumentInFirestore(favoriteFirestore: FavoriteFirestore): DataOrException<Boolean, String> {
+   suspend  fun adduserDocumentInFirestore(favoriteFirestore: FavoriteFirestore): DataOrException<Boolean, String> {
         val dataOrException = DataOrException<Boolean, String>()
         try {
            val products= db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())
-            products.get().addOnCompleteListener { task ->
+
+            products.set(favoriteFirestore,SetOptions.merge()).await()
+            dataOrException.data = true
+
+            //  products.get()
+            /*    .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val document = task.result
                     if(document != null) {
@@ -113,10 +118,11 @@ class ProductFirestoreRepository @Inject constructor(
 */
 
                     }
-                } else {
+                }
+                else {
                     dataOrException.e = task.exception.toString()
                 }
-            }
+            }*/
 
         } catch (e: FirebaseFirestoreException) {
             dataOrException.e = e.toString()

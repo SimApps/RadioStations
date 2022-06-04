@@ -1,11 +1,9 @@
 package com.amirami.simapp.radiostations.ui
 
 import android.Manifest
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -15,12 +13,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
-import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransition
 import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransitionConstraint
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.removeWord
@@ -32,6 +29,7 @@ import com.amirami.simapp.radiostations.databinding.FragmentListradioBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.model.Status
+import com.amirami.simapp.radiostations.utils.Constatnts.FROM_RECORDED_STREAM
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
@@ -283,24 +281,21 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
     }
 
     override fun onRecItemClick(recordInfo: RecordInfo) {
-
             GlobalRadiourl = recordInfo.uri.toString()
-            Exoplayer.initializePlayerRecodedradio(requireContext())
+            Exoplayer.initializePlayer(requireContext(),true)
 
             val radioVariables=RadioVariables ()
-
+        radioVariables.url_resolved= recordInfo.uri.toString()
         if (recordInfo.name.contains("_ _",true)){
             radioVariables.name=recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
-            radioVariables.url_resolved= recordInfo.uri.toString()
-
-            icyandState= shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _",
+            radioVariables.homepage=shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _",
                 true)[0] + 3, recordInfo.name.length), ".mp3"))
+          //  icyandState= shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _", true)[0] + 3, recordInfo.name.length), ".mp3"))
         }
         else {
             radioVariables.name=recordInfo.name
-            radioVariables.url_resolved= recordInfo.uri.toString()
-
-            icyandState= ""
+            radioVariables.homepage=""
+            //icyandState= ""
         }
 
 

@@ -190,9 +190,6 @@
         android:id="@+id/setAlarmBottomSheetFragment"
         android:name="com.amirami.simapp.radiostations.alarm.SetAlarmBottomSheetFragment"
         android:label="SetAlarmBottomSheetFragment" >
-        <argument
-            android:name="stationurl"
-            app:argType="string"
-            android:defaultValue="Empty"/>
+
     </dialog>
 </navigation>

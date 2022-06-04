@@ -74,10 +74,9 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
                 mainTxVw.text = radioRoom.name
                 descriptionTxVw.text = root.context.getString(
                     R.string.stationinfo,
-                    radioRoom.bitrate,
-                    radioRoom.country,
-                    radioRoom.language
-                )
+                    if (radioRoom.bitrate!="")radioRoom.bitrate +if (radioRoom.language!="" || radioRoom.language != "")" kbps, " else if(radioRoom.language!="") " kbps, " else " kbps " else ""  ,
+                    if(radioRoom.country!="")radioRoom.country +if (radioRoom.language!="")", " else "" else "",
+                    if(radioRoom.language!="")radioRoom.language  else "")
 
                 RadioFunction.loadImageString(root.context, radioRoom.favicon, MainActivity.imagedefaulterrorurl, ImageView)
 

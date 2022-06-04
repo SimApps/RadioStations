@@ -168,14 +168,25 @@
                     android:layout_gravity="center"
                     android:clickable="false"
                     android:scaleType="centerCrop"
+                    android:visibility="invisible"
                     app:srcCompat="@drawable/radioerror" />
 
-                <com.google.android.exoplayer2.ui.PlayerView
-                    android:id="@+id/video_view"
+
+
+                <androidx.media3.ui.AspectRatioFrameLayout
+                    android:layout_height="300dp"
                     android:layout_width="match_parent"
-                    android:layout_height="225dp"
-                    app:controller_layout_id="@layout/custom_playback_control"
-                    app:show_timeout="3000" />
+                    >
+                    <androidx.media3.ui.PlayerView
+                        android:id="@+id/video_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="225dp"
+                        app:controller_layout_id="@layout/custom_playback_control"
+                        app:show_timeout="3000"
+
+                        app:use_controller="true"
+                        app:use_artwork="true" />
+                </androidx.media3.ui.AspectRatioFrameLayout>
             </FrameLayout>
 
             <FrameLayout

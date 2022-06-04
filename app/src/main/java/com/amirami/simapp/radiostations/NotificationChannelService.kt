@@ -1,22 +1,19 @@
 package com.amirami.simapp.radiostations
 
-import android.annotation.SuppressLint
 import android.app.*
 import android.app.PendingIntent.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.media.AudioManager
-import android.media.MediaMetadata
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.support.v4.media.MediaMetadataCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import androidx.media.session.MediaButtonReceiver
+import androidx.media3.session.MediaStyleNotificationHelper
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.amirami.simapp.radiostations.Exoplayer.NOTIFICATION_DISMISSED
@@ -24,16 +21,13 @@ import com.amirami.simapp.radiostations.Exoplayer.PLAYPAUSE
 import com.amirami.simapp.radiostations.Exoplayer.REC
 import com.amirami.simapp.radiostations.Exoplayer.STOP
 import com.amirami.simapp.radiostations.Exoplayer.STOPALL
-import com.amirami.simapp.radiostations.Exoplayer.audioManager
 import com.amirami.simapp.radiostations.Exoplayer.getIsPlaying
-import com.amirami.simapp.radiostations.Exoplayer.initMediaSession
 import com.amirami.simapp.radiostations.Exoplayer.initializePlayer
 import com.amirami.simapp.radiostations.Exoplayer.isOreoPlus
 import com.amirami.simapp.radiostations.Exoplayer.is_downloading
 import com.amirami.simapp.radiostations.Exoplayer.is_playing_recorded_file
 import com.amirami.simapp.radiostations.Exoplayer.mMediaSession
 import com.amirami.simapp.radiostations.Exoplayer.notifi_CHANNEL_ID
-import com.amirami.simapp.radiostations.Exoplayer.notificationManager
 import com.amirami.simapp.radiostations.Exoplayer.ongoing
 import com.amirami.simapp.radiostations.Exoplayer.pausePlayer
 import com.amirami.simapp.radiostations.Exoplayer.playPauseIcon
@@ -49,7 +43,10 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterror
 
 
 class NotificationChannelService : Service() {
-    override fun onCreate() {
+    val notifID=93696
+    val requestCode=93695
+    val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
+  /*  override fun onCreate() {
         super.onCreate()
 
         /* mMediaSession = MediaSessionCompat(this, "media session")
@@ -65,51 +62,41 @@ class NotificationChannelService : Service() {
          audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
          */
-        initMediaSession(this)
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        //initMediaSession(this)
 
-        if (isOreoPlus()) OreoAudioFocusHandler(applicationContext)
 
 
 
         // The service is being created
         //Toast.makeText(application, "onCreate", Toast.LENGTH_SHORT).show()
-    }
+    }*/
 
     private fun handlePlayPause() {
 
-        playWhenReady = true
-        if (getIsPlaying()) {
+        //playWhenReady = true
+        if (playWhenReady && getIsPlaying) {
             pausePlayer( this)
-        } else {
+        }
+        else {
             if(player==null){
-                if(is_playing_recorded_file){
-                    Exoplayer.initializePlayerRecodedradio(this)
-                }else{
-                    initializePlayer(this)
-                    // video_view.player = player
-
-                }
+                if(is_playing_recorded_file)initializePlayer(this,true)
+                else initializePlayer(this,false)
             }
 
             startPlayer()
 
         }
 
-        if (player!=null){
-            player!!.addListener(Exoplayer.Playerlistener)
-        }
+      //  if (player!=null) player!!.addListener(Exoplayer.playbackStateListener(applicationContext))
+
     }
 
     private fun   handleREC(){
-
-
         if(is_downloading) {
             MainActivity.downloader?.cancelDownload()
         }
       else if(!is_playing_recorded_file && !is_downloading)  {
             RadioFunction.getDownloader(applicationContext )
-
             MainActivity.downloader?.download()
         }
 
@@ -117,58 +104,39 @@ class NotificationChannelService : Service() {
 
 
     private fun  handleSTOP(){
-        releasePlayer()
+        releasePlayer(applicationContext)
     }
 
     private fun  handleSTOPALL(){
         if(!is_downloading) {
             RadioFunction.stopService(this)
         }
-        releasePlayer()
+        releasePlayer(applicationContext)
 
 
     }
 
     fun getContentIntent(): PendingIntent {
-        val contentIntent = Intent(Intent.ACTION_VIEW, "radiobroadcasting://simappr.com/favoritfrag".toUri(),
-            this, MainActivity::class.java)
-       // val contentIntent = Intent(this, MainActivity::class.java)
-        return getActivity(this, 0, contentIntent, 0)/* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getBroadcast(
-                applicationContext,
-                0,
-                contentIntent,
-                FLAG_IMMUTABLE or FLAG_CANCEL_CURRENT
-            )
-        } else {
-            getBroadcast(
-                applicationContext,
-                0,
-                contentIntent,
-                FLAG_CANCEL_CURRENT // ignore it aleready fixed
-            )
-        }*/
+        // Create an Intent for the activity you want to start
+        val resultIntent = Intent(this, MainActivity::class.java)
+// Create the TaskStackBuilder
+        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+            // Add the intent, which inflates the back stack
+            addNextIntentWithParentStack(resultIntent)
+            // Get the PendingIntent containing the entire back stack
+            getPendingIntent(0,immutableFlag or FLAG_UPDATE_CURRENT)
+        }
 
+
+        return resultPendingIntent!!
 
     }
     fun getIntent(action: String): PendingIntent {
         val intent = Intent(this, ControlActionsListener::class.java)
         intent.action = action
-        return  getBroadcast(applicationContext, 0, intent, 0)/* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getBroadcast(
-                applicationContext,
-                0,
-                intent,
-                FLAG_IMMUTABLE or FLAG_CANCEL_CURRENT
-            )
-        } else {
-            getBroadcast(
-                applicationContext,
-                0,
-                intent,
-                FLAG_CANCEL_CURRENT // ignore it aleready fixed
-            )
-        }*/
+
+        return  getBroadcast(applicationContext, requestCode, intent, immutableFlag or FLAG_UPDATE_CURRENT)
+
 
 
     }
@@ -177,31 +145,10 @@ class NotificationChannelService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-       /* val   radiDBList= dbHandler.getCustomers(/*this*/)
-
-        if (radiDBList.size>0){
-
-            loop@ for (i in 0 until radiDBList.size){
-                val radio: RadioVariables =radiDBList[i]
-                if (GlobalRadioId ==radio.stationuuid) {
-                    likedislike=R.drawable.ic_heart
-
-                    break@loop
-                }else{
-                    likedislike=R.drawable.ic_liked
-                }
-            }
-        }
-*/
         lateinit var  notification: NotificationCompat.Builder
-        val actions = intent?.action
 
-        if (isOreoPlus() && actions != REC && actions != STOP && actions != PLAYPAUSE && actions != PLAYPAUSE) {
-            if (isOreoPlus() && actions != STOP && actions != REC && actions != PLAYPAUSE) {
-                setupFakeNotification()
-            }
-        }
-        when (actions) {
+
+        when (intent?.action) {
 
             PLAYPAUSE -> handlePlayPause()
             REC -> handleREC()
@@ -220,8 +167,6 @@ class NotificationChannelService : Service() {
                 notificationManager.createNotificationChannel(this)
             }
         }
-
-        if (!mMediaSession!!.isActive) MediaButtonReceiver.handleIntent(mMediaSession!!, intent)
 
 
         Exoplayer.Observer.changeText("Main text view", icyandState)
@@ -242,22 +187,9 @@ class NotificationChannelService : Service() {
         }
 
 
-        val notificationDismissedPendingIntent =  getBroadcast(this, 0, notificationDismissedIntent, FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                getBroadcast(
-                    this,
-                    0,
-                    notificationDismissedIntent,
-                    FLAG_IMMUTABLE or FLAG_CANCEL_CURRENT
-                )
-            } else {
-                getBroadcast(
-                    this,
-                    0,
-                    notificationDismissedIntent,
-                     FLAG_CANCEL_CURRENT // ignore it aleready fixed
-                )
-            }*/
+
+        val notificationDismissedPendingIntent =  getBroadcast(this, 0, notificationDismissedIntent, immutableFlag or FLAG_UPDATE_CURRENT)
+
 
 
       val request = ImageRequest.Builder(this@NotificationChannelService)
@@ -292,7 +224,6 @@ class NotificationChannelService : Service() {
                         .addAction(playPauseIcon, getString(R.string.playpause), getIntent(PLAYPAUSE))
                         //  .addAction(if(is_downloading){R.drawable.rec_on}else{R.drawable.rec_2}, "recon & recoff", getIntent(REC) /*favactionIntent*/)
                         .addAction(if(is_downloading) R.drawable.rec_on else R.drawable.stop_2, "stop", getIntent(STOP))
-                        .setShowWhen(false)
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         //.setContentIntent(playpauseactionIntent)
                         //.setDeleteIntent(pendingIntent)
@@ -300,13 +231,16 @@ class NotificationChannelService : Service() {
                         .setChannelId(notifi_CHANNEL_ID)
                         .setCategory(NotificationCompat.CATEGORY_SERVICE)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
                         .setStyle(
-                            androidx.media.app.NotificationCompat.MediaStyle()
+                           MediaStyleNotificationHelper.MediaStyle(mMediaSession)
                                 .setShowActionsInCompactView(0, 1, 2)
-                                .setMediaSession(mMediaSession?.sessionToken)
+                            // .setShowActionsInCompactView(1,2)
                         )
 
-                    mMediaSession!!.setMetadata(
+
+
+                 /*   mMediaSession!!.setMetadata(
                         MediaMetadataCompat.Builder()
                             .putBitmap(
                                 MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
@@ -318,13 +252,11 @@ class NotificationChannelService : Service() {
                             )
                             .putString(MediaMetadata.METADATA_KEY_ARTIST, icyandState)
                             .build()
-                    )
-                    //.setWhen()
-                    //.setUsesChronometer(true)
-                    // .build()
+                    )*/
 
 
-                    startForeground(1, notification.build())
+
+                    startForeground(notifID, notification.build())
 
 // delay foreground state updating a bit, so the notification can be swiped away properly after initial display
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -336,28 +268,7 @@ class NotificationChannelService : Service() {
 
                     }, 200L)
 
-                    // favactionIntent=getIntent(PLAYPAUSE)
-                    //   notification.build().flags = Notification.FLAG_ONGOING_EVENT
-                    //   notificationManager.notify(1, notification.build())
 
-                    /*     var playbackState = PlaybackStateCompat.STATE_PLAYING
-                     if (player!=null){
-                         if (player?.playWhenReady!!) { playbackState=PlaybackStateCompat.STATE_PLAYING } else{ playbackState=PlaybackStateCompat.STATE_PAUSED }
-
-                     }else{
-                         playbackState=PlaybackStateCompat.STATE_STOPPED
-                     }
-
-
-                        try {
-                            mMediaSession!!.setPlaybackState(
-                                PlaybackStateCompat.Builder()
-                                    .setState(playbackState,
-                                        PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
-                                    .build())
-                        } catch (ignored: IllegalStateException) {
-                        }
-*/
                 },
                 onError = { error ->
                     // Handle the error drawable.
@@ -386,7 +297,6 @@ class NotificationChannelService : Service() {
                         .addAction(playPauseIcon, getString(R.string.playpause), getIntent(PLAYPAUSE))
                         //  .addAction(if(is_downloading){R.drawable.rec_on}else{R.drawable.rec_2}, "recon & recoff", getIntent(REC) /*favactionIntent*/)
                         .addAction(if(is_downloading) R.drawable.rec_on else R.drawable.stop_2, "stop", getIntent(STOP))
-                        .setShowWhen(false)
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         //.setContentIntent(playpauseactionIntent)
                         //.setDeleteIntent(pendingIntent)
@@ -394,32 +304,13 @@ class NotificationChannelService : Service() {
                         .setChannelId(notifi_CHANNEL_ID)
                         .setCategory(NotificationCompat.CATEGORY_SERVICE)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setStyle(
-                            androidx.media.app.NotificationCompat.MediaStyle()
-                                .setShowActionsInCompactView(0, 1, 2)
-                                .setMediaSession(mMediaSession?.sessionToken)
+                        .setStyle(MediaStyleNotificationHelper.MediaStyle(mMediaSession)
+                            .setShowActionsInCompactView(0, 1, 2)
+                           // .setShowActionsInCompactView(1,2)
                         )
 
-                    mMediaSession!!.setMetadata(
-                        MediaMetadataCompat.Builder()
-                            .putBitmap(
-                                MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-                                BitmapFactory.decodeResource(this.resources,
-                                    R.drawable.radioerror)
-                            )//R.drawable.radio
-                            .putString(
-                                MediaMetadata.METADATA_KEY_TITLE, /*radio_name*/
-                                GlobalRadioName
-                            )
-                            .putString(MediaMetadata.METADATA_KEY_ARTIST, icyandState)
-                            .build()
-                    )
-                    //.setWhen()
-                    //.setUsesChronometer(true)
-                    // .build()
 
-
-                    startForeground(1, notification.build())
+                    startForeground(notifID, notification.build())
 
 // delay foreground state updating a bit, so the notification can be swiped away properly after initial display
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -435,16 +326,6 @@ class NotificationChannelService : Service() {
             )
             .build()
         this@NotificationChannelService.imageLoader.enqueue(request)
-
-
-
-
-        //do heavy work on a background thread
-        //    stopSelf()
-
-
-
-
 
         return START_STICKY  //START_NOT_STICKY
     }
@@ -470,12 +351,12 @@ class NotificationChannelService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         // The service is no longer used and is being destroyed
-        if (player == null/* && focus_state==AudioManager.AUDIOFOCUS_REQUEST_GRANTED*/){
+        if (player == null){
             stopSelf()
             stopForeground(true)
 
         }
-        mMediaSession?.isActive = false
+       // mMediaSession?.isActive = false
         //Toast.makeText(application, "onDestroy", Toast.LENGTH_SHORT).show()
 
 
@@ -488,31 +369,6 @@ class NotificationChannelService : Service() {
         }
 
     */
-    @SuppressLint("NewApi")
-    private fun setupFakeNotification() {
-        //  val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val name = resources.getString(R.string.app_name)
-        val importance = NotificationManager.IMPORTANCE_LOW
-        NotificationChannel(notifi_CHANNEL_ID, name, importance).apply {
-            enableLights(false)
-            enableVibration(false)
-            notificationManager.createNotificationChannel(this)
-        }
-        val  notification = NotificationCompat.Builder(applicationContext, notifi_CHANNEL_ID)
-            .setContentTitle("")
-            .setContentText("")
-            .setSmallIcon(R.drawable.radioerror)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_MIN) // max
-            .setChannelId(notifi_CHANNEL_ID)
-            .setOnlyAlertOnce(true)
-            .setCategory(Notification.CATEGORY_SERVICE)
-
-        startForeground(1, notification.build())
-
-        // notificationManager.notify( 1, notification.build() )
-    }
 
 
 }

@@ -39,7 +39,9 @@ class InfoViewModel  @Inject constructor(
     val putRadioPlayerInfo: StateFlow<RadioVariables>
         get() = _putRadioPlayerInfo
 
-
+    private val _putRadioAlarmInfo = MutableStateFlow(RadioVariables())
+    val putRadioAlarmInfo: StateFlow<RadioVariables>
+        get() = _putRadioAlarmInfo
 
     private val _putTitleText = MutableStateFlow("")
     val putTitleText: StateFlow<String>
@@ -251,11 +253,18 @@ fun countDownTimer(startingValue:Int) = flow<Int>{
         viewModelScope.launch {
             // radioEventsChannel.send(RadioInfoEvents.PutDefCountryInfo(radiovar))
 
-            _putRadioPlayerInfo.value = radiovar
+            //_putRadioPlayerInfo.value = radiovar
+            _putRadioPlayerInfo.emit(radiovar)
         }
     }
 
+    fun putRadioalarmInfo(radiovar:RadioVariables){
+        viewModelScope.launch {
+            // radioEventsChannel.send(RadioInfoEvents.PutDefCountryInfo(radiovar))
 
+            _putRadioAlarmInfo.value = radiovar
+        }
+    }
 
 
     fun putTitleText(title:String){

@@ -188,7 +188,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
         try {
             GlobalRadiourl=radio.url_resolved
             MainActivity.GlobalImage = radio.favicon
-            Exoplayer.initializePlayer(requireContext())
+            Exoplayer.initializePlayer(requireContext(),false)
             Exoplayer.startPlayer()
             infoViewModel.putRadiopalyerInfo(radio)
            // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)

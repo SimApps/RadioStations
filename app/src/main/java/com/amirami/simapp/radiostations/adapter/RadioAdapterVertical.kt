@@ -62,10 +62,36 @@ import java.util.*
                     RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
                     RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
 
+
                 mainTxVw.text=currentTvShow.name
-                descriptionTxVw.text=root.context.getString(
-                        R.string.stationinfo,
-                        currentTvShow.bitrate,currentTvShow.country,currentTvShow.language)
+                descriptionTxVw.text= root.context.getString(
+                    R.string.stationinfo,
+                  if (currentTvShow.bitrate!="")currentTvShow.bitrate +if (currentTvShow.language!="" || currentTvShow.language != "")" kbps, " else if(currentTvShow.language!="") " kbps, " else " kbps " else ""  ,
+                    if(currentTvShow.country!="")currentTvShow.country +if (currentTvShow.language!="")", " else "" else "",
+                    if(currentTvShow.language!="")currentTvShow.language  else "")
+
+                    /*    fun stationInfo():String{
+                 return if (currentTvShow.bitrate!=""&&currentTvShow.country!= "" && currentTvShow.language!= "")
+                     currentTvShow.bitrate + "kbps, " + currentTvShow.country+ ", " + currentTvShow.language
+                   else if (currentTvShow.bitrate != "" && currentTvShow.country != "" && currentTvShow.language == "")
+                     currentTvShow.bitrate + "kbps, " + currentTvShow.country
+                   else if (currentTvShow.bitrate!= "" && currentTvShow.country=="" && currentTvShow.language != "")
+                     currentTvShow.bitrate +"kbps, "+ currentTvShow.language!=""
+                   else if (currentTvShow.bitrate==""&&currentTvShow.country!="" &&currentTvShow.language!="")
+                     currentTvShow.country+ ", "+currentTvShow.language
+                   else if (currentTvShow.bitrate!=""&&currentTvShow.country==""&& currentTvShow.language=="")
+                     currentTvShow.bitrate +"kbps"
+                   else if(currentTvShow.bitrate==""&&currentTvShow.country!=""&& currentTvShow.language=="")
+                     currentTvShow.country
+                   else if (currentTvShow.bitrate==""&&currentTvShow.country==""&& currentTvShow.language!="")
+                     currentTvShow.language
+                   else ""
+               }*/
+
+
+
+
+
 
 
                     RadioFunction.loadImageString(

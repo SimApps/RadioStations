@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.amirami.simapp.radiostations.MainActivity
+import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
@@ -74,7 +75,13 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
                 RadioFunction.secondarytextviewColor(descriptionTxV, MainActivity.darkTheme)
 
                 mainTxV.text=radioRoom.name
-                descriptionTxV.text=radioRoom.country  //root.context.getString(R.string.stationinfo,radioRoom.bitrate,radioRoom.country,radioRoom.language)
+                descriptionTxV.text=root.context.getString(
+                    R.string.stationinfo,
+                    if (radioRoom.bitrate!="")radioRoom.bitrate +if (radioRoom.language!="" || radioRoom.language != "")" kbps, " else if(radioRoom.language!="") " kbps, " else " kbps " else ""  ,
+                    if(radioRoom.country!="")radioRoom.country +if (radioRoom.language!="")", " else "" else "",
+                    if(radioRoom.language!="")radioRoom.language  else "")
+
+                //root.context.getString(R.string.stationinfo,radioRoom.bitrate,radioRoom.country,radioRoom.language)
                 descriptionTxV.visibility = View.GONE
                 RadioFunction.loadImageString( root.context,radioRoom.favicon,
                     MainActivity.imagedefaulterrorurl,imageViewRv)

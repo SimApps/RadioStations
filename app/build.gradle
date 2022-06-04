@@ -58,9 +58,9 @@ dependencies {
 
     implementation 'androidx.multidex:multidex:2.0.1'
    // implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
@@ -83,11 +83,16 @@ dependencies {
     implementation("io.coil-kt:coil:1.4.0")
     implementation("io.coil-kt:coil-gif:1.4.0")
 
-//exoplayer
-     implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
-     implementation 'com.google.android.exoplayer:extension-mediasession:2.17.1'
 
-
+    implementation 'androidx.media3:media3-ui:1.0.0-alpha03'
+    implementation 'androidx.media3:media3-exoplayer:1.0.0-alpha03'
+    implementation 'androidx.media3:media3-session:1.0.0-alpha03'
+    // For DASH playback support with ExoPlayer
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.0-alpha03")
+    // For HLS playback support with ExoPlayer
+    implementation("androidx.media3:media3-exoplayer-hls:1.0.0-alpha03")
+// For exposing and controlling media sessions
+    implementation("androidx.media3:media3-session:1.0.0-alpha03")
 
 
     //key board event
@@ -98,17 +103,36 @@ dependencies {
     implementation 'com.tappx.sdk.android:tappx-sdk:3.1.16'
     implementation 'com.google.android.gms:play-services-base:18.0.1'
 
+
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:30.1.0')
+
     //ads to remove in pro
-    implementation  'com.google.firebase:firebase-ads:21.0.0'
+    //implementation  'com.google.firebase:firebase-ads-ktx'
     implementation 'com.google.android.gms:play-services-ads:21.0.0'
 
     // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.11'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     // Recommended: Add the Google Analytics SDK.
-    implementation 'com.google.firebase:firebase-analytics:21.0.0'
+ //   implementation 'com.google.firebase:firebase-analytics'
+
+    // Declare the KTX library instead (which automatically has a dependency on the base library)
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+
 // Add the dependency for the Performance Monitoring library
-    implementation 'com.google.firebase:firebase-perf:20.1.0'
+    implementation 'com.google.firebase:firebase-perf-ktx'
+
+//firebase auth
+   // implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.0'
+
+    //firebase firestore
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-appcheck-playintegrity'
 
 
 
@@ -175,11 +199,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
 
-    //firebase auth
-    implementation 'com.firebaseui:firebase-ui-auth:8.0.0' //remove it and fix the rest
 
-    //firebase firestore
-    implementation 'com.google.firebase:firebase-firestore:24.1.2'
 }
 allprojects {
     repositories {

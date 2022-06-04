@@ -4,12 +4,17 @@ import alirezat775.lib.downloader.Downloader
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
-import android.app.SearchManager
+import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.*
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +22,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
@@ -27,14 +34,19 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.RadioFunction.allPermissionsGranted
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
-import com.amirami.simapp.radiostations.RadioFunction.startServices
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
+import com.amirami.simapp.radiostations.alarm.RadioAlarmRoomViewModel
 import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
+import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_CHANNEL_ID
+import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
+import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
+import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
@@ -44,6 +56,9 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +70,6 @@ import java.io.IOException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemClickListener {
-
 
     var populateFavRv = true //temoprary mesure
 
@@ -78,9 +92,11 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     private val preferencesViewModel: PreferencesViewModel by viewModels()
     private val radioRoomViewModel: RadioRoomViewModel by viewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by viewModels()
+    private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by viewModels()
 
     private val radioRoom: MutableList<RadioRoom> = mutableListOf()
 
+  var recordDrawable= R.drawable.pop
     // Determine the screen width (less decorations) to use for the ad width.
     // If the ad hasn't been laid out, default to the full screen width.
     private val adSize: AdSize
@@ -130,6 +146,12 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         setContentView(view)
 
 
+        FirebaseappCheck()
+
+        if(fromAlarm) getAlarmRadioRoom()
+
+
+
         getPref()
         setTheme()
 
@@ -145,23 +167,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         searchquerry()
 
 
+        btnsClicks()
 
 
-        binding.searchView.settingButton.setSafeOnClickListener {
-            opensettingfrag()
-        }
-        binding.searchView.opencloseSearchButton.setSafeOnClickListener {
-            if (binding.searchView.searchInputText.isVisible) {
-                closeSearch()
-                closesearchfrag()
-            } else openSearch()
-
-        }
-
-        binding.searchView.addAlarmButton.setSafeOnClickListener {
-            // showCountdownTimerPopup()
-            openCountdownTimer()
-        }
 
 
 
@@ -173,406 +181,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 // This happens when lifecycle is STARTED and stops
                 // collecting when the lifecycle is STOPPED
                 infoViewModel.putRadioPlayerInfo.collectLatest { radioVar ->
-
-                    if (Exoplayer.player != null && !Exoplayer.is_playing_recorded_file) {
-                        val radioroom = RadioRoom(
-                            radioVar.stationuuid,
-                            radioVar.name,
-                            radioVar.bitrate,
-                            radioVar.homepage,
-                            radioVar.favicon,
-                            radioVar.tags,
-                            radioVar.country,
-                            radioVar.state,
-                            //var RadiostateDB: String?,
-                            radioVar.language,
-                            radioVar.url_resolved,
-                            false
-                        )
-                        radioRoomViewModel.upsertRadio(radioroom, "Radio added")
-                        radioRoomViewModel.deletelistened(false, "Radio listened deleted")
-
-                    }
-                    stationuuid = radioVar.stationuuid
-
-
-                    GlobalImage = radioVar.favicon
-                    GlobalRadioName = radioVar.name
-
-                    startServices(this@MainActivity)
-
-
-
-
-
-                    binding.radioplayer.RadioNameImVFrag.isSelected = true
-                    binding.radioplayer.RadioNameImVFrag.text = radioVar.name
-
-
-
-                    if (!Exoplayer.is_playing_recorded_file) {
-                        RadioFunction.loadImageString(
-                            this@MainActivity,
-                            radioVar.favicon,
-                            imagedefaulterrorurl,
-                            binding.radioplayer.RadioImVFragBig
-                        )
-                        RadioFunction.loadImageString(
-                            this@MainActivity,
-                            radioVar.favicon,
-                            imagedefaulterrorurl,
-                            binding.radioplayer.RadioImVFrag
-                        )
-                        //fav icon begin
-
-                        RadioFunction.loadImageString(
-                            this@MainActivity,
-                            radioVar.favicon,
-                            imagedefaulterrorurl,
-                            binding.radioplayer.RadioImVFrag
-                        )
-                        RadioFunction.loadImageString(
-                            this@MainActivity,
-                            radioVar.favicon,
-                            imagedefaulterrorurl,
-                            binding.radioplayer.RadioImVFragBig
-                        )
-                    }
-                    else {
-                        binding.radioplayer.RadioImVFragBig.setImageResource(R.drawable.rec_on)
-                        binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.rec_on)
-
-                        //maybe change maun faiv image like in mini palayer
-                        binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_recordings_folder)
-
-                        binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.rec_on)
-                        //  RadioFunction.loadImageInt(R.drawable.recordings, imagedefaulterrorurl, binding.radioplayer.RadioImVFrag)
-                    }
-
-
-                    binding.radioplayer.likeImageViewPlayermain.setOnClickListener {
-                        if (!Exoplayer.is_playing_recorded_file)
-                            favRadio(
-                                radioVar.favicon,
-                                radioVar.name,
-                                radioVar.homepage,
-                                radioVar.url_resolved,
-                                radioVar.country,
-                                radioVar.bitrate,
-                                radioVar.language,
-                                radioVar.tags,
-                                radioVar.stationuuid,
-                                radioVar.state
-                            )
-                        else DynamicToast.makeError(
-                            this@MainActivity,
-                            " Recorded files cannot be added to favorite radio ",
-                            3
-                        ).show()
-                    }
-                    binding.radioplayer.likeImageView.setOnClickListener {
-                        if (!Exoplayer.is_playing_recorded_file)
-                            favRadio(
-                                radioVar.favicon,
-                                radioVar.name,
-                                radioVar.homepage,
-                                radioVar.url_resolved,
-                                radioVar.country,
-                                radioVar.bitrate,
-                                radioVar.language,
-                                radioVar.tags,
-                                radioVar.stationuuid,
-                                radioVar.state
-                            )
-                        else {
-                            if (firstTimeopenRecordfolder) {
-                                firstTimeopenRecordfolder = false
-                                if (!isFinishing) {
-                                    val navController = Navigation.findNavController(
-                                        this@MainActivity,
-                                        R.id.fragment_container
-                                    )
-                                    navController.navigateUp()
-                                    val bundle = bundleOf(
-                                        "title" to getString(R.string.Keep_in_mind),
-                                        "msg" to getString(R.string.recordmessage)
-                                    )
-                                    navController.navigate(R.id.infoBottomSheetFragment, bundle)
-                                }
-
-                                preferencesViewModel.onFirstTimeopenRecordFolderChanged(
-                                    firstTimeopenRecordfolder
-                                )
-                            }
-                            RadioFunction.openRecordFolder(this@MainActivity)
-
-
-                        }
-                        //getRadioRoom()
-                        //infoViewModel.putRadiopalyerInfo(radioVar)
-                    }
-
-                    binding.radioplayer.moreButtons.setSafeOnClickListener {
-                        //     val radioVars = radioVar
-
-                        radioVar.moreinfo = "fromplayer"
-                        infoViewModel.putRadioInfo(radioVar)
-                        val navController =
-                            Navigation.findNavController(this@MainActivity, R.id.fragment_container)
-                        // navController.navigateUp()
-                        navController.navigate(R.id.moreBottomSheetFragment)
-
-
-                    }
-
-                    binding.radioplayer.radioInfotxV.setSafeOnClickListener {
-                        if (binding.radioplayer.radioInfotxV.text.toString().isNotEmpty()
-                            && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.playernullinfo)
-                            && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.BUFFERING)
-                            && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.OoOps_Try_another_station)
-                        ) {
-
-                            RadioFunction.copytext(
-                                this@MainActivity,
-                                binding.radioplayer.radioInfotxV.text.toString()
-                            )
-
-                           googleSearch()
-                        }
-
-                    }
-
-                    binding.radioplayer.stopButtonMain.setOnClickListener {
-                        if (isDownloadingCustomurl) {
-                            customdownloader?.cancelDownload()
-                            binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
-                        } else {
-                            if (Exoplayer.player != null) {
-                                if (!Exoplayer.is_downloading) {
-                                    binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
-                                    binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-                                    RadioFunction.stopService(this@MainActivity)
-                                    Exoplayer.releasePlayer()
-                                } else {
-                                    downloader?.cancelDownload()
-                                    binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
-                                }
-
-
-
-                                binding.radioplayer.videoView.player = null
-
-                                if (video_on || Exoplayer.is_playing_recorded_file) {
-
-                                    binding.radioplayer.videoView.player = Exoplayer.player
-                                    binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                                    binding.radioplayer.videoView.visibility = View.VISIBLE
-
-                                } else {
-                                    binding.radioplayer.videoView.visibility = View.INVISIBLE
-                                    binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-
-                                    RadioFunction.loadImageString(
-                                        this@MainActivity,
-                                        radioVar.favicon,
-                                        imagedefaulterrorurl,
-                                        binding.radioplayer.RadioImVFragBig
-                                    )
-                                }
-
-                            }
-                        }
-
-                        /*     if(ExoPlayer.player !=null){
-                            RadioFunction.startServices(this@MainActivity)
-                        }*/
-                    }
-                    binding.radioplayer.stopButton.setSafeOnClickListener {
-                        if (isDownloadingCustomurl) {
-                            customdownloader?.cancelDownload()
-                            binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
-                        }
-                        else
-                            if (Exoplayer.player != null) {
-                                if (!Exoplayer.is_downloading) {
-                                    binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
-                                    binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-                                    RadioFunction.stopService(this@MainActivity)
-                                    Exoplayer.releasePlayer()
-                                } else {
-                                    downloader?.cancelDownload()
-                                    binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
-                                }
-
-
-
-                                binding.radioplayer.videoView.player = null
-
-                                if (video_on || Exoplayer.is_playing_recorded_file) {
-
-                                    binding.radioplayer.videoView.player = Exoplayer.player
-                                    binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                                    binding.radioplayer.videoView.visibility = View.VISIBLE
-
-                                } else {
-                                    binding.radioplayer.videoView.visibility = View.INVISIBLE
-                                    binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-
-                                    RadioFunction.loadImageString(
-                                        this@MainActivity,
-                                        radioVar.favicon,
-                                        imagedefaulterrorurl,
-                                        binding.radioplayer.RadioImVFragBig
-                                    )
-                                }
-
-                            }
-                    }
-
-                    binding.radioplayer.pauseplayButtonMain.setOnClickListener {
-
-                        if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
-                            Exoplayer.startPlayer()
-                            //    seekbarUpdate()
-                            binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-
-                        } else if (Exoplayer.player == null) {
-                            if (Exoplayer.is_playing_recorded_file) {
-                                Exoplayer.initializePlayerRecodedradio(this@MainActivity)
-                                //    seekbarUpdate()
-                            } else Exoplayer.initializePlayer(this@MainActivity)
-
-                            Exoplayer.startPlayer()
-
-                            binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-
-
-                            if (video_on || Exoplayer.is_playing_recorded_file) {
-                                binding.radioplayer.videoView.player = Exoplayer.player
-                                binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                                binding.radioplayer.videoView.visibility = View.VISIBLE
-                            } else {
-                                binding.radioplayer.videoView.visibility = View.GONE
-                                binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-                            }
-                        } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
-                            //  seekbarUpdate()
-                            Exoplayer.pausePlayer(this@MainActivity)
-                            binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
-                            binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-                        }
-                    }
-
-                    binding.radioplayer.pauseplayButton.setOnClickListener {
-                       /* DynamicToast.makeError(
-                            this@MainActivity,
-                            ff+GlobalstateString + Exoplayer.playWhenReady.toString(),
-                            3
-                        ).show()*/
-                         if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED" /*&& GlobalRadiourl!=""*/) {
-
-                            Exoplayer.startPlayer()
-                            //   seekbarUpdate()
-                            binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-                            //binding.radioplayer.pauseplayButton.setImageResource(R.drawable.pause_2)
-
-                        }
-                        else if (Exoplayer.player == null  /*&& GlobalRadiourl!=""*/) {
-                            if (Exoplayer.is_playing_recorded_file) {
-                                Exoplayer.initializePlayerRecodedradio(this@MainActivity)
-                                //   seekbarUpdate()
-                            } else {
-                                Exoplayer.initializePlayer(this@MainActivity)
-                                // video_view.player = player
-
-                            }
-
-                            Exoplayer.startPlayer()
-
-                            binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-
-
-                            if (video_on || Exoplayer.is_playing_recorded_file) {
-                                binding.radioplayer.videoView.player = Exoplayer.player
-                                binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                                binding.radioplayer.videoView.visibility = View.VISIBLE
-                            } else {
-                                binding.radioplayer.videoView.visibility = View.INVISIBLE
-                                binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-                            }
-                        }
-                        else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" /*&& GlobalRadiourl!=""*/) {
-                            //    seekbarUpdate()
-                            Exoplayer.pausePlayer(this@MainActivity)
-                            binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
-                            binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-
-                        }
-                    }
-
-                    binding.radioplayer.recordOffONButton.setOnClickListener {
-
-                        if (Exoplayer.is_downloading) {
-                            downloader?.cancelDownload()
-                            binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
-                            binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
-                        } else {
-                            if (video_on || Exoplayer.is_playing_recorded_file) {
-                                DynamicToast.makeError(
-                                    this@MainActivity,
-                                    getString(R.string.VideoRecordNotAvailable),
-                                    6
-                                ).show()
-                            }
-                            if (Exoplayer.is_playing_recorded_file) {
-                                DynamicToast.makeError(
-                                    this@MainActivity,
-                                    getString(R.string.cantRecordArecordedStream),
-                                    6
-                                ).show()
-                            }
-                            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
-
-                                if (!isDownloadingCustomurl) {
-                                    if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
-                                    else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
-
-
-                                    downloader?.download()
-
-                                    if (Exoplayer.is_downloading) {
-                                        binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_on)
-                                        binding.radioplayer.stopButton.setImageResource(R.drawable.rec_on)
-
-                                    }
-                                    RadioFunction.interatialadsShow(this@MainActivity)
-                                } else {
-                                    DynamicToast.makeError(
-                                        this@MainActivity,
-                                        getString(R.string.cantrecordwhendownload),
-                                        6
-                                    ).show()
-                                }
-                            }
-                        }
-
-                    }
-
-
-                    //    savedInstanceState?.let { videoPosition = savedInstanceState.getLong(argVideoPosition) }
-
-                    Exoplayer.Observer.changeText("Main text view", RadioFunction.infoString())
-                    Exoplayer.Observer.changeText("text view", RadioFunction.infoString())
-
-
-                    if (video_on || Exoplayer.is_playing_recorded_file) {
-                        binding.radioplayer.videoView.player = Exoplayer.player
-                        binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                        binding.radioplayer.videoView.visibility = View.VISIBLE
-                    } else {
-                        binding.radioplayer.videoView.visibility = View.INVISIBLE
-                        binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-                    }
+                   // startServices(this@MainActivity)
+                    setPlayer(radioVar)
                 }
 
             }
@@ -586,7 +196,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 when (it) {
                     1 -> {
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        Exoplayer.releasePlayer()
+                        Exoplayer.releasePlayer(this@MainActivity)
                         infoViewModel.stoptimer()
                     }
                     -1 -> {
@@ -614,7 +224,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     }
                     it < 0L -> {
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        Exoplayer.releasePlayer()
+                        Exoplayer.releasePlayer(this@MainActivity)
                         infoViewModel.stopdatatimer()
                     }
                     else -> {
@@ -631,6 +241,416 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     }
 
+    private fun setPlayer(radioVar: RadioVariables) {
+        if (Exoplayer.player != null && !Exoplayer.is_playing_recorded_file) {
+            val radioroom = RadioRoom(
+                radioVar.stationuuid,
+                radioVar.name,
+                radioVar.bitrate,
+                radioVar.homepage,
+                radioVar.favicon,
+                radioVar.tags,
+                radioVar.country,
+                radioVar.state,
+                //var RadiostateDB: String?,
+                radioVar.language,
+                radioVar.url_resolved,
+                false
+            )
+            radioRoomViewModel.upsertRadio(radioroom, "Radio added")
+            radioRoomViewModel.deletelistened(false, "Radio listened deleted")
+
+        }
+
+
+        if (!Exoplayer.is_playing_recorded_file) {
+            RadioFunction.loadImageString(
+                this@MainActivity,
+                radioVar.favicon,
+                imagedefaulterrorurl,
+                binding.radioplayer.RadioImVFrag
+            )
+            RadioFunction.loadImageString(
+                this@MainActivity,
+                radioVar.favicon,
+                imagedefaulterrorurl,
+                binding.radioplayer.RadioImVFragBig
+            )
+        }
+        else {
+            binding.radioplayer.RadioImVFragBig.setImageResource(R.drawable.rec_on)
+            binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.rec_on)
+
+            //maybe change maun faiv image like in mini palayer
+            binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_recordings_folder)
+
+            binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.rec_on)
+            //  RadioFunction.loadImageInt(R.drawable.recordings, imagedefaulterrorurl, binding.radioplayer.RadioImVFrag)
+        }
+
+        stationuuid = radioVar.stationuuid
+        GlobalImage = radioVar.favicon
+        GlobalRadioName = radioVar.name
+
+        binding.radioplayer.likeImageViewPlayermain.setSafeOnClickListener {
+            if (!Exoplayer.is_playing_recorded_file)
+                favRadio(
+                    radioVar.favicon,
+                    radioVar.name,
+                    radioVar.homepage,
+                    radioVar.url_resolved,
+                    radioVar.country,
+                    radioVar.bitrate,
+                    radioVar.language,
+                    radioVar.tags,
+                    radioVar.stationuuid,
+                    radioVar.state
+                )
+            else DynamicToast.makeError(
+                this@MainActivity,
+                " Recorded files cannot be added to favorite radio ",
+                3
+            ).show()
+        }
+        binding.radioplayer.likeImageView.setSafeOnClickListener {
+            if (!Exoplayer.is_playing_recorded_file)
+                favRadio(
+                    radioVar.favicon,
+                    radioVar.name,
+                    radioVar.homepage,
+                    radioVar.url_resolved,
+                    radioVar.country,
+                    radioVar.bitrate,
+                    radioVar.language,
+                    radioVar.tags,
+                    radioVar.stationuuid,
+                    radioVar.state
+                )
+            else {
+                if (firstTimeopenRecordfolder) {
+                    firstTimeopenRecordfolder = false
+                    if (!isFinishing) {
+                        val navController = Navigation.findNavController(
+                            this@MainActivity,
+                            R.id.fragment_container
+                        )
+                        navController.navigateUp()
+                        val bundle = bundleOf(
+                            "title" to getString(R.string.Keep_in_mind),
+                            "msg" to getString(R.string.recordmessage)
+                        )
+                        navController.navigate(R.id.infoBottomSheetFragment, bundle)
+                    }
+
+                    preferencesViewModel.onFirstTimeopenRecordFolderChanged(
+                        firstTimeopenRecordfolder
+                    )
+                }
+                RadioFunction.openRecordFolder(this@MainActivity)
+
+
+            }
+            //getRadioRoom()
+            //infoViewModel.putRadiopalyerInfo(radioVar)
+        }
+
+        binding.radioplayer.moreButtons.setSafeOnClickListener {
+            //     val radioVars = radioVar
+            radioVar.moreinfo = FROM_PLAYER
+            infoViewModel.putRadioInfo(radioVar)
+            val navController =
+                Navigation.findNavController(this@MainActivity, R.id.fragment_container)
+            // navController.navigateUp()
+            navController.navigate(R.id.moreBottomSheetFragment)
+
+
+        }
+
+
+        binding.radioplayer.stopButtonMain.setSafeOnClickListener {
+            if (isDownloadingCustomurl) {
+                customdownloader?.cancelDownload()
+                binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
+            } else {
+                if (Exoplayer.player != null) {
+                    if (!Exoplayer.is_downloading) {
+                        binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
+                        binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
+                        RadioFunction.stopService(this@MainActivity)
+                        Exoplayer.releasePlayer(this@MainActivity)
+                    } else {
+                        downloader?.cancelDownload()
+                        binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
+                    }
+
+
+
+                    binding.radioplayer.videoView.player = null
+
+                    if (video_on || Exoplayer.is_playing_recorded_file) {
+
+                        binding.radioplayer.videoView.player = Exoplayer.player
+                        binding.radioplayer.RadioImVFragBig.visibility = View.GONE
+                        binding.radioplayer.videoView.visibility = View.VISIBLE
+                        binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
+
+                    } else {
+                        binding.radioplayer.videoView.visibility = View.INVISIBLE
+                        binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
+
+                        RadioFunction.loadImageString(
+                            this@MainActivity,
+                            radioVar.favicon,
+                            imagedefaulterrorurl,
+                            binding.radioplayer.RadioImVFragBig
+                        )
+                    }
+
+                }
+            }
+
+            /*     if(ExoPlayer.player !=null){
+                RadioFunction.startServices(this@MainActivity)
+            }*/
+        }
+        binding.radioplayer.stopButton.setSafeOnClickListener {
+            if (isDownloadingCustomurl) {
+                customdownloader?.cancelDownload()
+                binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
+            }
+            else
+                if (Exoplayer.player != null) {
+                    if (!Exoplayer.is_downloading) {
+                        binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
+                        binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
+                        RadioFunction.stopService(this@MainActivity)
+                        Exoplayer.releasePlayer(this@MainActivity)
+                    } else {
+                        downloader?.cancelDownload()
+                        binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
+                    }
+
+
+
+                    binding.radioplayer.videoView.player = null
+
+                    if (video_on || Exoplayer.is_playing_recorded_file) {
+
+                        binding.radioplayer.videoView.player = Exoplayer.player
+                        binding.radioplayer.RadioImVFragBig.visibility = View.GONE
+                        binding.radioplayer.videoView.visibility = View.VISIBLE
+                        binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
+
+                    } else {
+                        binding.radioplayer.videoView.visibility = View.INVISIBLE
+                        binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
+
+                        RadioFunction.loadImageString(
+                            this@MainActivity,
+                            radioVar.favicon,
+                            imagedefaulterrorurl,
+                            binding.radioplayer.RadioImVFragBig
+                        )
+                    }
+
+                }
+        }
+
+        binding.radioplayer.pauseplayButtonMain.setOnClickListener {
+
+            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
+                Exoplayer.startPlayer()
+                //    seekbarUpdate()
+                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
+
+            } else if (Exoplayer.player == null) {
+                if (Exoplayer.is_playing_recorded_file) {
+                    Exoplayer.initializePlayer(this@MainActivity,true)
+                    //    seekbarUpdate()
+                } else Exoplayer.initializePlayer(this@MainActivity,false)
+
+                Exoplayer.startPlayer()
+
+                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
+
+
+                if (video_on || Exoplayer.is_playing_recorded_file) {
+                    binding.radioplayer.videoView.player = Exoplayer.player
+                    binding.radioplayer.RadioImVFragBig.visibility = View.GONE
+                    binding.radioplayer.videoView.visibility = View.VISIBLE
+                    binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
+                } else {
+                    binding.radioplayer.videoView.visibility = View.GONE
+                    binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
+                }
+            } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
+                //  seekbarUpdate()
+                Exoplayer.pausePlayer(this@MainActivity)
+                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
+                binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
+            }
+        }
+
+        binding.radioplayer.pauseplayButton.setOnClickListener {
+            /* DynamicToast.makeError(
+                 this@MainActivity,
+                 ff+GlobalstateString + Exoplayer.playWhenReady.toString(),
+                 3
+             ).show()*/
+            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED" /*&& GlobalRadiourl!=""*/) {
+
+                Exoplayer.startPlayer()
+                //   seekbarUpdate()
+                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
+                //binding.radioplayer.pauseplayButton.setImageResource(R.drawable.pause_2)
+
+            }
+            else if (Exoplayer.player == null  /*&& GlobalRadiourl!=""*/) {
+                if (Exoplayer.is_playing_recorded_file) {
+                    Exoplayer.initializePlayer(this@MainActivity,true)
+                    //   seekbarUpdate()
+                } else {
+                    Exoplayer.initializePlayer(this@MainActivity,false)
+                    // video_view.player = player
+
+                }
+
+                Exoplayer.startPlayer()
+
+                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
+
+
+                if (video_on || Exoplayer.is_playing_recorded_file) {
+                    binding.radioplayer.videoView.player = Exoplayer.player
+                    binding.radioplayer.RadioImVFragBig.visibility = View.GONE
+                    binding.radioplayer.videoView.visibility = View.VISIBLE
+                    binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
+                } else {
+                    binding.radioplayer.videoView.visibility = View.INVISIBLE
+                    binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
+                }
+            }
+            else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" /*&& GlobalRadiourl!=""*/) {
+                //    seekbarUpdate()
+                Exoplayer.pausePlayer(this@MainActivity)
+                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
+                binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
+
+            }
+        }
+
+
+        binding.radioplayer.RadioNameImVFrag.isSelected = true
+        binding.radioplayer.RadioNameImVFrag.text = radioVar.name
+
+        binding.radioplayer.recordOffONButton.setSafeOnClickListener {
+
+            if (Exoplayer.is_downloading) {
+                downloader?.cancelDownload()
+                binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
+                binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
+            } else {
+                if (video_on || Exoplayer.is_playing_recorded_file) {
+                    DynamicToast.makeError(
+                        this@MainActivity,
+                        getString(R.string.VideoRecordNotAvailable),
+                        6
+                    ).show()
+                }
+                if (Exoplayer.is_playing_recorded_file) {
+                    DynamicToast.makeError(
+                        this@MainActivity,
+                        getString(R.string.cantRecordArecordedStream),
+                        6
+                    ).show()
+                }
+                if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
+
+                    if (!isDownloadingCustomurl) {
+                        if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
+                        else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+
+
+                        downloader?.download()
+
+                        if (Exoplayer.is_downloading) {
+                            binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_on)
+                            binding.radioplayer.stopButton.setImageResource(R.drawable.rec_on)
+
+                        }
+                        RadioFunction.interatialadsShow(this@MainActivity)
+                    } else {
+                        DynamicToast.makeError(
+                            this@MainActivity,
+                            getString(R.string.cantrecordwhendownload),
+                            6
+                        ).show()
+                    }
+                }
+            }
+
+        }
+
+        binding.radioplayer.radioInfotxV.setSafeOnClickListener {
+            if (binding.radioplayer.radioInfotxV.text.toString().isNotEmpty()
+                && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.playernullinfo)
+                && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.BUFFERING)
+                && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.OoOps_Try_another_station)
+            ) {
+
+                RadioFunction.copytext(
+                    this@MainActivity,
+                    binding.radioplayer.radioInfotxV.text.toString()
+                )
+
+                googleSearch()
+            }
+
+        }
+
+        //    savedInstanceState?.let { videoPosition = savedInstanceState.getLong(argVideoPosition) }
+
+        Exoplayer.Observer.changeText("Main text view", RadioFunction.infoString())
+        Exoplayer.Observer.changeText("text view", RadioFunction.infoString())
+
+
+        if (video_on || Exoplayer.is_playing_recorded_file) {
+            binding.radioplayer.videoView.player = Exoplayer.player
+            binding.radioplayer.RadioImVFragBig.visibility = View.GONE
+            binding.radioplayer.videoView.visibility = View.VISIBLE
+            binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
+        }
+        else {
+            binding.radioplayer.videoView.visibility = View.INVISIBLE
+            binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
+        }
+    }
+
+    private fun btnsClicks() {
+        binding.searchView.settingButton.setSafeOnClickListener {
+            opensettingfrag()
+        }
+        binding.searchView.opencloseSearchButton.setSafeOnClickListener {
+            if (binding.searchView.searchInputText.isVisible) {
+                closeSearch()
+                closesearchfrag()
+            } else openSearch()
+
+        }
+
+        binding.searchView.addAlarmButton.setSafeOnClickListener {
+            // showCountdownTimerPopup()
+            openCountdownTimer()
+        }
+    }
+
+    fun FirebaseappCheck(){
+        FirebaseApp.initializeApp(this@MainActivity)
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        firebaseAppCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
+    }
 
     private fun transitionBottomSheetBackgroundColor(slideOffset: Float) {
         val colorFrom: Int
@@ -702,12 +722,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         var GlobalRadioName = ""
         var GlobalRadiourl = ""
 
+        var fromAlarm=false
+
         var video_on = false
 
         var GlobalImage = ""
         var GlobalstateString = ""
 
-        const val tag = "MainActivity"
 
         var defaultCountry = ""
 
@@ -728,28 +749,23 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
     public override fun onResume() {
-/*
-        if ((video_on || Exoplayer.is_playing_recorded_file) && Exoplayer.player != null)
-            binding.radioplayer.videoView.player = Exoplayer.player
-*/
-        //SMALL PLAYER END
+        super.onResume()
 
         adViewAdaptiveBanner.resume()
 
         //Makes sure that the media controls pop up on resuming and when going between PIP and non-PIP states.
 
         if (Exoplayer.player != null) {
-            Exoplayer.player!!.addAnalyticsListener(Exoplayer.Analyticslistener)
             if (video_on || Exoplayer.is_playing_recorded_file) {
                 /*  if (videoPosition > 0L/* && !isInPipMode*/) {
                       Exoplayer.player!!.seekTo(videoPosition)
                   }*/
                 //Makes sure that the media controls pop up on resuming and when going between PIP and non-PIP states.
-                binding.radioplayer.videoView.useController = true
                 //     showSystemUi()
                 binding.radioplayer.videoView.player = Exoplayer.player
                 binding.radioplayer.RadioImVFragBig.visibility = View.GONE
                 binding.radioplayer.videoView.visibility = View.VISIBLE
+                binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
 
             } else {
                 binding.radioplayer.videoView.visibility = View.INVISIBLE
@@ -761,19 +777,24 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
 
 
-        super.onResume()
 
+        binding.radioplayer.videoView.onResume()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        binding.radioplayer.videoView.player = null
     }
 
     override fun onPause() {
-
+        super.onPause()
         if (Exoplayer.player != null) {
             videoPosition = Exoplayer.player!!.currentPosition
         }
         adViewAdaptiveBanner.pause()
+        binding.radioplayer.videoView.onPause()
 
 
-        super.onPause()
     }
 
     override fun onDestroy() {
@@ -783,15 +804,14 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
         currentNativeAd?.destroy()
 
+        turnScreenOffAndKeyguardOn()
+
         /*   if (Build.VERSION.SDK_INT > 23 && !isChangingConfigurations) {
                ExoPlayer.releasePlayer()
            }
    */
 
-        if (Exoplayer.player != null) {
-            //  binding.radioplayer.videoView.player = null
-            Exoplayer.player!!.removeAnalyticsListener(Exoplayer.Analyticslistener)
-        }
+
 
     }
 
@@ -927,13 +947,86 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         RadioFunction.interatialadsLoad(this@MainActivity)
     }
 
+    private fun getAlarmRadioRoom() {
+
+        turnScreenOnAndKeyguardOff()
+        radioAlarmRoomViewModel.getAll().observe(this) { list ->
+            if (list.isNotEmpty() && fromAlarm) {
+                val radioVar =RadioVariables(
+                    1,
+                    list[0].name,
+                    /*ip*/"",
+                    /*stationcount*/"",
+                list[0].homepage,
+                list[0].favicon,
+                list[0].tags,
+                list[0].country,
+                list[0].state,
+                list[0].language,
+                list[0].streamurl,
+                list[0].bitrate,
+                list[0].radiouid,
+                /*iso_639*/"",
+                    list[0].moreinfo
+                )
+
+
+
+                GlobalRadiourl = list[0].streamurl
+                if(list[0].radiouid==""){
+                   // Exoplayer.is_playing_recorded_file=true
+                    Exoplayer.initializePlayer(this,true)
+                }
+                else Exoplayer.initializePlayer(this,false)
+
+                Exoplayer.startPlayer()
+                setPlayer(radioVar)
+
+                radioAlarmRoomViewModel.deleteAll("")
+
+                bottomsheetopenclose()
+            }
+        }
+
+    }
+
+
+    private  fun hasInternetConnection(): Boolean {
+        val connectivityManager = getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            return when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.activeNetworkInfo?.run {
+                return when (type) {
+                    ConnectivityManager.TYPE_WIFI -> true
+                    ConnectivityManager.TYPE_MOBILE -> true
+                    ConnectivityManager.TYPE_ETHERNET -> true
+                    else -> false
+                }
+            }
+        }
+        return false
+    }
+
 
     private fun getFavRadioRoom() {
         radioRoomViewModel.getAll(true).observe(this) { list ->
             //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
 
 
-            if (populateFavRv) {
+                if (populateFavRv) {
                 setupRadioLisRV()
                 populateRecyclerView(list)
             }
@@ -964,6 +1057,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             //  DynamicToast.makeError(this, list.size.toString(), 9).show()
             if (list.isNotEmpty()) {
                 if (Exoplayer.player == null) {
+
+
+
                     val radioVariables = RadioVariables()
                     radioVariables.name = list[0].name
                     radioVariables.bitrate = list[0].bitrate
@@ -1328,7 +1424,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             populateFavRv = false
             GlobalRadiourl = radioRoom.streamurl
             GlobalImage = radioRoom.favicon
-            Exoplayer.initializePlayer(this)
+            Exoplayer.initializePlayer(this,false)
             Exoplayer.startPlayer()
 
             val radioVariables = RadioVariables()
@@ -1447,4 +1543,45 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+    fun Activity.turnScreenOnAndKeyguardOff() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            )
+        }
+
+        with(getSystemService(KEYGUARD_SERVICE) as KeyguardManager) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                requestDismissKeyguard(this@turnScreenOnAndKeyguardOff, null)
+            }
+        }
+    }
+
+    fun Activity.turnScreenOffAndKeyguardOn() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(false)
+            setTurnScreenOn(false)
+        } else {
+            window.clearFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            )
+        }
+    }
+
 }

@@ -496,7 +496,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             try {
                 MainActivity.GlobalImage = radio.favicon
                 MainActivity.GlobalRadiourl = radio.url_resolved
-                Exoplayer.initializePlayer(requireContext())
+                Exoplayer.initializePlayer(requireContext(),false)
                 Exoplayer.startPlayer()
 
                 infoViewModel.putRadiopalyerInfo(radio)
@@ -552,7 +552,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         try {
             MainActivity.GlobalRadiourl =radioRoom.streamurl
             MainActivity.GlobalImage = radioRoom.favicon
-            Exoplayer.initializePlayer(requireContext())
+            Exoplayer.initializePlayer(requireContext(),false)
             Exoplayer.startPlayer()
             val radioVariables=RadioVariables ()
 
