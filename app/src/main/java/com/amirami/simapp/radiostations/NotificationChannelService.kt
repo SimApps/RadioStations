@@ -40,6 +40,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalImage
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterrorurl
+import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 
 
 class NotificationChannelService : Service() {
@@ -79,7 +80,7 @@ class NotificationChannelService : Service() {
         }
         else {
             if(player==null){
-                if(is_playing_recorded_file)initializePlayer(this,true)
+                if(is_playing_recorded_file) initializePlayer(this,true)
                 else initializePlayer(this,false)
             }
 
@@ -169,9 +170,7 @@ class NotificationChannelService : Service() {
         }
 
 
-        Exoplayer.Observer.changeText("Main text view", icyandState)
-        Exoplayer.Observer.changeText("text view", icyandState)
-        Exoplayer.Observer.subscribenotificztion("Main text view", icyandState)
+        Exoplayer.Observer.subscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icyandState, ""))
 
 
 

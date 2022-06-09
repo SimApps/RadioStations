@@ -7,8 +7,6 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.RingtoneManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.*
@@ -22,7 +20,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -34,7 +31,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.RadioFunction.allPermissionsGranted
-import com.amirami.simapp.radiostations.RadioFunction.errorToast
+import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
@@ -43,14 +40,8 @@ import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
-import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_CHANNEL_ID
-import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
-import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
-import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
-import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
-import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
-import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.amirami.simapp.radiostations.viewmodel.*
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
@@ -60,6 +51,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -67,6 +59,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil
 import java.io.IOException
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemClickListener {
@@ -150,13 +143,14 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         if(fromAlarm) getAlarmRadioRoom()
 
-
-
         getPref()
         setTheme()
 
 
         setDataConsumption()
+        dataConsuptionTimer()
+        putTimer()
+
         subsucribers()
         setPlayerBottomSheet()
         loadBannerAD()
@@ -166,9 +160,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         getFavRadioRoom()
         searchquerry()
 
-
         btnsClicks()
-
 
 
 
@@ -181,13 +173,18 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 // This happens when lifecycle is STARTED and stops
                 // collecting when the lifecycle is STOPPED
                 infoViewModel.putRadioPlayerInfo.collectLatest { radioVar ->
-                   // startServices(this@MainActivity)
                     setPlayer(radioVar)
                 }
 
             }
         }
 
+
+        AppRater.applaunched(this@MainActivity)
+
+    }
+
+    private fun putTimer() {
         lifecycleScope.launch {
             //  repeatOnLifecycle(Lifecycle.State.STARTED) { THIS IS NOT GOOD §§§§§§§§§§§§§
 
@@ -210,8 +207,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             //   }
         }
 
+    }
 
-
+    private fun dataConsuptionTimer() {
         lifecycleScope.launch {
             //   repeatOnLifecycle(Lifecycle.State.STARTED) {
 
@@ -234,10 +232,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             }
             //  }
         }
-
-
-
-        AppRater.applaunched(this@MainActivity)
 
     }
 
@@ -610,8 +604,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         //    savedInstanceState?.let { videoPosition = savedInstanceState.getLong(argVideoPosition) }
 
-        Exoplayer.Observer.changeText("Main text view", RadioFunction.infoString())
-        Exoplayer.Observer.changeText("text view", RadioFunction.infoString())
 
 
         if (video_on || Exoplayer.is_playing_recorded_file) {
@@ -650,6 +642,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         firebaseAppCheck.installAppCheckProviderFactory(
             PlayIntegrityAppCheckProviderFactory.getInstance()
         )
+
+
     }
 
     private fun transitionBottomSheetBackgroundColor(slideOffset: Float) {
@@ -737,7 +731,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         var scale: Float = 0.0F
         var data = 0L
         var icyandState = ""
-        var icybackup = ""
         var currentNativeAd: NativeAd? = null
         var firstTimeOpened = false
         var firstTimeopenRecordfolder = true
@@ -891,7 +884,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorTransition(binding.searchView.searchVwframe, 4, it)
+                    RadioFunction.cardViewColor(binding.searchView.searchcardview,  it)
+                  //  RadioFunction.gradiancolorTransition(binding.searchView.searchVwframe, 4, it)
                     RadioFunction.textcolorSearchviewTransition(binding.searchView.searchInputText, it)
                     RadioFunction.maintextviewColor(binding.searchView.ActionBarTitle, it)
 
@@ -1095,7 +1089,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                     binding.radioplayer.RadioImVFragBig.setImageResource(R.drawable.radioerror)
                     binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.radioerror)
-                    icyandState = getString(R.string.playernullinfo)
+
+                    icyandStateWhenPlayRecordFiles(getString(R.string.playernullinfo), "")
+                   // icyandState = getString(R.string.playernullinfo)
                 }
 
             }
@@ -1583,5 +1579,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             )
         }
     }
+
+
 
 }

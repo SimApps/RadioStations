@@ -14,11 +14,11 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
-import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
 import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransitionConstraint
+import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.removeWord
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -286,23 +286,40 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
 
             val radioVariables=RadioVariables ()
         radioVariables.url_resolved= recordInfo.uri.toString()
-        if (recordInfo.name.contains("_ _",true)){
-            radioVariables.name=recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
-            radioVariables.homepage=shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _",
-                true)[0] + 3, recordInfo.name.length), ".mp3"))
-          //  icyandState= shortformateDate(removeWord(recordInfo.name.substring(recordInfo.name.indexesOf("_ _", true)[0] + 3, recordInfo.name.length), ".mp3"))
+
+
+
+
+
+        if (recordInfo.name.contains("_ _",true) && recordInfo.name.contains("___",true)){
+
+
+            radioVariables.name = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
+
+
+
+            radioVariables.homepage=  recordInfo.name.substring(recordInfo.name.indexesOf("_ _", true)[0] + 3,
+                    recordInfo.name.indexesOf("___", true)[0])  + " "+
+                        shortformateDate(recordInfo.name.substring(recordInfo.name.indexesOf("___", true)[0] +3,
+                            recordInfo.name.length-4
+                        )) + ".mp3"
+
         }
         else {
-            radioVariables.name=recordInfo.name
-            radioVariables.homepage=""
-            //icyandState= ""
+            radioVariables.name  = recordInfo.name
+            radioVariables.homepage =""
         }
+
+
 
 
             // DynamicToast.makeSuccess(requireContext(), "refresh frag PLAYER", 9).show()
-            Exoplayer.startPlayer()
+        Exoplayer.startPlayer()
+        Exoplayer.Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", radioVariables.homepage))
+        Exoplayer.Observer.changeText("text view", icyandStateWhenPlayRecordFiles("",radioVariables.homepage))
+       // Exoplayer.Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("",radioVariables.homepage))
 
-            infoViewModel.putRadiopalyerInfo(radioVariables)
+        infoViewModel.putRadiopalyerInfo(radioVariables)
 
 
 

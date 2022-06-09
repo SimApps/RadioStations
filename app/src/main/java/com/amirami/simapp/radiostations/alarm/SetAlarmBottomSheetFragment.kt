@@ -19,7 +19,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
+import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
 import com.amirami.simapp.radiostations.alarm.Utils.cancelAlarm
 import com.amirami.simapp.radiostations.databinding.BottomsheetAddalarmBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
@@ -137,7 +139,19 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
         _binding=null
     }
 
+fun formatRcordDescriptionName(description:String):String{
+  return  if ( description.contains("___",true)){
 
+            description.substring(0,
+                description.indexesOf("___", true)[0])  + " "+
+                   shortformateDate(description.substring(description.indexesOf("___", true)[0] +3,
+                        description.length
+                    )) + ".mp3"
+    }
+    else {
+        description
+    }
+}
     private fun viewsVisibility(radioAlarmEmpty: MutableList<RadioAlarmRoom>){
         if(radioAlarmEmpty.isEmpty()){
            /* _binding!!.textView.visibility = View.VISIBLE
@@ -151,7 +165,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
             _binding!!.infoalarm.text =  getString(R.string.radioAlarmIsSetAT,
                 shortformateDate(androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()).getLong("timeInMilli", 1)),
                 if(radioAlarmEmpty[0].radiouid!="") getString(R.string.RadioStationName) else   getString(R.string.RecordedStationName),
-                radioAlarmEmpty[0].name + radioAlarmEmpty[0].homepage)
+                radioAlarmEmpty[0].name + if(radioAlarmEmpty[0].radiouid!="")  "" else formatRcordDescriptionName(radioAlarmEmpty[0].homepage))
             _binding!!.infoalarm.visibility = View.VISIBLE
 
             _binding!!.buttonStartCancelalarm.text = getString(R.string.cancel_alarm)
@@ -162,13 +176,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
         }
     }
 
-    private fun shortformateDate(Date:Long):String{
-        // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
-        // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
 
-        return SimpleDateFormat("MMM d''yy HH:mm", Locale.getDefault()).format(Date)
-
-    }
     fun <T> SetAlarmBottomSheetFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

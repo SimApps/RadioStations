@@ -32,10 +32,7 @@ class FavoriteFirestoreViewModel @Inject constructor(
 
     }
 
-    fun addAllProductNamesArrayInFirestore(product: ArrayList<String>) = liveData(Dispatchers.IO) {
-        emit(repository.addAllProductNamesArrayInFirestore(product))
 
-    }
 
 
     fun deleteFavoriteRadioFromArrayinFirestore(radioUid: String) = liveData(Dispatchers.IO) {

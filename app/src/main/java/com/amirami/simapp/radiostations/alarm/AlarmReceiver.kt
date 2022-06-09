@@ -57,7 +57,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
 
         fun handleSTOP() {
-            Exoplayer.releaseAlarmPlayer(context)
+            Exoplayer.releasePlayer(context)
             am.cancel(ALARM_ID)
         }
 

@@ -32,6 +32,7 @@ import androidx.annotation.NonNull
 import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -42,10 +43,12 @@ import coil.Coil
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.decode.SvgDecoder
 import coil.load
 import coil.request.CachePolicy
 import coil.size.Scale
 import coil.transform.RoundedCornersTransformation
+import com.amirami.simapp.radiostations.Exoplayer.is_playing_recorded_file
 import com.amirami.simapp.radiostations.Exoplayer.player
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
@@ -85,8 +88,32 @@ import java.util.*
 
 
 object RadioFunction {
-    fun shareRadio(context: Context, radioName: String, radioHomepage: String, radioStreamURL: String, radioCountry: String, radioLanguage: String, radioBitrate: String) {
-        if(radioName!=""){
+    fun shortformateDate(Date: Long): String {
+        // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
+        // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("MMM d''yy HH:mm", Locale.getDefault()).format(Date)
+    }
+
+    fun shortformateDate(Date: String): String {
+        // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
+        // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
+
+        return if (isNumber(Date)) SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(
+            Date.toLong()
+        )
+        else Date
+    }
+
+    fun shareRadio(
+        context: Context,
+        radioName: String,
+        radioHomepage: String,
+        radioStreamURL: String,
+        radioCountry: String,
+        radioLanguage: String,
+        radioBitrate: String
+    ) {
+        if (radioName != "") {
             if (Exoplayer.is_playing_recorded_file) {
                 try {
                     val intent = Intent(Intent.ACTION_SEND)
@@ -99,12 +126,16 @@ object RadioFunction {
                                 "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
                     )
                     intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : $radioName")
-                    context.startActivity(Intent.createChooser(intent, "Share Radio Information Via"))
+                    context.startActivity(
+                        Intent.createChooser(
+                            intent,
+                            "Share Radio Information Via"
+                        )
+                    )
                 } catch (e: Exception) {
                     //e.toString();
                 }
-            }
-            else {
+            } else {
                 try {
                     val intent = Intent(Intent.ACTION_SEND)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -120,35 +151,44 @@ object RadioFunction {
                                 "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
                     )
                     intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : $radioName")
-                    context.startActivity(Intent.createChooser(intent, "Share Radio Information Via"))
+                    context.startActivity(
+                        Intent.createChooser(
+                            intent,
+                            "Share Radio Information Via"
+                        )
+                    )
 
                 } catch (e: Exception) {
                     //e.toString();
                 }
             }
-        }
-
-        else  DynamicToast.makeError(context,context.resources.getString(R.string.Select_radio_toshare) , 9).show()
+        } else DynamicToast.makeError(
+            context,
+            context.resources.getString(R.string.Select_radio_toshare),
+            9
+        ).show()
 
 
     }
-
 
 
     fun startServices(context: Context) {
         try {
-            if(player!=null){
+            if (player != null) {
                 val serviceIntent = Intent(context, NotificationChannelService::class.java)
-                serviceIntent.putExtra("input_radio_name",GlobalRadioName)
+                serviceIntent.putExtra("input_radio_name", GlobalRadioName)
                 startForegroundService(context, serviceIntent)
             }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
         }
-        catch (e: IOException) { e.printStackTrace() }
-        catch (e: IllegalArgumentException) { e.printStackTrace() }
-        catch (e: SecurityException) { e.printStackTrace() }
-        catch (e: IllegalStateException) { e.printStackTrace() }
     }
-
 
 
     fun stopService(context: Context) {
@@ -157,23 +197,16 @@ object RadioFunction {
     }
 
 
-
-
-
-
-
-
-    fun unwrap(context: Context):Activity {
-        var scontext=context
-        while (scontext !is Activity && scontext is ContextWrapper)
-        {
+    fun unwrap(context: Context): Activity {
+        var scontext = context
+        while (scontext !is Activity && scontext is ContextWrapper) {
             scontext = scontext.baseContext
         }
         return scontext as Activity
     }
 
 
-    fun countryCodeToName(GlobalCountriesJsons: String?):String{
+    fun countryCodeToName(GlobalCountriesJsons: String?): String {
         return when (GlobalCountriesJsons) {
             "AF" -> "Afghanistan"
             "AX" -> "Aland Islands"
@@ -432,34 +465,47 @@ object RadioFunction {
         }
 
 
-
     }
 
-    fun isNumber(s: String?): Boolean = if (s.isNullOrEmpty()) false else s.all { Character.isDigit(it) }
+    fun isNumber(s: String?): Boolean =
+        if (s.isNullOrEmpty()) false else s.all { Character.isDigit(it) }
 
 
     fun getDownloader(context: Context) {
 
 
-            var recordFileName= GlobalRadioName + "_ _" + icyandState + " " +  System.currentTimeMillis()
-            recordFileName=recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
+        var recordFileName =
+            GlobalRadioName + "_ _" + " " + icyandState + "___" + System.currentTimeMillis()
+        recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
 
 
-          //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
-          //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
+        //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
+        //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
 
 
-
-
-            downloader = Downloader.Builder(context, GlobalRadiourl).downloadListener(object : OnDownloadListener {
+        downloader = Downloader.Builder(context, GlobalRadiourl)
+            .downloadListener(object : OnDownloadListener {
                 override fun onStart() {
                     Exoplayer.is_downloading = true
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.rec_on)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.rec_on
+                        )
 
-                        DynamicToast.make(context, "Recording Started . . .", getDrawable(context, R.drawable.rec_on), getColor(context, R.color.blue), getColor(context, R.color.violet_medium), 9).show()
+                        DynamicToast.make(
+                            context,
+                            "Recording Started . . .",
+                            getDrawable(context, R.drawable.rec_on),
+                            getColor(context, R.color.blue),
+                            getColor(context, R.color.violet_medium),
+                            9
+                        ).show()
                         startServices(unwrap(context))
 
                     }
@@ -470,8 +516,14 @@ object RadioFunction {
                     //
                     DynamicToast.makeSuccess(context, "Recording paused", 3).show()
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
 
                         startServices(unwrap(context))
                     }
@@ -482,8 +534,14 @@ object RadioFunction {
 
                     DynamicToast.makeSuccess(context, "Recording resumed", 3).show()
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.rec_on)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.rec_on
+                        )
 
                         startServices(unwrap(context))
                     }
@@ -495,8 +553,14 @@ object RadioFunction {
 
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.rec_on)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.rec_on
+                        )
                         //  current_status_txt.text = "onProgressUpdate"
                         //   percent_txt.text = percent.toString().plus("%")
                         //   size_txt.text = getSize(downloadedSize)
@@ -512,8 +576,14 @@ object RadioFunction {
                     Exoplayer.is_downloading = false
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
 
                         DynamicToast.make(
                             context, "Recording Saved",
@@ -533,8 +603,14 @@ object RadioFunction {
                     handlers.post {
 
                         Exoplayer.is_downloading = false
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
 
 
                         DynamicToast.makeError(context, reason!!, 9).show()
@@ -548,10 +624,17 @@ object RadioFunction {
 
                     handlers.post {
                         Exoplayer.is_downloading = false
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
 
-                        DynamicToast.make(context, "Recording Saved",
+                        DynamicToast.make(
+                            context, "Recording Saved",
                             getDrawable(context, R.drawable.rec_on),
                             getColor(context, R.color.blue),
                             getColor(context, R.color.violet_medium), 9
@@ -562,51 +645,72 @@ object RadioFunction {
                     }
                     //  Log.d(TAG, "onCancel")
                 }
-            }).fileName(recordFileName, "mp3" ).downloadDirectory(getDownloadDir(context).toString()).
-
-            build()
-
-
-
-
+            }).fileName(recordFileName, "mp3").downloadDirectory(getDownloadDir(context).toString())
+            .build()
 
 
     }
 
 
-    fun getCutomDownloader(context: Context, nameRecord:String, url:String) {
+    fun getCutomDownloader(context: Context, nameRecord: String, url: String) {
 
-          //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
-            // var recordFileName= nameRecord+ "_ _"  + sdfDate.format(Date())
+        //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
+        // var recordFileName= nameRecord+ "_ _"  + sdfDate.format(Date())
 
-            var recordFileName= nameRecord+ "_ _"  + System.currentTimeMillis()
-            recordFileName=recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
+        var recordFileName = nameRecord + "_ _" + System.currentTimeMillis()
+        recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
 
 
-            customdownloader = Downloader.Builder(context, url).downloadListener(object : OnDownloadListener {
+        customdownloader =
+            Downloader.Builder(context, url).downloadListener(object : OnDownloadListener {
                 override fun onStart() {
-                    isDownloadingCustomurl=true
+                    isDownloadingCustomurl = true
 
                     handlers.post {
-                        DynamicToast.make(context, "Download Started . . .", getDrawable(context, R.drawable.rec_on), getColor(context, R.color.blue), getColor(context, R.color.violet_medium), 9).show()
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button_on)
+                        DynamicToast.make(
+                            context,
+                            "Download Started . . .",
+                            getDrawable(context, R.drawable.rec_on),
+                            getColor(context, R.color.blue),
+                            getColor(context, R.color.violet_medium),
+                            9
+                        ).show()
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button_on
+                        )
 
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.rec_on)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.rec_on
+                        )
                     }
                     //  Log.d(TAG, "onStart")
                 }
 
                 override fun onPause() {
-                    isDownloadingCustomurl=false
+                    isDownloadingCustomurl = false
                     // icy="Download Completed"
 
                     handlers.post {
                         DynamicToast.makeSuccess(context, "Download paused", 3).show()
 
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button
+                        )
                         Exoplayer.Observer.changeText("Main text view", "Download Completed")
                         Exoplayer.Observer.changeText("text view", "Download Completed")
                     }
@@ -615,35 +719,63 @@ object RadioFunction {
                 }
 
                 override fun onResume() {
-                    isDownloadingCustomurl=true
+                    isDownloadingCustomurl = true
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button_on)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button_on
+                        )
                         DynamicToast.makeSuccess(context, "Download resumed", 3).show()
                     }
                     //  Log.d(TAG, "onResume")
                 }
 
                 override fun onProgressUpdate(percent: Int, downloadedSize: Int, totalSize: Int) {
-                    isDownloadingCustomurl=true
+                    isDownloadingCustomurl = true
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.rec_on)
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button_on)
-                        Exoplayer.Observer.changeText("Main text view",
-                            if(percent<0){ nameRecord+  " is Downloading" }
-                            else{
-                                nameRecord+  " is Downloading: "+bytesIntoHumanReadable(downloadedSize.toLong()) + " / " + bytesIntoHumanReadable(totalSize.toLong())
-                            })
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.rec_on
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button_on
+                        )
+                        Exoplayer.Observer.changeText(
+                            "Main text view",
+                            if (percent < 0) {
+                                nameRecord + " is Downloading"
+                            } else {
+                                nameRecord + " is Downloading: " + bytesIntoHumanReadable(
+                                    downloadedSize.toLong()
+                                ) + " / " + bytesIntoHumanReadable(totalSize.toLong())
+                            }
+                        )
 
-                        Exoplayer.Observer.changeText("text view",
-                            if(percent<0){ nameRecord+  " is Downloading" }
-                            else{
-                                nameRecord+  " is Downloading: "+bytesIntoHumanReadable(downloadedSize.toLong()) + " / " + bytesIntoHumanReadable(totalSize.toLong())
-                            })
+                        Exoplayer.Observer.changeText(
+                            "text view",
+                            if (percent < 0) {
+                                nameRecord + " is Downloading"
+                            } else {
+                                nameRecord + " is Downloading: " + bytesIntoHumanReadable(
+                                    downloadedSize.toLong()
+                                ) + " / " + bytesIntoHumanReadable(totalSize.toLong())
+                            }
+                        )
                         //  current_status_txt.text = "onProgressUpdate"
                         //   percent_txt.text = percent.toString().plus("%")
                         //   size_txt.text = getSize(downloadedSize)
@@ -655,13 +787,22 @@ object RadioFunction {
 
                 override fun onCompleted(file: File?) {
 
-                    isDownloadingCustomurl=false
+                    isDownloadingCustomurl = false
                     // icy="Download Completed"
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button
+                        )
                         DynamicToast.make(
                             context, "Download Complete",
                             getDrawable(context, R.drawable.rec_on),
@@ -676,15 +817,27 @@ object RadioFunction {
 
                 override fun onFailure(reason: String?) {
 
-                    isDownloadingCustomurl=false
+                    isDownloadingCustomurl = false
 
                     handlers.post {
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button
+                        )
                         // icy="Download Completed"
-                        Exoplayer.Observer.changeText("Main text view", "Download Failed : "+ reason)
-                        Exoplayer.Observer.changeText("text view", "Download Failed : "+ reason)
+                        Exoplayer.Observer.changeText(
+                            "Main text view",
+                            "Download Failed : " + reason
+                        )
+                        Exoplayer.Observer.changeText("text view", "Download Failed : " + reason)
 
                         DynamicToast.makeError(context, /*"Download Failed"*/reason, 9).show()
                         // DynamicToast.makeError(context, GlobalRadiourl, 9).show()
@@ -694,15 +847,24 @@ object RadioFunction {
 
                 override fun onCancel() {
 
-                    isDownloadingCustomurl=false
+                    isDownloadingCustomurl = false
 
                     handlers.post {
                         // icy="Download Completed"
                         Exoplayer.Observer.changeText("Main text view", "Download Completed")
                         Exoplayer.Observer.changeText("text view", "Download Completed")
-                        Exoplayer.Observer.changeImageRecord("Main record image view", R.drawable.rec_2)
-                        Exoplayer.Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
-                        Exoplayer.Observer.changeImageRecord("floatingActionAddDownload", R.drawable.ic_download_button)
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main record image view",
+                            R.drawable.rec_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "Main stop image view",
+                            R.drawable.stop_2
+                        )
+                        Exoplayer.Observer.changeImageRecord(
+                            "floatingActionAddDownload",
+                            R.drawable.ic_download_button
+                        )
 
                         DynamicToast.make(
                             context, "Download Saved",
@@ -713,49 +875,36 @@ object RadioFunction {
                     }
                     //  Log.d(TAG, "onCancel")
                 }
-            }).fileName(recordFileName,"" ).downloadDirectory(getDownloadDir(context).toString()).
-
-            build()
-
-
+            }).fileName(recordFileName, "").downloadDirectory(getDownloadDir(context).toString())
+                .build()
 
 
     }
 
-    fun shortformateDate(Date:String):String{
-        // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
-        // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
-
-        return if(isNumber(Date)) SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date.toLong())
-        else Date
-    }
 
     fun removeWord(value: String, wordtoremove: String): String {
         var result = ""
         var possibleMatch = ""
         var i = 0
         var j = 0
-        while ( i in value.indices) {
-            if ( value[i] == wordtoremove[j] ) {
-                if ( j == wordtoremove.length - 1 ) { // match
+        while (i in value.indices) {
+            if (value[i] == wordtoremove[j]) {
+                if (j == wordtoremove.length - 1) { // match
                     possibleMatch = "" // discard word
                     j = 0
-                }
-                else {
+                } else {
                     possibleMatch += value[i]
                     j++
                 }
-            }
-            else {
+            } else {
 
                 result += possibleMatch
                 possibleMatch = ""
 
-                if ( j == 0 ) {
+                if (j == 0) {
 
                     result += value[i]
-                }
-                else {
+                } else {
 
                     j = 0
                     i-- // re-test
@@ -784,12 +933,11 @@ object RadioFunction {
     }
 
 
-
-    fun deleteRecordedItem(index: Int,  context: Context) {
+    fun deleteRecordedItem(index: Int, context: Context) {
         val file = getDownloadDir(context).listFiles()!![index]
 
         try {
-            deleteAllFileAndContents(file,context)
+            deleteAllFileAndContents(file, context)
 
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -799,30 +947,39 @@ object RadioFunction {
     private fun deleteAllFileAndContents(@NonNull file: File, context: Context) {
         if (file.exists()) {
 
-         /*
-           // if (file.isDirectory) {
-                val contents = file.listFiles()
-                if (contents != null) {
-                    for (content in contents) {
-                        deleteAllFileAndContents(content,context)
-                    }
-                }
-          //  }
-            */
+            /*
+              // if (file.isDirectory) {
+                   val contents = file.listFiles()
+                   if (contents != null) {
+                       for (content in contents) {
+                           deleteAllFileAndContents(content,context)
+                       }
+                   }
+             //  }
+               */
 
 
-           val result = file.delete()
-            if (result) errorToast(context,context.getString(R.string.sucssessDeleteRecord,shortRecordFileName(file)))
-            else errorToast(context,context.getString(R.string.errorDeleteRecord,shortRecordFileName(file)))
+            val result = file.delete()
+            if (result) errorToast(
+                context,
+                context.getString(R.string.sucssessDeleteRecord, shortRecordFileName(file))
+            )
+            else errorToast(
+                context,
+                context.getString(R.string.errorDeleteRecord, shortRecordFileName(file))
+            )
 
         }
     }
 
 
- fun  shortRecordFileName(@NonNull file: File):String{
-    return if (file.name.contains("_ _",true)) file.name.substring(0, file.name.indexesOf("_ _", true)[0])
-     else file.name
-   }
+    fun shortRecordFileName(@NonNull file: File): String {
+        return if (file.name.contains("_ _", true)) file.name.substring(
+            0,
+            file.name.indexesOf("_ _", true)[0]
+        )
+        else file.name
+    }
 
 
     fun String?.indexesOf(substr: String, ignoreCase: Boolean = true): List<Int> {
@@ -833,18 +990,23 @@ object RadioFunction {
     }
 
 
-
-    fun allPermissionsGranted(context: Context):Boolean {
-        if ((checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) &&
-            (checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED))
-        {
+    fun allPermissionsGranted(context: Context): Boolean {
+        if ((checkSelfPermission(
+                context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED) &&
+            (checkSelfPermission(
+                context,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED)
+        ) {
             // Permission is not granted
             return false
         }
         return true
     }
 
-    fun openRecordFolder(context: Context){
+    fun openRecordFolder(context: Context) {
 
 
         if (getDownloadDir(context).exists()) {
@@ -853,18 +1015,26 @@ object RadioFunction {
             val intent = Intent(Intent.ACTION_VIEW)
 
 
-            val uri = Uri.parse(getDownloadDir(context).absolutePath/*.path.absolutePath*//*.path.toString()*/ /*+ File.separator + "files" + File.separator*/)
+            val uri =
+                Uri.parse(getDownloadDir(context).absolutePath/*.path.absolutePath*//*.path.toString()*/ /*+ File.separator + "files" + File.separator*/)
             //       DynamicToast.makeSuccess(context, uri.toString(), 3).show()
             intent.setDataAndType(uri, "*/*")//"resource/folder"
             //  context.startActivity(Intent.createChooser(intent, "Choose a file manager to open downloaded record folder"))
             try {
                 // Yes there is one start it then
-                val chooserIntent = Intent.createChooser(intent, context.resources.getString(R.string.choosefilemanager))
+                val chooserIntent = Intent.createChooser(
+                    intent,
+                    context.resources.getString(R.string.choosefilemanager)
+                )
                 chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                 context.startActivity(chooserIntent)
             } catch (ex: ActivityNotFoundException) {
-                DynamicToast.makeError(context,context.resources.getString(R.string.filemanagernotfound) , 9).show()
+                DynamicToast.makeError(
+                    context,
+                    context.resources.getString(R.string.filemanagernotfound),
+                    9
+                ).show()
             }
             /* if (intent.resolveActivityInfo(context.packageManager, 0) != null) {
                  // Yes there is one start it then
@@ -881,9 +1051,11 @@ object RadioFunction {
         }
     }
 
-    private fun getDownloadDir(context: Context):File{
-        val f =  File(getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString()
-                +File.separator  + RECORDS_FILE_NAME)
+    private fun getDownloadDir(context: Context): File {
+        val f = File(
+            getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString()
+                    + File.separator + RECORDS_FILE_NAME
+        )
 
         return if (f.isDirectory) f
         else {
@@ -894,67 +1066,76 @@ object RadioFunction {
 
     fun getRecordedFiles(context: Context): ArrayList<RecordInfo> {
         val RcordInfo = ArrayList<RecordInfo>()
-            //TARGET FOLDER
-            var s: RecordInfo
-            if (getDownloadDir(context).exists()) {
-                //GET ALL FILES IN DOWNLOAD FOLDER
-                val files = getDownloadDir(context).listFiles()
-                if (files != null) {
-                    if(files.isNotEmpty()){
-                        //LOOP THRU THOSE FILES GETTING NAME AND URI
-                        for (i in files.indices) {
-                            val file = files[i]
-                            s = RecordInfo()
-                            s.name = file.name
-                            s.uri = Uri.fromFile(file)
-                            RcordInfo.add(s)
-                        }
+        //TARGET FOLDER
+        var s: RecordInfo
+        if (getDownloadDir(context).exists()) {
+            //GET ALL FILES IN DOWNLOAD FOLDER
+            val files = getDownloadDir(context).listFiles()
+            if (files != null) {
+                if (files.isNotEmpty()) {
+                    //LOOP THRU THOSE FILES GETTING NAME AND URI
+                    for (i in files.indices) {
+                        val file = files[i]
+                        s = RecordInfo()
+                        s.name = file.name
+                        s.uri = Uri.fromFile(file)
+                        RcordInfo.add(s)
                     }
                 }
+            }
 
-                //  DynamicToast.makeSuccess(context, getDownloadDir(context).toString(), 9).show()
-            }
-            else{
-                DynamicToast.makeError(context, "not found", 3).show()
-            }
+            //  DynamicToast.makeSuccess(context, getDownloadDir(context).toString(), 9).show()
+        } else {
+            DynamicToast.makeError(context, "not found", 3).show()
+        }
 
 
 
         return RcordInfo
     }
-    fun interatialadsLoad(context: Context){
+
+    fun interatialadsLoad(context: Context) {
         val adRequest = AdRequest.Builder().build()
 
-        InterstitialAd.load(context,context.resources.getString(R.string.interstial_adUnitId), adRequest, object : InterstitialAdLoadCallback() {
-            override fun onAdFailedToLoad(adError: LoadAdError) {
-                mInterstitialAd = null
-            }
+        InterstitialAd.load(
+            context,
+            context.resources.getString(R.string.interstial_adUnitId),
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    mInterstitialAd = null
+                }
 
-            override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                mInterstitialAd = interstitialAd
-            }
-        })
-
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                }
+            })
 
 
     }
-    fun interatialadsShow(context:Context){
-        mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+
+    fun interatialadsShow(context: Context) {
+        mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 val adRequest = AdRequest.Builder().build()
-                InterstitialAd.load(context,context.resources.getString(R.string.interstial_adUnitId), adRequest, object : InterstitialAdLoadCallback() {
-                    override fun onAdFailedToLoad(adError: LoadAdError) {
-                        mInterstitialAd = null
-                    }
+                InterstitialAd.load(
+                    context,
+                    context.resources.getString(R.string.interstial_adUnitId),
+                    adRequest,
+                    object : InterstitialAdLoadCallback() {
+                        override fun onAdFailedToLoad(adError: LoadAdError) {
+                            mInterstitialAd = null
+                        }
 
-                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                        mInterstitialAd = interstitialAd
-                    }
-                })
+                        override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                            mInterstitialAd = interstitialAd
+                        }
+                    })
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
             }
+
             override fun onAdShowedFullScreenContent() {
                 mInterstitialAd = null
             }
@@ -970,34 +1151,34 @@ object RadioFunction {
     }
 
 
+    fun loadImageString(
+        context: Context,
+        mainiconSting: String,
+        erroricon: Int,
+        imageview: ImageView
+    ) {
 
-    fun loadImageString(context: Context,mainiconSting: String, erroricon: Int, imageview: ImageView){
-
-        if(!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)){
+        if (!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)) {
             val imageLoader = ImageLoader.Builder(context)
-                .componentRegistry {
-                    // video-support
-                    // gif-support
-                    if (SDK_INT >= 28) {
-                        add(ImageDecoderDecoder(context))
-                    } else {
-                        add(GifDecoder())
-                    }
+                .components {
+                    add(SvgDecoder.Factory())
+                    if (SDK_INT >= 28) add(ImageDecoderDecoder.Factory())
+                    else add(GifDecoder.Factory())
+
                 }
-                //  .logger(DebugLogger(Log.VERBOSE))
                 .build()
 
-           // Coil.setImageLoader(imageLoader)
-
-            imageview.load(mainiconSting,imageLoader) {
+            imageview.load(mainiconSting, imageLoader) {
                 // crossfade(true)
                 // crossfade(500)
-                transformations(RoundedCornersTransformation(16f))
+                if (mainiconSting.contains(COUNTRY_FLAGS_BASE_URL))
+                    transformations(RoundedCornersTransformation(16f))
+                else transformations(RoundedCornersTransformation(8f))
                 error(erroricon)
                 diskCachePolicy(CachePolicy.ENABLED)
                 memoryCachePolicy(CachePolicy.ENABLED)
                 placeholder(erroricon) //image shown when loading image
-                scale(Scale.FILL)
+             //   scale(Scale.FILL)
                 //   transformations(CircleCropTransformation())
                 // transformations(GrayscaleTransformation())
                 //   transformations(BlurTransformation(applicationContext))
@@ -1006,103 +1187,65 @@ object RadioFunction {
         }
     }
 
-    fun loadImageInt(mainiconSting: Int, erroricon: Int, imageview: ImageView){
+    fun loadImageInt(mainiconSting: Int, erroricon: Int, imageview: ImageView) {
         imageview.load(mainiconSting) {
-         //   crossfade(true)
-         //   crossfade(500)
-            transformations(RoundedCornersTransformation(16f))
-            error(erroricon)
-            diskCachePolicy(CachePolicy.ENABLED)
-            memoryCachePolicy(CachePolicy.ENABLED)
-            scale(Scale.FIT)
-            placeholder(erroricon) //image shown when loading image
-        //    transformations(CircleCropTransformation())
-            // transformations(GrayscaleTransformation())
-            //   transformations(BlurTransformation(applicationContext))
-            //  transformations(BlurTransformation(applicationContext, 5f))
-        }
-    }
-     fun loadImageSkipCache(mainiconDrawable: Drawable?, erroricon: Int, imageview: ImageView){
-
-         imageview.load(mainiconDrawable) {
-         //    crossfade(true)
-          //   crossfade(500)
-             transformations(RoundedCornersTransformation(16f))
-             error(erroricon)
-             diskCachePolicy(CachePolicy.ENABLED)
-             memoryCachePolicy(CachePolicy.ENABLED)
-             scale(Scale.FIT)
-             placeholder(erroricon) //image shown when loading image
-            // transformations(CircleCropTransformation())
-             // transformations(GrayscaleTransformation())
-             //   transformations(BlurTransformation(applicationContext))
-             //  transformations(BlurTransformation(applicationContext, 5f))
-         }
-
-    }
-
-
-
-    fun loadImageSkipCacheInt(mainiconDrawable: Int, erroricon: Int, imageview: ImageView){
-
-        imageview.load(mainiconDrawable) {
-            //    crossfade(true)
+            //   crossfade(true)
             //   crossfade(500)
-            transformations(RoundedCornersTransformation(16f))
+            transformations(RoundedCornersTransformation(8f))
             error(erroricon)
             diskCachePolicy(CachePolicy.ENABLED)
             memoryCachePolicy(CachePolicy.ENABLED)
-            scale(Scale.FIT)
+          //  scale(Scale.FIT)
             placeholder(erroricon) //image shown when loading image
-            // transformations(CircleCropTransformation())
+            //    transformations(CircleCropTransformation())
             // transformations(GrayscaleTransformation())
             //   transformations(BlurTransformation(applicationContext))
             //  transformations(BlurTransformation(applicationContext, 5f))
         }
-
     }
 
 
 
-    fun switchColor(switch: SwitchCompat,theme:Boolean){
+
+
+    fun switchColor(switch: SwitchCompat, theme: Boolean) {
         if (theme) {
             switch.setTextColor(parseColor("#FFFFFF"))
 
-        }
-        else {
+        } else {
             switch.setTextColor(parseColor("#000000"))
 
         }
     }
 
-    fun maintextviewColor(textcolor:TextView,theme:Boolean) {
+    fun maintextviewColor(textcolor: TextView, theme: Boolean) {
         if (theme) textcolor.setTextColor(parseColor("#FFFFFF"))
         else textcolor.setTextColor(parseColor("#000000"))
     }
 
-    fun maintextviewColored(textcolor:TextView,theme:Boolean) {
+    fun maintextviewColored(textcolor: TextView, theme: Boolean) {
         if (theme) textcolor.setTextColor(parseColor("#00C0FF"))
         else textcolor.setTextColor(parseColor("#02142B"))
     }
 
-    fun secondarytextviewColor(textcolor:TextView,theme:Boolean) {
+    fun secondarytextviewColor(textcolor: TextView, theme: Boolean) {
         if (theme) textcolor.setTextColor(parseColor("#BABABA"))
         else textcolor.setTextColor(parseColor("#0E0E0E"))
     }
 
-    fun hintColor(textcolor:EditText,theme:Boolean) {
+    fun hintColor(textcolor: EditText, theme: Boolean) {
         if (theme) textcolor.setHintTextColor(parseColor("#BABABA"))
         else textcolor.setHintTextColor(parseColor("#000000"))
     }
 
     @SuppressLint("SoonBlockedPrivateApi")
-    fun setNumberPickerTextColor(numberPicker: NumberPicker ,theme:Boolean) {
+    fun setNumberPickerTextColor(numberPicker: NumberPicker, theme: Boolean) {
         try {
             val selectorWheelPaintField: Field = numberPicker.javaClass
                 .getDeclaredField("mSelectorWheelPaint")
             selectorWheelPaintField.isAccessible = true
             (selectorWheelPaintField.get(numberPicker) as Paint).color = if (theme)
-                parseColor("#BABABA")  else  parseColor("#000000")
+                parseColor("#BABABA") else parseColor("#000000")
         } catch (e: NoSuchFieldException) {
             Log.w("setNumberPickerTxtColor", e)
         } catch (e: IllegalAccessException) {
@@ -1113,14 +1256,23 @@ object RadioFunction {
         val count = numberPicker.childCount
         for (i in 0 until count) {
             val child = numberPicker.getChildAt(i)
-            if (child is EditText) child.setTextColor(  if (theme)
-                parseColor("#BABABA")  else  parseColor("#000000"))
+            if (child is EditText) child.setTextColor(
+                if (theme)
+                    parseColor("#BABABA") else parseColor("#000000")
+            )
         }
         numberPicker.invalidate()
     }
 
 
-    fun nativeadstexViewColor(textcolor1:TextView,textcolor2:TextView,textcolor3:TextView,textcolor4:TextView,textcolor5:TextView,theme:Boolean){
+    fun nativeadstexViewColor(
+        textcolor1: TextView,
+        textcolor2: TextView,
+        textcolor3: TextView,
+        textcolor4: TextView,
+        textcolor5: TextView,
+        theme: Boolean
+    ) {
         if (theme) {
             textcolor1.setTextColor(parseColor("#BABABA"))
             textcolor2.setTextColor(parseColor("#BABABA"))
@@ -1128,8 +1280,7 @@ object RadioFunction {
             textcolor4.setTextColor(parseColor("#BABABA"))
             textcolor5.setTextColor(parseColor("#BABABA"))
 
-        }
-        else {
+        } else {
             textcolor1.setTextColor(parseColor("#000000"))
             textcolor2.setTextColor(parseColor("#000000"))
             textcolor3.setTextColor(parseColor("#000000"))
@@ -1139,17 +1290,16 @@ object RadioFunction {
         }
     }
 
-    fun buttonColor(buttoncolor:Button,theme:Boolean){
+    fun buttonColor(buttoncolor: Button, theme: Boolean) {
         val gdDefault = GradientDrawable()
 
-        if (theme){
+        if (theme) {
             //  gdDefault.setColor(parseColor("#33CAEEFF"))
             // gdDefault.cornerRadius = 9f
             // gdDefault.setStroke(1, parseColor("#26000000"))
             //  buttoncolor.background = gdDefault
             buttoncolor.setTextColor(parseColor("#FFFFFF"))
-        }
-        else{
+        } else {
             //  gdDefault.setColor(parseColor("#2602142B"))
             // gdDefault.cornerRadius = 9f
             //  gdDefault.setStroke(1, parseColor("#40FFFFFF"))
@@ -1159,16 +1309,14 @@ object RadioFunction {
     }
 
 
-
-    fun viewColor(view: View,theme:Boolean){
+    fun viewColor(view: View, theme: Boolean) {
         val gdDefault = GradientDrawable()
-        if (theme){
+        if (theme) {
             gdDefault.setColor(parseColor("#33CAEEFF"))
             gdDefault.cornerRadius = 9f
             gdDefault.setStroke(1, parseColor("#26CAEEFF"))
             view.background = gdDefault
-        }
-        else{
+        } else {
             gdDefault.setColor(parseColor("#2602142B"))
             gdDefault.cornerRadius = 9f
             gdDefault.setStroke(1, parseColor("#4002142B"))
@@ -1176,59 +1324,72 @@ object RadioFunction {
         }
 
     }
+    fun cardViewColor(cardView: CardView, theme: Boolean) {
+        if (theme) {
+            cardView.setCardBackgroundColor(parseColor("#26CAEEFF"))
 
-    fun fabColor(mFab: FloatingActionButton,theme:Boolean){
-        if (theme){
+        } else {
+            cardView.setCardBackgroundColor(parseColor("#f8f9fa"))
+        }
+    }
+    fun fabColor(mFab: FloatingActionButton, theme: Boolean) {
+        if (theme) {
             mFab.backgroundTintList = ColorStateList.valueOf(parseColor("#000000"))
 
-        }
-        else{
+        } else {
             mFab.backgroundTintList = ColorStateList.valueOf(parseColor("#FFFFFF"))
         }
     }
 
 
-    fun textcolorSearchviewTransition(container: androidx.appcompat.widget.SearchView,theme:Boolean){
-        if (!theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
-        }
-        else{
-            color1=parseColor("#FFFFFF")
-            color2=parseColor("#FFFFFF")
-            color3=parseColor("#FFFFFF")
-            color4=parseColor("#FFFFFF")
+    fun textcolorSearchviewTransition(
+        container: androidx.appcompat.widget.SearchView,
+        theme: Boolean
+    ) {
+        if (!theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#FFFFFF")
+            color2 = parseColor("#FFFFFF")
+            color3 = parseColor("#FFFFFF")
+            color4 = parseColor("#FFFFFF")
         }
 
 
-       //val searchView = findViewById(R.id.search) as SearchView
-         val searchEditText = container.findViewById(R.id.search_src_text) as EditText
+        //val searchView = findViewById(R.id.search) as SearchView
+        val searchEditText = container.findViewById(R.id.search_src_text) as EditText
         searchEditText.setTextColor(color1)
         searchEditText.setHintTextColor(color1)
     }
 
 
-    fun gradiancolorNestedScrollViewTransitionseconcolor(container: NestedScrollView, duration: Int, theme:Boolean){
-        if (theme){
-            color1= parseColor("#070326")//-256
-            color2= parseColor("#070326")//-65536
-            color3= parseColor("#070326")
-            color4= parseColor("#070326")
-        }
-        else{
-            color1=parseColor("#F0FFFF")
-            color2=parseColor("#F0FFFF")
-            color3=parseColor("#F0FFFF")
-            color4=parseColor("#F0FFFF")
+    fun gradiancolorNestedScrollViewTransitionseconcolor(
+        container: NestedScrollView,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#070326")//-256
+            color2 = parseColor("#070326")//-65536
+            color3 = parseColor("#070326")
+            color4 = parseColor("#070326")
+        } else {
+            color1 = parseColor("#F0FFFF")
+            color2 = parseColor("#F0FFFF")
+            color3 = parseColor("#F0FFFF")
+            color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1238,25 +1399,30 @@ object RadioFunction {
         trans.startTransition(duration)
     }
 
-    fun gradiancolorNestedScrollViewTransition(container: NestedScrollView, duration: Int, theme:Boolean){
-        if (theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
-        }
-        else{
-            color1=parseColor("#FFFFFF")
-            color2=parseColor("#FFFFFF")
-            color3=parseColor("#FFFFFF")
-            color4=parseColor("#FFFFFF")
+    fun gradiancolorNestedScrollViewTransition(
+        container: NestedScrollView,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#FFFFFF")
+            color2 = parseColor("#FFFFFF")
+            color3 = parseColor("#FFFFFF")
+            color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1267,25 +1433,26 @@ object RadioFunction {
     }
 
 
-    fun gradiancolorTransition(container: RelativeLayout, duration: Int,theme:Boolean){
-        if (theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
-        }
-        else{
-            color1=parseColor("#FFFFFF")
-            color2=parseColor("#FFFFFF")
-            color3=parseColor("#FFFFFF")
-            color4=parseColor("#FFFFFF")
+    fun gradiancolorTransition(container: RelativeLayout, duration: Int, theme: Boolean) {
+        if (theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#FFFFFF")
+            color2 = parseColor("#FFFFFF")
+            color3 = parseColor("#FFFFFF")
+            color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1295,25 +1462,30 @@ object RadioFunction {
         trans.startTransition(duration)
     }
 
-    fun gradiancolorTransitionBottomSheet(container: RelativeLayout, duration: Int,theme:Boolean){
-        if (theme){
-            color1= parseColor("#070326")//-256
-            color2= parseColor("#070326")//-65536
-            color3= parseColor("#070326")
-            color4= parseColor("#070326")
-        }
-        else{
-            color1=parseColor("#F0FFFF")
-            color2=parseColor("#F0FFFF")
-            color3=parseColor("#F0FFFF")
-            color4=parseColor("#F0FFFF")
+    fun gradiancolorTransitionBottomSheet(
+        container: RelativeLayout,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#070326")//-256
+            color2 = parseColor("#070326")//-65536
+            color3 = parseColor("#070326")
+            color4 = parseColor("#070326")
+        } else {
+            color1 = parseColor("#F0FFFF")
+            color2 = parseColor("#F0FFFF")
+            color3 = parseColor("#F0FFFF")
+            color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1323,25 +1495,30 @@ object RadioFunction {
         trans.startTransition(duration)
     }
 
-    fun gradiancolorConstraintBottomSheet(container: ConstraintLayout, duration: Int,theme:Boolean){
-        if (theme){
-            color1= parseColor("#070326")//-256
-            color2= parseColor("#070326")//-65536
-            color3= parseColor("#070326")
-            color4= parseColor("#070326")
-        }
-        else{
-            color1=parseColor("#F0FFFF")
-            color2=parseColor("#F0FFFF")
-            color3=parseColor("#F0FFFF")
-            color4=parseColor("#F0FFFF")
+    fun gradiancolorConstraintBottomSheet(
+        container: ConstraintLayout,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#070326")//-256
+            color2 = parseColor("#070326")//-65536
+            color3 = parseColor("#070326")
+            color4 = parseColor("#070326")
+        } else {
+            color1 = parseColor("#F0FFFF")
+            color2 = parseColor("#F0FFFF")
+            color3 = parseColor("#F0FFFF")
+            color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1350,25 +1527,31 @@ object RadioFunction {
         container.background = trans
         trans.startTransition(duration)
     }
-    fun gradiancolorTransitionConstraint(container: ConstraintLayout, duration: Int,theme:Boolean){
-        if (theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
-        }
-        else{
-            color1=parseColor("#FFFFFF")
-            color2=parseColor("#FFFFFF")
-            color3=parseColor("#FFFFFF")
-            color4=parseColor("#FFFFFF")
+
+    fun gradiancolorTransitionConstraint(
+        container: ConstraintLayout,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#FFFFFF")
+            color2 = parseColor("#FFFFFF")
+            color3 = parseColor("#FFFFFF")
+            color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1379,25 +1562,30 @@ object RadioFunction {
     }
 
 
-    fun gradiancolorLinearlayoutTransitionBottomSheet(container: LinearLayout, duration: Int,theme:Boolean){
-        if (theme){
-            color1= parseColor("#070326")//-256
-            color2= parseColor("#070326")//-65536
-            color3= parseColor("#070326")
-            color4= parseColor("#070326")
-        }
-        else{
-            color1=parseColor("#F0FFFF")
-            color2=parseColor("#F0FFFF")
-            color3=parseColor("#F0FFFF")
-            color4=parseColor("#F0FFFF")
+    fun gradiancolorLinearlayoutTransitionBottomSheet(
+        container: LinearLayout,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#070326")//-256
+            color2 = parseColor("#070326")//-65536
+            color3 = parseColor("#070326")
+            color4 = parseColor("#070326")
+        } else {
+            color1 = parseColor("#F0FFFF")
+            color2 = parseColor("#F0FFFF")
+            color3 = parseColor("#F0FFFF")
+            color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+        )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+        )
         gd.cornerRadius = 0f
 
 
@@ -1407,23 +1595,25 @@ object RadioFunction {
         trans.startTransition(duration)
 
     }
-    fun gradiancolorLinearlayoutTransition(container: LinearLayout, duration: Int,theme:Boolean){
-        if (theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
+
+    fun gradiancolorLinearlayoutTransition(container: LinearLayout, duration: Int, theme: Boolean) {
+        if (theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#BABABA")
+            color2 = parseColor("#BABABA")
+            color3 = parseColor("#BABABA")
+            color4 = parseColor("#BABABA")
         }
-        else{
-            color1=parseColor("#BABABA")
-            color2=parseColor("#BABABA")
-            color3=parseColor("#BABABA")
-            color4=parseColor("#BABABA")
-        }
-        val gd1 = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+        val gd1 =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
         gd1.cornerRadius = 0f
 
-        val gd = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+        val gd =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
 
@@ -1434,23 +1624,28 @@ object RadioFunction {
 
     }
 
-    fun gradiancolorConstraintLayoutTransition(container: ConstraintLayout, duration: Int, theme:Boolean){
-        if (theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
+    fun gradiancolorConstraintLayoutTransition(
+        container: ConstraintLayout,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#FFFFFF")
+            color2 = parseColor("#FFFFFF")
+            color3 = parseColor("#FFFFFF")
+            color4 = parseColor("#FFFFFF")
         }
-        else{
-            color1=parseColor("#FFFFFF")
-            color2=parseColor("#FFFFFF")
-            color3=parseColor("#FFFFFF")
-            color4=parseColor("#FFFFFF")
-        }
-        val gd1 = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+        val gd1 =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
         gd1.cornerRadius = 0f
 
-        val gd = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+        val gd =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
 
@@ -1462,19 +1657,18 @@ object RadioFunction {
     }
 
 
-    fun gradiancolorFrameLayout(container: FrameLayout, duration: Int,theme:Boolean){
+    fun gradiancolorFrameLayout(container: FrameLayout, duration: Int, theme: Boolean) {
 
-        if (theme){
-            color1= parseColor("#000000")//-256
-            color2= parseColor("#000000")//-65536
-            color3= parseColor("#000000")
-            color4= parseColor("#000000")
-        }
-        else{
-            color1=parseColor("#FFFFFF")
-            color2=parseColor("#FFFFFF")
-            color3=parseColor("#FFFFFF")
-            color4=parseColor("#FFFFFF")
+        if (theme) {
+            color1 = parseColor("#000000")//-256
+            color2 = parseColor("#000000")//-65536
+            color3 = parseColor("#000000")
+            color4 = parseColor("#000000")
+        } else {
+            color1 = parseColor("#FFFFFF")
+            color2 = parseColor("#FFFFFF")
+            color3 = parseColor("#FFFFFF")
+            color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(
@@ -1500,16 +1694,18 @@ object RadioFunction {
     }
 
 
-    fun gradiancolorNativeAdslayout(container: FrameLayout, duration: Int){
+    fun gradiancolorNativeAdslayout(container: FrameLayout, duration: Int) {
 
-        color1=parseColor("#00000000")
-        color2=parseColor("#00000000")
-        color3=parseColor("#00000000")
-        color4=parseColor("#00000000")
-        val gd1 = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+        color1 = parseColor("#00000000")
+        color2 = parseColor("#00000000")
+        color3 = parseColor("#00000000")
+        color4 = parseColor("#00000000")
+        val gd1 =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
         gd1.cornerRadius = 0f
 
-        val gd = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+        val gd =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
 
@@ -1519,40 +1715,37 @@ object RadioFunction {
         trans.startTransition(duration)
     }
 
-    fun parseColor(colorString: String):Int {
+    fun parseColor(colorString: String): Int {
 
         return colorString.toColorInt()
     }
 
-    fun colouriseToolbar(appBarLayout: CollapsingToolbarLayout, @ColorInt background:Int, @ColorInt foreground:Int) {
+    fun colouriseToolbar(
+        appBarLayout: CollapsingToolbarLayout,
+        @ColorInt background: Int,
+        @ColorInt foreground: Int
+    ) {
         appBarLayout.setBackgroundColor(background)
         val toolbar = appBarLayout.getChildAt(0) as Toolbar
         toolbar.setTitleTextColor(foreground)
         toolbar.setSubtitleTextColor(foreground)
         val colorFilter = PorterDuffColorFilter(foreground, PorterDuff.Mode.MULTIPLY)
-        for (i in 0 until toolbar.childCount)
-        {
+        for (i in 0 until toolbar.childCount) {
             val view = toolbar.getChildAt(i)
             //todo: cal icon?
             //Back button or drawer open button
-            if (view is ImageButton)
-            {
+            if (view is ImageButton) {
                 view.drawable.colorFilter = colorFilter
             }
-            if (view is ActionMenuView)
-            {
-                for (j in 0 until view.childCount)
-                {
+            if (view is ActionMenuView) {
+                for (j in 0 until view.childCount) {
                     val innerView = view.getChildAt(j)
                     //Any ActionMenuViews - icons that are not back button, text or overflow menu
-                    if (innerView is ActionMenuItemView)
-                    {
+                    if (innerView is ActionMenuItemView) {
                         val drawables = innerView.compoundDrawables
-                        for (k in drawables.indices)
-                        {
+                        for (k in drawables.indices) {
                             val drawable = drawables[k]
-                            if (drawable != null)
-                            {
+                            if (drawable != null) {
                                 //Set the color filter in separate thread
                                 //by adding it to the message queue - won't work otherwise
                                 innerView.post {
@@ -1567,17 +1760,14 @@ object RadioFunction {
         }
         //Overflow icon
         val overflowIcon = toolbar.overflowIcon
-        if (overflowIcon != null)
-        {
+        if (overflowIcon != null) {
             overflowIcon.colorFilter = colorFilter
             toolbar.overflowIcon = overflowIcon
         }
     }
 
 
-
-
-    fun nativeSmallAds(context: Context, ad_frame: FrameLayout, adView:NativeAdView){
+    fun nativeSmallAds(context: Context, ad_frame: FrameLayout, adView: NativeAdView) {
         fun populateUnifiedNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
 
             // You must call destroy on old ads when you are done with them,
@@ -1591,7 +1781,6 @@ object RadioFunction {
             adView.mediaView = adView.findViewById(R.id.ad_media)
 
 
-
             // Set other ad assets.
             adView.headlineView = adView.findViewById(R.id.ad_headline)
             adView.bodyView = adView.findViewById(R.id.ad_body)
@@ -1603,15 +1792,15 @@ object RadioFunction {
             adView.advertiserView = adView.findViewById(R.id.ad_advertiser)
 
 
-            if(adView.headlineView!=null){
-                    nativeadstexViewColor(
-                        adView.headlineView as TextView,
-                        adView.advertiserView as TextView,
-                        adView.bodyView as TextView,
-                        adView.priceView as TextView,
-                        adView.storeView as TextView,
-                        darkTheme
-                    )
+            if (adView.headlineView != null) {
+                nativeadstexViewColor(
+                    adView.headlineView as TextView,
+                    adView.advertiserView as TextView,
+                    adView.bodyView as TextView,
+                    adView.priceView as TextView,
+                    adView.storeView as TextView,
+                    darkTheme
+                )
 
                 // The headline is guaranteed to be in every UnifiedNativeAd.
                 (adView.headlineView as TextView).text = nativeAd.headline
@@ -1668,8 +1857,7 @@ object RadioFunction {
 
                 if (nativeAd.advertiser == null) {
                     adView.advertiserView!!.visibility = View.INVISIBLE//INVISIBLE
-                }
-                else {
+                } else {
                     (adView.advertiserView as TextView).text = nativeAd.advertiser
                     adView.advertiserView!!.visibility = View.VISIBLE
                 }
@@ -1679,9 +1867,6 @@ object RadioFunction {
                 adView.storeView!!.visibility = View.GONE
                 adView.advertiserView!!.visibility = View.GONE
             }
-
-
-
 
 
             // This method tells the Google Mobile Ads SDK that you have finished populating your
@@ -1785,73 +1970,65 @@ object RadioFunction {
         refreshAd()
     }
 
-    fun dialogueBackround():Int{
-        return if (darkTheme){
+    fun dialogueBackround(): Int {
+        return if (darkTheme) {
             R.drawable.round_corner_dark
-        }
-        else{
+        } else {
             R.drawable.round_corner_light
         }
     }
 
 
-
-
-
     fun homepageChrome(context: Context, homepageJson: String) {
-        if (homepageJson!="") {
+        if (homepageJson != "") {
 
-            if (!homepageJson.startsWith("http://") && !homepageJson.startsWith("https://")){
+            if (!homepageJson.startsWith("http://") && !homepageJson.startsWith("https://")) {
                 val browserIntent = Intent()
                     .setAction(Intent.ACTION_VIEW)
-               //    .addCategory(Intent.CATEGORY_BROWSABLE)
-               //     .putExtra(SearchManager.QUERY, "http://$homepageJson")
-            //        .setData(Uri.fromParts("http", "", null))
+                //    .addCategory(Intent.CATEGORY_BROWSABLE)
+                //     .putExtra(SearchManager.QUERY, "http://$homepageJson")
+                //        .setData(Uri.fromParts("http", "", null))
                 browserIntent.data = Uri.parse("http://$homepageJson")
                 unwrap(context).startActivity(browserIntent)
-            }
-            else{
+            } else {
                 val browserIntent = Intent()
                     .setAction(Intent.ACTION_VIEW)
-                   // .addCategory(Intent.CATEGORY_BROWSABLE)
-                 //   .putExtra(SearchManager.QUERY, homepageJson)
-                 //   .setData(Uri.fromParts("http", "", null))
+                // .addCategory(Intent.CATEGORY_BROWSABLE)
+                //   .putExtra(SearchManager.QUERY, homepageJson)
+                //   .setData(Uri.fromParts("http", "", null))
                 browserIntent.data = Uri.parse(homepageJson)
                 unwrap(context).startActivity(browserIntent)
             }
 
 
+            /*
+                     val url: String = homepageJson
+                     val intent = Intent(Intent.ACTION_VIEW)
 
-   /*
-            val url: String = homepageJson
-            val intent = Intent(Intent.ACTION_VIEW)
-
-            if (!url.startsWith("http://") && !url.startsWith("https://")){
-                intent.data = Uri.parse(url)
-                unwrap(context).startActivity(intent)
-            }
-            else{
-                intent.data = Uri.parse(url)
-                unwrap(context).startActivity(intent)
-            }
-*/
-        }
-        else DynamicToast.makeError(context,context.resources.getString(R.string.No_Homepage) , 9).show()
+                     if (!url.startsWith("http://") && !url.startsWith("https://")){
+                         intent.data = Uri.parse(url)
+                         unwrap(context).startActivity(intent)
+                     }
+                     else{
+                         intent.data = Uri.parse(url)
+                         unwrap(context).startActivity(intent)
+                     }
+         */
+        } else DynamicToast.makeError(context, context.resources.getString(R.string.No_Homepage), 9)
+            .show()
     }
 
-    fun copytext(context: Context, textToCopy:String) {
+    fun copytext(context: Context, textToCopy: String) {
 
 
         val myClipboard =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val myClip: ClipData = ClipData.newPlainText("note_copy", textToCopy)
         myClipboard.setPrimaryClip(myClip)
-        DynamicToast.makeSuccess(context, context.resources.getString(R.string.StreamInfoCopied), 3).show()
+        DynamicToast.makeSuccess(context, context.resources.getString(R.string.StreamInfoCopied), 3)
+            .show()
 
     }
-
-
-
 
 
     class SafeClickListener(
@@ -1877,71 +2054,34 @@ object RadioFunction {
         setOnClickListener(safeClickListener)
     }
 
-    fun infoString():String{
-        return if(icyandState=="") MainActivity.icybackup else icyandState
+    fun icyandStateWhenPlayRecordFiles(icyandStates: String, downloadRecInfo: String): String {
+        if (is_playing_recorded_file) icyandState = downloadRecInfo
+            else icyandState = icyandStates
+        //  MainActivity.icyandState
+        return if (is_playing_recorded_file) downloadRecInfo else icyandStates
     }
 
 
-
-
-
-
-
-
-
-
-
-
-/*
-    fun OnfailiurejsonCall(context: Context){
-
-        if (repeat_tryconnect_server < server_arraylist.size - 1) {
-            repeat_tryconnect_server += 1
-            server_arraylist[repeat_tryconnect_server]
-            //    val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-            //    val editor = sharedPref.edit()
-
-            //   editor.putString("prefered_servers", server_arraylist[repeat_tryconnect_server])
-            //    editor.apply()
-            BASE_URL = server_arraylist[repeat_tryconnect_server]
-       //     jSon_list_of_country_Calls()
-        }
-        else {
-            repeat_tryconnect_server=-1
-
-            DynamicToast.makeError(context, "Failed to connect to $BASE_URL", 3).show()
-            /* val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-             val editor = sharedPref.edit()
-
-             editor.putString("prefered_servers", "de1.api.radio-browser.info")
-             editor.apply()
-             BASE_URL = "de1.api.radio-browser.info"*/
-        }
+    fun getuserid(): String {
+        return if (userRecord.uid != null) userRecord.uid!!
+        else "no_user"
     }
-*/
 
-
-fun getuserid():String{
-    return if(userRecord.uid!=null) userRecord.uid!!
-    else "no_user"
-}
-
-    fun errorToast(context: Context,message: String) {
+    fun errorToast(context: Context, message: String) {
         DynamicToast.make(context, message, 9).show()
     }
 
-    fun succesToast(context: Context,message: String) {
+    fun succesToast(context: Context, message: String) {
         DynamicToast.make(context, message, 9).show()
     }
 
-    fun warningToast(context: Context,message: String) {
+    fun warningToast(context: Context, message: String) {
         DynamicToast.makeWarning(context, message, 9).show()
     }
-    fun dynamicToast(context: Context,message: String) {
+
+    fun dynamicToast(context: Context, message: String) {
         DynamicToast.make(context, message, 9).show()
     }
-
-
 
 
 }

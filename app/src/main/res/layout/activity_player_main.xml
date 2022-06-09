@@ -7,8 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:focusable="true"
+    android:elevation="3dp"
 
+    android:focusable="true"
     android:keepScreenOn="true"
     android:paddingBottom="12dp"
     app:behavior_hideable="false"
@@ -172,11 +173,10 @@
                     app:srcCompat="@drawable/radioerror" />
 
 
-
                 <androidx.media3.ui.AspectRatioFrameLayout
-                    android:layout_height="300dp"
                     android:layout_width="match_parent"
-                    >
+                    android:layout_height="300dp">
+
                     <androidx.media3.ui.PlayerView
                         android:id="@+id/video_view"
                         android:layout_width="match_parent"
@@ -184,8 +184,8 @@
                         app:controller_layout_id="@layout/custom_playback_control"
                         app:show_timeout="3000"
 
-                        app:use_controller="true"
-                        app:use_artwork="true" />
+                        app:use_artwork="true"
+                        app:use_controller="true" />
                 </androidx.media3.ui.AspectRatioFrameLayout>
             </FrameLayout>
 

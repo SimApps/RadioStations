@@ -86,7 +86,7 @@
         <androidx.appcompat.widget.AppCompatRatingBar
             android:id="@+id/ad_stars"
             style="?android:attr/ratingBarStyleSmall"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
             android:layout_marginTop="6dp"

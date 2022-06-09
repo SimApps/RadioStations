@@ -22,6 +22,7 @@ class ProductFirestoreRepository @Inject constructor(
         val DataOrExceptionProdNames = DataOrException<MutableList<ArrayList<String>>, String>()
         try {
             val productList = mutableListOf<ArrayList<String>>()
+            disableOfflineMode(db)
 
             //db.firestoreSettings.isPersistenceEnabled
             val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
@@ -45,6 +46,7 @@ class ProductFirestoreRepository @Inject constructor(
     suspend    fun addFavoriteRadioidInArrayFirestore(prodName:String): DataOrException<Boolean, String> {
         val dataOrException = DataOrException<Boolean, String>()
         try {
+
             val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid())//document(RADIO_FAVORITE_COLLECTION)
             //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
          products.update(RADIO_FAVORITE_ARRAYS, FieldValue.arrayUnion(prodName)).await()
@@ -57,20 +59,7 @@ class ProductFirestoreRepository @Inject constructor(
         return dataOrException
     }
 
-    suspend    fun addAllProductNamesArrayInFirestore(prodName:ArrayList<String>): DataOrException<Boolean, String> {
-        val dataOrException = DataOrException<Boolean, String>()
-        try {
-            val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//document(RADIO_FAVORITE_COLLECTION)
-            //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
-            //    products.update(PRODUCTS_LIST_NAMES_ARRAYS, FieldValue.arrayUnion(prodName)).await()
-            products.update(RADIO_FAVORITE_ARRAYS, prodName).await()
-            dataOrException.data = true
 
-        } catch (e: FirebaseFirestoreException) {
-            dataOrException.e = e.toString()
-        }
-        return dataOrException
-    }
 
 
     suspend    fun deleteFavoriteRadioFromArrayInFirestore(prodName:String): DataOrException<Boolean, String> {
@@ -78,7 +67,6 @@ class ProductFirestoreRepository @Inject constructor(
         try {
             val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
             //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
-
             products.update(RADIO_FAVORITE_ARRAYS, FieldValue.arrayRemove(prodName)).await()
 
             dataOrException.data = true
@@ -98,7 +86,11 @@ class ProductFirestoreRepository @Inject constructor(
    suspend  fun adduserDocumentInFirestore(favoriteFirestore: FavoriteFirestore): DataOrException<Boolean, String> {
         val dataOrException = DataOrException<Boolean, String>()
         try {
-           val products= db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())
+            disableOfflineMode(db)
+
+            val products= db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())
+
+
 
             products.set(favoriteFirestore,SetOptions.merge()).await()
             dataOrException.data = true
@@ -129,5 +121,11 @@ class ProductFirestoreRepository @Inject constructor(
         }
         return dataOrException
     }
+
+    private fun disableOfflineMode(db: FirebaseFirestore) {
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
+        db.firestoreSettings = settings    }
 
 }

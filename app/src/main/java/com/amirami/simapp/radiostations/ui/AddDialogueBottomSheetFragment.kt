@@ -71,9 +71,10 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
       binding.addBtn.setSafeOnClickListener {
             if(!argsFrom.addDouwnload){
                 val sdfDate =  binding.RadioNameTXviewadd.toString() + SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
-                binding.RadioBitrateTXviewadd.setBackgroundColor(RadioFunction.parseColor("#00000000"))
-                binding.RadioNameTXviewadd.setBackgroundColor(RadioFunction.parseColor("#00000000"))
-                binding.RadioStreamlinkTXviewadd.setBackgroundColor(RadioFunction.parseColor("#00000000"))
+                binding.RadioBitrateTXviewaddLayout.error=null
+                binding.RadioNameTXviewaddLayout.error=null
+                binding.RadioStreamlinkTXviewaddLayout.error=null
+
 
                 if ((binding.RadioNameTXviewadd.text.toString().isNotEmpty() &&
                             binding.RadioStreamlinkTXviewadd.text.toString().isNotEmpty() &&
@@ -107,13 +108,17 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                     RadioFunction.interatialadsShow(requireContext())
                 }
 
-                else if (binding.RadioNameTXviewadd.text.toString().isNotEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isNotEmpty() && binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
+                else if (binding.RadioNameTXviewadd.text.toString().isNotEmpty()
+                    && binding.RadioStreamlinkTXviewadd.text.toString().isNotEmpty()
+                    && binding.RadioBitrateTXviewadd.text.toString().isNotEmpty() && !RadioFunction.isNumber(
                         binding.RadioBitrateTXviewadd.text.toString()))  {
                     binding.RadioBitrateTXviewadd.text?.clear()
                     binding.RadioBitrateTXviewaddLayout.error = getString(R.string.enternumber)
 
                 }
-                else if(binding.RadioNameTXviewadd.text.toString().isEmpty() && binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()){
+                else if(binding.RadioNameTXviewadd.text.toString().isEmpty()
+                    && binding.RadioStreamlinkTXviewadd.text.toString().isEmpty()){
+
                     binding.RadioNameTXviewaddLayout.error  = getString(R.string.Cant_beEmpty)
                     binding.RadioStreamlinkTXviewaddLayout.error = getString(R.string.Cant_beEmpty)
                 }

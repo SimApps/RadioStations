@@ -27,17 +27,13 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalstateString
 import com.amirami.simapp.radiostations.MainActivity.Companion.downloader
 import com.amirami.simapp.radiostations.MainActivity.Companion.fromAlarm
-import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
-import com.amirami.simapp.radiostations.MainActivity.Companion.icybackup
 import com.amirami.simapp.radiostations.MainActivity.Companion.video_on
-import com.amirami.simapp.radiostations.utils.Constatnts
+import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
 
 object Exoplayer {
-
-
     const val notifi_CHANNEL_ID = "SimAPPcganelIDradioApp"
     var showWhen = false
     var ongoing = false
@@ -53,19 +49,20 @@ object Exoplayer {
     var is_downloading = false
     var player: ExoPlayer? = null
     lateinit var mMediaSession: MediaSession
-    var getIsPlaying =  false
+    var getIsPlaying = false
     private var playbackPosition: Long = 0
     private var currentWindow: Int = 0
     var playWhenReady = true
-    var playPauseIcon = R.drawable.pause_2 //if (!getIsPlaying()) R.drawable.ic_pause else R.drawable.ic_play
+    var playPauseIcon =
+        R.drawable.pause_2 //if (!getIsPlaying()) R.drawable.ic_pause else R.drawable.ic_play
 
     fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     fun initializePlayer(ctx: Context, is_playingrecordedfile: Boolean) {
         video_on = false
         is_playing_recorded_file = is_playingrecordedfile
-        icyandState = ""
-        icybackup = ""
+        //icyandState = ""
+        // icybackup = ""
         showWhen = true
         ongoing = true
         val eContext = ctx.applicationContext
@@ -97,8 +94,7 @@ object Exoplayer {
                 .createMediaSource(mediaItem)
             player!!.setMediaSource(mediaSource, true)
 
-        }
-        else {
+        } else {
             val mediaSource = buildMediaSource(Uri.parse(GlobalRadiourl))
             player!!.setMediaSource(mediaSource, true)
         }
@@ -109,8 +105,6 @@ object Exoplayer {
             repeatMode = Player.REPEAT_MODE_OFF
             prepare()
         }
-
-    //    RadioFunction.startServices(ctx)
 
         if (is_downloading) downloader?.cancelDownload()
 
@@ -196,13 +190,9 @@ object Exoplayer {
         if (player != null) {
 
             if (is_downloading) {
-                Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
-
                 downloader?.cancelDownload()
                 mMediaSession.release()
-
-            }
-            else {
+            } else {
                 playbackPosition = player!!.currentPosition
                 currentWindow = player!!.currentMediaItemIndex
                 player!!.playWhenReady = player!!.playWhenReady
@@ -214,13 +204,7 @@ object Exoplayer {
                 player = null
 
                 video_on = false
-                icyandState = ""
-                Observer.changeText("Main text view", icyandState)
-                Observer.changeText("text view", icyandState)
-
-                playPauseIcon = R.drawable.play_2
-                changeImagePlayPause("Main image view", R.drawable.play_2)
-                changeImagePlayPause("image view", R.drawable.play_2)
+                //icyandState = ""
             }
         }
     }
@@ -253,7 +237,8 @@ object Exoplayer {
             C.TYPE_DASH -> {
                 video_on = true
 
-                val dashChunkSourceFactory = DefaultDashChunkSource.Factory(DefaultHttpDataSource.Factory())
+                val dashChunkSourceFactory =
+                    DefaultDashChunkSource.Factory(DefaultHttpDataSource.Factory())
 
                 val manifestDataSourceFactory = DefaultHttpDataSource.Factory()
 
@@ -288,19 +273,19 @@ object Exoplayer {
     }
 
     fun pausePlayer(context: Context) {
-        Observer.changeText("Main text view", icyandState)
-        Observer.changeText("text view", icyandState)
+        //  Observer.changeText("Main text view", icyandState)
+        //  Observer.changeText("text view", icyandState)
         if (player != null) {
             player!!.playWhenReady = false
             player!!.playbackState
         }
 
         if (is_downloading) {
-            Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
+            //   Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
             downloader?.cancelDownload()
         }
 
-        RadioFunction.startServices(context)
+       // RadioFunction.startServices(context)
     }
 
     fun startPlayer() {
@@ -317,28 +302,34 @@ object Exoplayer {
     }
 
     fun playbackStateListener(ctx: Context) = object : Player.Listener {
+        var icybackup=""
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
-            RadioFunction.startServices(ctx)
 
-            getIsPlaying=isPlaying
+
+            getIsPlaying = isPlaying
+
+
+
             if (playWhenReady && isPlaying) {
-                if (is_playing_recorded_file) {
-                    totalTime = player?.duration!!
-                }
+                if (is_playing_recorded_file) totalTime = player?.duration!!
+                else if ( GlobalstateString == "UNKNOWN_STATE" && !is_playing_recorded_file) {
+                   Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+                   Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+                   Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+
+               }
+
+
+
 
                 playPauseIcon = R.drawable.pause_2
                 GlobalstateString = "Player.STATE_READY"
                 changeImagePlayPause("Main image view", R.drawable.pause_2)
                 changeImagePlayPause("image view", R.drawable.pause_2)
 
-                if (icyandState == "BUFFERING") {
-                    icyandState = ""
-                    Observer.changeText("Main text view", icybackup)
-                    Observer.changeText("text view", icybackup)
-                }
-            }
 
+            }
             else if (playWhenReady && !isPlaying && GlobalstateString != "Player.STATE_BUFFERING") {
                 playPauseIcon = R.drawable.play_2
                 GlobalstateString = "Player.STATE_PAUSED"
@@ -346,15 +337,19 @@ object Exoplayer {
                 changeImagePlayPause("image view", R.drawable.play_2)
             }
 
+            RadioFunction.startServices(ctx)
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            RadioFunction.startServices(ctx)
+
             when (playbackState) {
                 Player.STATE_IDLE // The player does not have any media to play.
                 -> {
                     playPauseIcon = R.drawable.play_2
                     GlobalstateString = "Player.STATE_IDLE"
+                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
                     changeImagePlayPause("Main image view", R.drawable.play_2)
                     changeImagePlayPause("image view", R.drawable.play_2)
                 }
@@ -362,9 +357,10 @@ object Exoplayer {
                 -> {
                     GlobalstateString = "Player.STATE_BUFFERING"
                     playPauseIcon = R.drawable.pause_2
-                    icyandState = "BUFFERING"
-                    Observer.changeText("Main text view", icyandState)
-                    Observer.changeText("text view", icyandState)
+                    // icyandState = "BUFFERING"
+                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
+                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
+                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
                     changeImagePlayPause("Main image view", R.drawable.pause_2)
                     changeImagePlayPause("image view", R.drawable.pause_2)
                 }
@@ -382,6 +378,10 @@ object Exoplayer {
                 -> {
                     GlobalstateString = "Player.STATE_ENDED"
                     playPauseIcon = R.drawable.play_2
+                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+
+                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
                     changeImagePlayPause("Main image view", R.drawable.play_2)
                     changeImagePlayPause("image view", R.drawable.play_2)
                 }
@@ -399,16 +399,18 @@ object Exoplayer {
                 }
             }
 
-
+            RadioFunction.startServices(ctx)
         }
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
-            icyandState = mediaMetadata.title.toString() //+ mediaMetadata.genre.toString()
-            icybackup = mediaMetadata.title.toString()
-            Observer.changeText("Main text view", icyandState)
-            Observer.changeText("text view", icyandState)
-            Observer.changesubscribenotificztion("Main text view", icyandState)
+            // icyandState = mediaMetadata.title.toString() //+ mediaMetadata.genre.toString()
+            // icybackup = mediaMetadata.title.toString()
+            icybackup =mediaMetadata.title.toString()
+            RadioFunction.startServices(ctx)
+            Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString() , ""))
+            Observer.changeText("text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
+            Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -418,18 +420,19 @@ object Exoplayer {
 
             GlobalstateString = "onPlayerError"
 
-            icyandState = "OoOps! Try another station! "
-            icybackup = ""
-            Observer.changeText("Main text view", icyandState)
-            Observer.changeText("text view", icyandState)
+            //   icyandState = "OoOps! Try another station! "
+            //  icybackup = ""
+            Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
+
+            Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
+            Observer.changeText("text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
             changeImagePlayPause("Main image view", R.drawable.play_2)
             changeImagePlayPause("image view", R.drawable.play_2)
             playPauseIcon = R.drawable.play_2
 
 
 
-           if(fromAlarm) PlaySystemAlarm(ctx)
-
+            if (fromAlarm) PlaySystemAlarm(ctx)
 
 
         }
@@ -438,8 +441,9 @@ object Exoplayer {
         override fun onRepeatModeChanged(repeatMode: Int) = Unit
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = Unit
     }
-    private fun PlaySystemAlarm(context: Context) {
-        fromAlarm=false
+
+     fun PlaySystemAlarm(context: Context) {
+        fromAlarm = false
 
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 

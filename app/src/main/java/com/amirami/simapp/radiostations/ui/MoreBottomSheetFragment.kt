@@ -57,10 +57,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         collectLatestLifecycleFlow(infoViewModel.putRadioInfo) {radioVar ->
             setInfoRadio(radioVar)
             getFavRadioRoom(radioVar)
-            //val customers:RadioVariables=Radio[mExpandedPosition]
-            //  DynamicToast.makeError(requireContext(), radioVar.moreinfo, 3).show()
-            if (radioVar.moreinfo == "fromplayer") binding.likeImageView.visibility = View.GONE
-            else binding.likeImageView.visibility = View.VISIBLE
+            btnsVisibility(radioVar)
 
             binding.likeImageView.setSafeOnClickListener {
                 favRadio(
@@ -134,6 +131,20 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
 
+    }
+
+    private fun btnsVisibility(radioVar:RadioVariables) {
+        if (radioVar.moreinfo == "fromplayer") binding.likeImageView.visibility = View.GONE
+        else binding.likeImageView.visibility = View.VISIBLE
+
+        if(radioVar.stationuuid=="") {
+            binding.shareImageView.visibility = View.GONE
+            binding.VistitStationhomepageIm.visibility = View.GONE
+        }
+        else {
+            binding.shareImageView.visibility = View.VISIBLE
+            binding.VistitStationhomepageIm.visibility = View.VISIBLE
+        }
     }
 
 
