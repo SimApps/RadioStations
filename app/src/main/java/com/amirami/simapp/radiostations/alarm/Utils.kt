@@ -1,20 +1,17 @@
 package com.amirami.simapp.radiostations.alarm
 
-import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.AlarmManager.AlarmClockInfo
-import android.app.PendingIntent
 import android.app.PendingIntent.*
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.annotation.RequiresApi
 
 object Utils {
 const val requestalarmId= 11421
-    val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
+    private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
 
 
     fun setAlarm(context: Context, timeOfAlarm: Long) {

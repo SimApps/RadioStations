@@ -34,8 +34,8 @@
     <string name="shutdown">Stop playing after : </string>
     <string name="fab_content_desc">Add custom stream.</string>
 
-    <string name="appversion">Version : 2.2.53</string>
-    <string name="version">2.2.53</string>
+    <string name="appversion">Version : 2.2.577</string>
+    <string name="version">2.2.577</string>
 
 
 
@@ -99,7 +99,7 @@
 
     <string name="batterieoptimisationmessages">If you experience playback interruptions you have to disable battery optimization. Click on "GO" to open setting and search for this app. (there is some brand that require additional settings) </string>
 
-    <string name="batterieoptimisationmessageson">You have already disabled battery optimization. If you still experience playback interruptions please check you have a strong internet connection(please note that there is some brand that require additional settings)</string>
+    <string name="batterieoptimisationmessageson">You have already disabled battery optimization. If you still experience playback interruptions please check you have an internet connection (please note that there is some brand that require additional settings)</string>
 
     <string name="nobatterieoptimisationmessageso">You don\'t need battery optimization. </string>
 

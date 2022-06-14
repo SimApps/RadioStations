@@ -8,46 +8,31 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.TransitionDrawable
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.os.Environment
 import android.os.Environment.*
 import android.os.SystemClock
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.annotation.ColorInt
 import androidx.annotation.NonNull
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.*
 import androidx.core.graphics.toColorInt
 import androidx.core.widget.NestedScrollView
-import coil.Coil
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.load
 import coil.request.CachePolicy
-import coil.size.Scale
 import coil.transform.RoundedCornersTransformation
+import com.amirami.simapp.radiostations.Exoplayer.isOreoPlus
 import com.amirami.simapp.radiostations.Exoplayer.is_playing_recorded_file
 import com.amirami.simapp.radiostations.Exoplayer.player
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
@@ -65,7 +50,6 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
-import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.utils.Constatnts.RECORDS_FILE_NAME
@@ -75,19 +59,18 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import java.io.File
-import java.io.IOException
 import java.lang.reflect.Field
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 object RadioFunction {
+    fun getCurrentDate():Long{
+
+        return System.currentTimeMillis() //DateFormat.getDateTimeInstance().format(currentDate) // formated
+    }
     fun shortformateDate(Date: Long): String {
         // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
         // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
@@ -114,7 +97,7 @@ object RadioFunction {
         radioBitrate: String
     ) {
         if (radioName != "") {
-            if (Exoplayer.is_playing_recorded_file) {
+            if (is_playing_recorded_file) {
                 try {
                     val intent = Intent(Intent.ACTION_SEND)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -172,7 +155,7 @@ object RadioFunction {
     }
 
 
-    fun startServices(context: Context) {
+  /*  fun startServices(context: Context) {
         try {
             if (player != null) {
                 val serviceIntent = Intent(context, NotificationChannelService::class.java)
@@ -188,10 +171,25 @@ object RadioFunction {
         } catch (e: IllegalStateException) {
             e.printStackTrace()
         }
+    }*/
+
+
+     fun startServices(context: Context) {
+        if (player != null) {
+            Exoplayer.dismissNotification = false
+            val serviceIntent = Intent(context, NotificationChannelService::class.java)
+           // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
+
+            if (isOreoPlus()) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                // Pre-O behavior.
+                context.startService(serviceIntent)
+            }
+        }
     }
-
-
     fun stopService(context: Context) {
+        Exoplayer.dismissNotification = true
         val serviceIntent = Intent(context, NotificationChannelService::class.java)
         context.stopService(serviceIntent)
     }
@@ -207,7 +205,7 @@ object RadioFunction {
 
 
     fun countryCodeToName(GlobalCountriesJsons: String?): String {
-        return when (GlobalCountriesJsons) {
+        return when (GlobalCountriesJsons!!.uppercase()) {
             "AF" -> "Afghanistan"
             "AX" -> "Aland Islands"
             "AL" -> "Albania"
@@ -458,10 +456,7 @@ object RadioFunction {
             "ZM" -> "Zambia"
             "ZW" -> "Yemen"
             "XK" -> "Kosovo"
-
-
-            //  else -> GlobalCountriesJsons!!
-            else -> GlobalCountriesJsons!!
+            else -> GlobalCountriesJsons
         }
 
 
@@ -769,9 +764,9 @@ object RadioFunction {
                         Exoplayer.Observer.changeText(
                             "text view",
                             if (percent < 0) {
-                                nameRecord + " is Downloading"
+                                "$nameRecord is Downloading"
                             } else {
-                                nameRecord + " is Downloading: " + bytesIntoHumanReadable(
+                                "$nameRecord is Downloading: " + bytesIntoHumanReadable(
                                     downloadedSize.toLong()
                                 ) + " / " + bytesIntoHumanReadable(totalSize.toLong())
                             }
@@ -1008,18 +1003,18 @@ object RadioFunction {
 
     fun openRecordFolder(context: Context) {
 
-
         if (getDownloadDir(context).exists()) {
 
             // val intent = Intent(Intent.ACTION_GET_CONTENT)
-            val intent = Intent(Intent.ACTION_VIEW)
+            //val intent = Intent(Intent.ACTION_VIEW)
+            val uri = Uri.parse(getDownloadDir(context).absolutePath)
 
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+               // addCategory(Intent.CATEGORY_OPENABLE)
+                setDataAndType(uri, "*/*")
+                //data = uri
+            }
 
-            val uri =
-                Uri.parse(getDownloadDir(context).absolutePath/*.path.absolutePath*//*.path.toString()*/ /*+ File.separator + "files" + File.separator*/)
-            //       DynamicToast.makeSuccess(context, uri.toString(), 3).show()
-            intent.setDataAndType(uri, "*/*")//"resource/folder"
-            //  context.startActivity(Intent.createChooser(intent, "Choose a file manager to open downloaded record folder"))
             try {
                 // Yes there is one start it then
                 val chooserIntent = Intent.createChooser(
@@ -1051,11 +1046,15 @@ object RadioFunction {
         }
     }
 
-    private fun getDownloadDir(context: Context): File {
+     private fun getDownloadDir(context: Context): File {
         val f = File(
             getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString()
                     + File.separator + RECORDS_FILE_NAME
         )
+      /*  val f = File(
+            context.getExternalFilesDir(null).toString()
+                   /* + File.separator + RECORDS_FILE_NAME*/
+        )*/
 
         return if (f.isDirectory) f
         else {
@@ -1206,8 +1205,6 @@ object RadioFunction {
 
 
 
-
-
     fun switchColor(switch: SwitchCompat, theme: Boolean) {
         if (theme) {
             switch.setTextColor(parseColor("#FFFFFF"))
@@ -1223,20 +1220,14 @@ object RadioFunction {
         else textcolor.setTextColor(parseColor("#000000"))
     }
 
-    fun maintextviewColored(textcolor: TextView, theme: Boolean) {
-        if (theme) textcolor.setTextColor(parseColor("#00C0FF"))
-        else textcolor.setTextColor(parseColor("#02142B"))
-    }
+
 
     fun secondarytextviewColor(textcolor: TextView, theme: Boolean) {
         if (theme) textcolor.setTextColor(parseColor("#BABABA"))
         else textcolor.setTextColor(parseColor("#0E0E0E"))
     }
 
-    fun hintColor(textcolor: EditText, theme: Boolean) {
-        if (theme) textcolor.setHintTextColor(parseColor("#BABABA"))
-        else textcolor.setHintTextColor(parseColor("#000000"))
-    }
+
 
     @SuppressLint("SoonBlockedPrivateApi")
     fun setNumberPickerTextColor(numberPicker: NumberPicker, theme: Boolean) {
@@ -1291,54 +1282,16 @@ object RadioFunction {
     }
 
     fun buttonColor(buttoncolor: Button, theme: Boolean) {
-        val gdDefault = GradientDrawable()
-
-        if (theme) {
-            //  gdDefault.setColor(parseColor("#33CAEEFF"))
-            // gdDefault.cornerRadius = 9f
-            // gdDefault.setStroke(1, parseColor("#26000000"))
-            //  buttoncolor.background = gdDefault
-            buttoncolor.setTextColor(parseColor("#FFFFFF"))
-        } else {
-            //  gdDefault.setColor(parseColor("#2602142B"))
-            // gdDefault.cornerRadius = 9f
-            //  gdDefault.setStroke(1, parseColor("#40FFFFFF"))
-            // buttoncolor.background = gdDefault
-            buttoncolor.setTextColor(parseColor("#000000"))
-        }
-    }
-
-
-    fun viewColor(view: View, theme: Boolean) {
-        val gdDefault = GradientDrawable()
-        if (theme) {
-            gdDefault.setColor(parseColor("#33CAEEFF"))
-            gdDefault.cornerRadius = 9f
-            gdDefault.setStroke(1, parseColor("#26CAEEFF"))
-            view.background = gdDefault
-        } else {
-            gdDefault.setColor(parseColor("#2602142B"))
-            gdDefault.cornerRadius = 9f
-            gdDefault.setStroke(1, parseColor("#4002142B"))
-            view.background = gdDefault
-        }
+        if (theme) buttoncolor.setTextColor(parseColor("#FFFFFF"))
+        else buttoncolor.setTextColor(parseColor("#000000"))
 
     }
+
+
+
     fun cardViewColor(cardView: CardView, theme: Boolean) {
-        if (theme) {
-            cardView.setCardBackgroundColor(parseColor("#26CAEEFF"))
-
-        } else {
-            cardView.setCardBackgroundColor(parseColor("#f8f9fa"))
-        }
-    }
-    fun fabColor(mFab: FloatingActionButton, theme: Boolean) {
-        if (theme) {
-            mFab.backgroundTintList = ColorStateList.valueOf(parseColor("#000000"))
-
-        } else {
-            mFab.backgroundTintList = ColorStateList.valueOf(parseColor("#FFFFFF"))
-        }
+        if (theme) cardView.setCardBackgroundColor(parseColor("#26CAEEFF"))
+        else cardView.setCardBackgroundColor(parseColor("#f8f9fa"))
     }
 
 
@@ -1657,43 +1610,6 @@ object RadioFunction {
     }
 
 
-    fun gradiancolorFrameLayout(container: FrameLayout, duration: Int, theme: Boolean) {
-
-        if (theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#FFFFFF")
-            color2 = parseColor("#FFFFFF")
-            color3 = parseColor("#FFFFFF")
-            color4 = parseColor("#FFFFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(
-                color1,
-                color2
-            )
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(
-                color3,
-                color4
-            )
-        )
-        gd.cornerRadius = 0f
-
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-
     fun gradiancolorNativeAdslayout(container: FrameLayout, duration: Int) {
 
         color1 = parseColor("#00000000")
@@ -1720,51 +1636,7 @@ object RadioFunction {
         return colorString.toColorInt()
     }
 
-    fun colouriseToolbar(
-        appBarLayout: CollapsingToolbarLayout,
-        @ColorInt background: Int,
-        @ColorInt foreground: Int
-    ) {
-        appBarLayout.setBackgroundColor(background)
-        val toolbar = appBarLayout.getChildAt(0) as Toolbar
-        toolbar.setTitleTextColor(foreground)
-        toolbar.setSubtitleTextColor(foreground)
-        val colorFilter = PorterDuffColorFilter(foreground, PorterDuff.Mode.MULTIPLY)
-        for (i in 0 until toolbar.childCount) {
-            val view = toolbar.getChildAt(i)
-            //todo: cal icon?
-            //Back button or drawer open button
-            if (view is ImageButton) {
-                view.drawable.colorFilter = colorFilter
-            }
-            if (view is ActionMenuView) {
-                for (j in 0 until view.childCount) {
-                    val innerView = view.getChildAt(j)
-                    //Any ActionMenuViews - icons that are not back button, text or overflow menu
-                    if (innerView is ActionMenuItemView) {
-                        val drawables = innerView.compoundDrawables
-                        for (k in drawables.indices) {
-                            val drawable = drawables[k]
-                            if (drawable != null) {
-                                //Set the color filter in separate thread
-                                //by adding it to the message queue - won't work otherwise
-                                innerView.post {
-                                    innerView.compoundDrawables[k].colorFilter =
-                                        colorFilter
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //Overflow icon
-        val overflowIcon = toolbar.overflowIcon
-        if (overflowIcon != null) {
-            overflowIcon.colorFilter = colorFilter
-            toolbar.overflowIcon = overflowIcon
-        }
-    }
+
 
 
     fun nativeSmallAds(context: Context, ad_frame: FrameLayout, adView: NativeAdView) {
@@ -1970,13 +1842,7 @@ object RadioFunction {
         refreshAd()
     }
 
-    fun dialogueBackround(): Int {
-        return if (darkTheme) {
-            R.drawable.round_corner_dark
-        } else {
-            R.drawable.round_corner_light
-        }
-    }
+
 
 
     fun homepageChrome(context: Context, homepageJson: String) {

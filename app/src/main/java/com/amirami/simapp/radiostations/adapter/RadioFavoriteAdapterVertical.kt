@@ -20,7 +20,7 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
 
 
     private val items = ArrayList<RadioRoom>()
-    private lateinit var ProductShopingRoom: RadioRoom
+    private lateinit var productShopingRoom: RadioRoom
 
     fun setItems(items: MutableList<RadioRoom>) {
         this.items.clear()
@@ -37,10 +37,10 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
 
-        ProductShopingRoom = items[position]//radiodiffer[position]
+        productShopingRoom = items[position]//radiodiffer[position]
 
 
-        holder.bind(ProductShopingRoom)
+        holder.bind(productShopingRoom)
     }
 
     override fun getItemCount(): Int = items.size// differ.currentList.size     //fidCardDBList.size
@@ -74,7 +74,7 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
                 mainTxVw.text = radioRoom.name
                 descriptionTxVw.text = root.context.getString(
                     R.string.stationinfo,
-                    if (radioRoom.bitrate!="")radioRoom.bitrate +if (radioRoom.language!="" || radioRoom.language != "")" kbps, " else if(radioRoom.language!="") " kbps, " else " kbps " else ""  ,
+                    if (radioRoom.bitrate!="")radioRoom.bitrate +if (radioRoom.language!="" || radioRoom.language != "")" kbps, "  else " kbps " else ""  ,
                     if(radioRoom.country!="")radioRoom.country +if (radioRoom.language!="")", " else "" else "",
                     if(radioRoom.language!="")radioRoom.language  else "")
 

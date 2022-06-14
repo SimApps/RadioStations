@@ -9,7 +9,7 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -108,6 +108,11 @@ class InfoBottomSheetFragment: BottomSheetDialogFragment() {
             binding.TitleTxtVw.text = getString(R.string.DisconnectMsg)
         }
 
+         val requestMultiplePermissions = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+            }
+
+
         binding.btnOui.setSafeOnClickListener{
             if (argsFrom.title=="BatterieOptimisation"){
                 // Do something when user press the positive button
@@ -118,7 +123,8 @@ class InfoBottomSheetFragment: BottomSheetDialogFragment() {
                         dismiss()
                     }
                     else{
-                        startActivityForResult(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS), 0)
+                       requestMultiplePermissions.launch(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    //    startActivityForResult(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS), 0)
                         dismiss()
                     }
                 }
@@ -146,7 +152,7 @@ class InfoBottomSheetFragment: BottomSheetDialogFragment() {
         _binding=null
     }
 
-    fun <T> InfoBottomSheetFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 flow.collectLatest(collect)

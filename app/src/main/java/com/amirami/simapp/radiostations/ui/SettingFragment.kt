@@ -19,6 +19,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.saveData
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
 import com.amirami.simapp.radiostations.RadioFunction.countryCodeToName
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
+import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.getuserid
 import com.amirami.simapp.radiostations.RadioFunction.gradiancolorNestedScrollViewTransition
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
@@ -149,7 +150,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                             }
 
                         }
-                        else -> {}
                     }.exhaustive
 
                 }
@@ -496,10 +496,11 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
             if (list.isNotEmpty() ) {
                 val favoriteFirestore=FavoriteFirestore(getuserid(),
-                    list.map { it.radiouid } as ArrayList<String>)
+                    list.map { it.radiouid } as ArrayList<String>,
+                    getCurrentDate())
                 createUserDocument(favoriteFirestore)
             }
-            else createUserDocument(FavoriteFirestore(getuserid()))
+            else createUserDocument(FavoriteFirestore(getuserid(), ArrayList<String>(),getCurrentDate()))
         }
 
     }
@@ -507,7 +508,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
     private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
         val addFavoritRadioIdInArrayFirestore =
-            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid)
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid,getCurrentDate())
         addFavoritRadioIdInArrayFirestore.observe(this) {
             //if (it != null)  if (it.data!!)  prod name array updated
             if (it.e != null) {

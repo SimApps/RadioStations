@@ -20,7 +20,6 @@ import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
 import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransitionConstraint
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
-import com.amirami.simapp.radiostations.RadioFunction.removeWord
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
@@ -29,7 +28,6 @@ import com.amirami.simapp.radiostations.databinding.FragmentListradioBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.model.Status
-import com.amirami.simapp.radiostations.utils.Constatnts.FROM_RECORDED_STREAM
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
@@ -42,7 +40,6 @@ import java.io.IOException
 @AndroidEntryPoint
 class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapterVertical.OnItemClickListener, RecordedFilesAdapter.OnItemClickListener {
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val radioList: MutableList<RadioVariables> = mutableListOf()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private lateinit var radioAdapterHorizantal: RadioListAdapterVertical
     private lateinit var recordedFilesAdapter: RecordedFilesAdapter
@@ -65,16 +62,12 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
                                 }
                             }
                         }
-                        else -> {}
+
                     }.exhaustive
                 }
 
             }
         }
-
-
-
-
 
 
         binding.itemErrorMessage.btnRetry.setSafeOnClickListener {
@@ -143,15 +136,9 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
     private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
-                if (it.value) {
-                    setUpRecord()
-
-                    } else {
-                        DynamicToast.makeError(
-                            requireContext(),
-                            getString(R.string.PermissionsNotgranted),
-                            9
-                        ).show()
+                if (it.value) setUpRecord()
+                else {
+                        errorToast( requireContext(), getString(R.string.PermissionsNotgranted))
                         MainActivity.customdownloader?.cancelDownload()
                     }
 
@@ -282,6 +269,8 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
 
     override fun onRecItemClick(recordInfo: RecordInfo) {
             GlobalRadiourl = recordInfo.uri.toString()
+
+
             Exoplayer.initializePlayer(requireContext(),true)
 
             val radioVariables=RadioVariables ()
@@ -320,9 +309,6 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
        // Exoplayer.Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("",radioVariables.homepage))
 
         infoViewModel.putRadiopalyerInfo(radioVariables)
-
-
-
     }
 
     override fun onRecMoreItemClick(recordInfo: RecordInfo, position:Int) {

@@ -1,8 +1,9 @@
 package com.amirami.simapp.radiostations.firestore
 
-import com.amirami.simapp.priceindicatortunisia.data.DataOrException
+import com.amirami.simapp.radiostations.data.DataOrException
 import com.amirami.simapp.radiostations.RadioFunction.getuserid
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
+import com.amirami.simapp.radiostations.utils.Constatnts.LAST_DATE_MODIFIED
 import com.amirami.simapp.radiostations.utils.Constatnts.RADIO_FAVORITE_ARRAYS
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -15,17 +16,15 @@ class ProductFirestoreRepository @Inject constructor(
     private val db : FirebaseFirestore
 ) {
 
+    suspend  fun getAllRadioFavoriteListFromFirestore(): DataOrException<MutableList<ArrayList<String>>, String> {
 
-
-
-    suspend    fun getAllRadioFavoriteListFromFirestore(): DataOrException<MutableList<ArrayList<String>>, String> {
         val DataOrExceptionProdNames = DataOrException<MutableList<ArrayList<String>>, String>()
         try {
             val productList = mutableListOf<ArrayList<String>>()
-            disableOfflineMode(db)
+
 
             //db.firestoreSettings.isPersistenceEnabled
-            val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
+            val products = disableOfflineMode(false).collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
                 //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
 
                 .get().await()
@@ -43,14 +42,15 @@ class ProductFirestoreRepository @Inject constructor(
 
 
 
-    suspend    fun addFavoriteRadioidInArrayFirestore(prodName:String): DataOrException<Boolean, String> {
+    suspend    fun addFavoriteRadioidInArrayFirestore(prodName:String,lastmodified:Long): DataOrException<Boolean, String> {
         val dataOrException = DataOrException<Boolean, String>()
         try {
 
-            val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid())//document(RADIO_FAVORITE_COLLECTION)
+            val products = disableOfflineMode(true).collection(RADIO_FAVORITE_COLLECTION).document(getuserid())//document(RADIO_FAVORITE_COLLECTION)
             //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
-         products.update(RADIO_FAVORITE_ARRAYS, FieldValue.arrayUnion(prodName)).await()
-
+        // products.update(RADIO_FAVORITE_ARRAYS, FieldValue.arrayUnion(prodName)).await()
+            products.update(RADIO_FAVORITE_ARRAYS, FieldValue.arrayUnion(prodName),LAST_DATE_MODIFIED,lastmodified).await()
+           // products.set(favoriteFirestore,SetOptions.merge()).await()
             dataOrException.data = true
 
         } catch (e: FirebaseFirestoreException) {
@@ -65,7 +65,7 @@ class ProductFirestoreRepository @Inject constructor(
     suspend    fun deleteFavoriteRadioFromArrayInFirestore(prodName:String): DataOrException<Boolean, String> {
         val dataOrException = DataOrException<Boolean, String>()
         try {
-            val products = db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
+            val products = disableOfflineMode(true).collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
             //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
             products.update(RADIO_FAVORITE_ARRAYS, FieldValue.arrayRemove(prodName)).await()
 
@@ -86,9 +86,9 @@ class ProductFirestoreRepository @Inject constructor(
    suspend  fun adduserDocumentInFirestore(favoriteFirestore: FavoriteFirestore): DataOrException<Boolean, String> {
         val dataOrException = DataOrException<Boolean, String>()
         try {
-            disableOfflineMode(db)
 
-            val products= db.collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())
+
+            val products=  disableOfflineMode(false).collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())
 
 
 
@@ -122,10 +122,13 @@ class ProductFirestoreRepository @Inject constructor(
         return dataOrException
     }
 
-    private fun disableOfflineMode(db: FirebaseFirestore) {
+    private fun disableOfflineMode(enableoffline:Boolean/* app crush when change enable offline from true to false*/): FirebaseFirestore {
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(false)
             .build()
-        db.firestoreSettings = settings    }
+        db.firestoreSettings = settings
+
+        return db
+    }
 
 }

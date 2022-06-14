@@ -122,9 +122,10 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                             this@MoreBottomSheetFragment.findNavController().navigate(action) //    NavHostFragment.findNavController(requireParentFragment()).navigate(action)
                         }
                     }
+// Request code for selecting a PDF document.
+
 
                     RadioFunction.openRecordFolder(requireContext())
-
                 }
             }
 
@@ -180,15 +181,12 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
             }
             else radioRoom.clear()
-
-
-
         }
 
     }
 
 
-    fun favRadio(
+    private fun favRadio(
         faviconJson: String,
         nameJson: String,
         homepageJson: String,
@@ -272,9 +270,12 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
            val addFavoritRadioIdInArrayFirestore =
-                favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid)
+                favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid,
+                    RadioFunction.getCurrentDate()
+                )
             addFavoritRadioIdInArrayFirestore.observe(viewLifecycleOwner) {
                 //if (it != null)  if (it.data!!)  prod name array updated
+                RadioFunction.interatialadsShow(requireContext())
                 if (it.e != null) {
                     //prod bame array not updated
                     errorToast(requireContext(),it.e!!)
@@ -289,6 +290,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
         val deleteFavoriteRadiofromArrayInFirestore= favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
         deleteFavoriteRadiofromArrayInFirestore.observe(viewLifecycleOwner) {
+            RadioFunction.interatialadsShow(requireContext())
             //if (it != null)  if (it.data!!)  prod name array updated
             if (it.e != null) {
                 //prod bame array not updated
@@ -375,7 +377,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding=null
     }
-    fun <T> BottomSheetDialogFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    private fun <T> BottomSheetDialogFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 flow.collectLatest(collect)

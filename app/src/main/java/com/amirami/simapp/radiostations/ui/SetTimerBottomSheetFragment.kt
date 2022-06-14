@@ -119,7 +119,7 @@ class SetTimerBottomSheetFragment : BottomSheetDialogFragment(),
                         binding.numberpikerLl.visibility = View.GONE
                         binding.textViewCountdown.visibility = View.VISIBLE
                         binding.switchTmerData.visibility = View.GONE
-                        binding.textViewCountdown.text = RadioFunction.bytesIntoHumanReadable(it.toLong())
+                        binding.textViewCountdown.text = RadioFunction.bytesIntoHumanReadable(it)
                     }
                     it==-1L -> {
                         binding.buttonStartPause.text = getString(R.string.Start)
@@ -218,7 +218,7 @@ class SetTimerBottomSheetFragment : BottomSheetDialogFragment(),
                 else input.toLong() * 1024 * 1024*/
 
                 if (binding.timerUnitTxvw.text == getString(R.string.Minute) && binding.buttonStartPause.text != getString(R.string.Reset)) {
-                    infoViewModel.puttimer(input.toInt() * 60, true)
+                    infoViewModel.puttimer(input.toInt() * 60)
                 }
                 else if(binding.switchTmerData.text == getString(R.string.Data) && binding.buttonStartPause.text != getString(R.string.Reset)){
                     infoViewModel.putDataConsumptiontimer(input.toLong() * 1024 * 1024)
@@ -253,7 +253,7 @@ class SetTimerBottomSheetFragment : BottomSheetDialogFragment(),
         super.onDestroyView()
         _binding=null
     }
-    fun <T> SetTimerBottomSheetFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 flow.collectLatest(collect)

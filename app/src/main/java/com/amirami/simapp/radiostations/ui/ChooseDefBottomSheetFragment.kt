@@ -289,7 +289,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         super.onDestroyView()
         _binding=null
     }
-    fun <T> ChooseDefBottomSheetFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 flow.collectLatest(collect)

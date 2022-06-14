@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.amirami.simapp.radiostations.*
@@ -17,7 +16,6 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction.countryCodeToName
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
-import com.amirami.simapp.radiostations.adapter.RadioAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.RadioAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentRadiosBinding
 import com.amirami.simapp.radiostations.model.RadioVariables

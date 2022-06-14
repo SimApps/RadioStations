@@ -11,7 +11,8 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
           /*  if(Exoplayer.player!=null){
                 Exoplayer.player!!.removeListener(Exoplayer.playbackStateListener(context))
             }*/
-            context.stopService(this)
+           context.stopService(this)
+            //  stopService(context)
 
         }
     }

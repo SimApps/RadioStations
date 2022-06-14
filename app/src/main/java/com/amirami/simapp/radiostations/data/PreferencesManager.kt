@@ -1,4 +1,4 @@
-package com.amirami.simapp.priceindicatortunisia.data
+package com.amirami.simapp.radiostations.data
 
 import android.content.Context
 import androidx.datastore.preferences.core.*
@@ -22,20 +22,7 @@ data class FilterPreferences(val date_list_name_refresh: String,
 
 @Singleton
 class PreferencesManager @Inject constructor(@ApplicationContext context: Context) {
-    //   private val dataStore = context.dataStore
     private val dataStore = context.dataStore
-
-    /* suspend fun setThemeMode(mode: Int) {
-         dataStore.edit { settings ->
-             settings[Settings.NIGHT_MODE] = mode
-         }
-     }
-
-     val themeMode: Flow<Int> = dataStore.data.map { preferences ->
-         preferences[Settings.NIGHT_MODE] ?: AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
-     }
-     */
-
 
 
     // used to sort also
@@ -49,49 +36,18 @@ class PreferencesManager @Inject constructor(@ApplicationContext context: Contex
             }
         }
         .map { preferences ->
-            val date_list_name_refresh = preferences[PreferencesKeys.Date_LIST_NAME_REFRESH] ?:  "01/08/2021"
-            val first_open = preferences[PreferencesKeys.FIRST_OPEN] ?: true
-            val nbr_Interstitial_Ad_Showed = preferences[PreferencesKeys.NBR_INTERSTITIAL_AD_SHOWED] ?:  0
+            val dateListNameRefresh = preferences[PreferencesKeys.Date_LIST_NAME_REFRESH] ?:  "01/08/2021"
+            val firstOpen = preferences[PreferencesKeys.FIRST_OPEN] ?: true
+            val nbrInterstitialAdShowed = preferences[PreferencesKeys.NBR_INTERSTITIAL_AD_SHOWED] ?:  0
 
-            val last_shopinglist_refresh = preferences[PreferencesKeys.LAST_SHOPINGLIST_REFRESH] ?:  "01/08/2021"
+            val lastShopinglistRefresh = preferences[PreferencesKeys.LAST_SHOPINGLIST_REFRESH] ?:  "01/08/2021"
             FilterPreferences(
-                date_list_name_refresh,
-                first_open,
-                last_shopinglist_refresh,
-                nbr_Interstitial_Ad_Showed
+                dateListNameRefresh,
+                firstOpen,
+                lastShopinglistRefresh,
+                nbrInterstitialAdShowed
             )
         }
-
-
-    suspend fun updateFirstOpen(value: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.FIRST_OPEN] = value
-        }
-    }
-
-    suspend fun updateLastShopingRefresh(value: String) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.LAST_SHOPINGLIST_REFRESH] = value
-        }
-    }
-
-    suspend fun ListNameRefresh(value: String) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.Date_LIST_NAME_REFRESH] = value
-        }
-    }
-
-    suspend fun nbrInterstitialAdShowed(value: Int) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.NBR_INTERSTITIAL_AD_SHOWED] = value
-        }
-    }
-
-
-
-
-
-
 
 
     private object PreferencesKeys {

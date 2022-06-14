@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -418,7 +417,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
 
 
-    fun btnClick(){
+    private fun btnClick(){
         binding.btnAllcountry.setSafeOnClickListener {
             //   retrofitRadioViewModel.getListRadios(getString(R.string.countries))
             val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
@@ -465,7 +464,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     }
 
 
-    fun adsLooad(){
+    private fun adsLooad(){
         adViewSmallActivitymain  =  View.inflate(requireContext(),R.layout.ads_small,null) as NativeAdView
         adViewBigActivityMain  =  View.inflate(requireContext(),R.layout.ads_big,null) as NativeAdView
 

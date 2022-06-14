@@ -1,9 +1,7 @@
 package com.amirami.simapp.radiostations.adapter
 
-import android.text.TextUtils.substring
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TableRow
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +23,7 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
     ListAdapter<MutableList<RecordInfo>, RecordedFilesAdapter.RecViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
     private val items = ArrayList<RecordInfo>()
-    private lateinit var ProductShopingRoom: RecordInfo
+    private lateinit var productShopingRoom: RecordInfo
 
     fun setItems(items: MutableList<RecordInfo>) {
         this.items.clear()
@@ -44,10 +42,10 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
 
     override fun onBindViewHolder(holder: RecViewHolder, position: Int) {
 
-        ProductShopingRoom = items[position]
+        productShopingRoom = items[position]
 
 
-        holder.bind(ProductShopingRoom)
+        holder.bind(productShopingRoom)
     }
 
     override fun getItemCount(): Int {

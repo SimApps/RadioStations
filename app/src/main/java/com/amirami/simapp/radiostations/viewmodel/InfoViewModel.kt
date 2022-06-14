@@ -47,7 +47,7 @@ class InfoViewModel  @Inject constructor(
     val putTitleText: StateFlow<String>
         get() = _putTitleText
 
-    private val _putTheme = MutableStateFlow<Boolean>(true)
+    private val _putTheme = MutableStateFlow(true)
     val putTheme = _putTheme.asStateFlow()
 
 
@@ -59,11 +59,11 @@ class InfoViewModel  @Inject constructor(
     private val _putDataConsumption = MutableSharedFlow<String>()
     val putDataConsumption: SharedFlow<String> = _putDataConsumption
 
-    private val _putDataConsumptionTimer = MutableStateFlow<kotlin.Long>(-1251L)
+    private val _putDataConsumptionTimer = MutableStateFlow(-1251L)
     val putDataConsumptionTimer: StateFlow<kotlin.Long> = _putDataConsumptionTimer
 
     private var job: Job? = null
-    private val _putTimer = MutableStateFlow<Int>(-1)
+    private val _putTimer = MutableStateFlow(-1)
     val putTimer = _putTimer.asStateFlow()//.takeWhile { isValid }
 
 
@@ -126,7 +126,7 @@ class InfoViewModel  @Inject constructor(
     }
 
 
-    fun puttimer(nbrMinute:Int,on:Boolean){
+    fun puttimer(nbrMinute:Int){
         job?.cancel()
         job =  viewModelScope.launch {
             if(nbrMinute<= 0) job?.cancel()

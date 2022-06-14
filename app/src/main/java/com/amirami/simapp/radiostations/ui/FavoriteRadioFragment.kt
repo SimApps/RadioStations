@@ -7,7 +7,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
@@ -15,18 +14,13 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.Exoplayer.initializePlayer
 import com.amirami.simapp.radiostations.Exoplayer.startPlayer
 import com.amirami.simapp.radiostations.R
-import com.amirami.simapp.radiostations.RadioFunction.getuserid
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentFavoriteBinding
-import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
-import com.amirami.simapp.radiostations.model.Status
-import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
-import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -173,11 +167,4 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         infoViewModel.putRadioInfo(radioVariables)
         this@FavoriteRadioFragment.findNavController().navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment) //      NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment)
     }
-
-
-
-
-
-
-
 }

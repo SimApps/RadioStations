@@ -1,7 +1,6 @@
 package com.amirami.simapp.radiostations.alarm
 
 import androidx.lifecycle.LiveData
-import com.amirami.simapp.radiostations.room.RadioEntity
 
 interface RadioAlarmRoomBaseRepository {
 

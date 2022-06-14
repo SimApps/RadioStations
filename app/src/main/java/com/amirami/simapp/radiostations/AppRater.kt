@@ -36,7 +36,7 @@ object AppRater {
         editor.apply()
     }
 
-    fun nativeRate(mContext:Context){
+    private fun nativeRate(mContext:Context){
         val manager = ReviewManagerFactory.create(mContext)
 
         val request = manager.requestReviewFlow()

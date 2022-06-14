@@ -66,7 +66,7 @@ import java.util.*
                 mainTxVw.text=currentTvShow.name
                 descriptionTxVw.text= root.context.getString(
                     R.string.stationinfo,
-                  if (currentTvShow.bitrate!="")currentTvShow.bitrate +if (currentTvShow.language!="" || currentTvShow.language != "")" kbps, " else if(currentTvShow.language!="") " kbps, " else " kbps " else ""  ,
+                  if (currentTvShow.bitrate!="")currentTvShow.bitrate +if (currentTvShow.language!="" || currentTvShow.language != "")" kbps, " else " kbps " else ""  ,
                     if(currentTvShow.country!="")currentTvShow.country +if (currentTvShow.language!="")", " else "" else "",
                     if(currentTvShow.language!="")currentTvShow.language  else "")
 

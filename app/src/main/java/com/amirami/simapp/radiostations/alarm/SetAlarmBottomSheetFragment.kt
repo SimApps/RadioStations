@@ -37,21 +37,20 @@ import java.util.*
 @AndroidEntryPoint
 class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
 
-    var hourPicker: NumberPicker? = null
-    var munitPicker: NumberPicker? = null
-    var timeInMilliSeconds: Long = 0
-    var hour = 20
-    var minute = 50
+    private var hourPicker: NumberPicker? = null
+    private var munitPicker: NumberPicker? = null
+    private var timeInMilliSeconds: Long = 0
+    private var hour = 20
+    private var minute = 50
 
     private val infoViewModel: InfoViewModel by activityViewModels()
 
     private var _binding: BottomsheetAddalarmBinding? = null
 
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by activityViewModels()
-    private val radioRoom: MutableList<RadioAlarmRoom> = mutableListOf()
-    val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
+    private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
 
-    lateinit var radioVariable:RadioVariables
+    private lateinit var radioVariable:RadioVariables
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,8 +80,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
 
         }
         collectLatestLifecycleFlow(infoViewModel.putRadioAlarmInfo) {
-            radioVariable=it
-
+            it.also { radioVariable = it }
         }
 
 
@@ -139,7 +137,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
         _binding=null
     }
 
-fun formatRcordDescriptionName(description:String):String{
+private fun formatRcordDescriptionName(description:String):String{
   return  if ( description.contains("___",true)){
 
             description.substring(0,
@@ -177,7 +175,7 @@ fun formatRcordDescriptionName(description:String):String{
     }
 
 
-    fun <T> SetAlarmBottomSheetFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 flow.collectLatest(collect)

@@ -38,23 +38,6 @@ object ConvertRadioClass {
 
     fun toEntity(radioRoomModel: RadioRoom) : RadioEntity {
         return when(radioRoomModel.radiouid) {
-            null -> {
-                RadioEntity(
-                radioRoomModel.radiouid,
-                radioRoomModel.name,
-                radioRoomModel.bitrate,
-                radioRoomModel.homepage,
-                radioRoomModel.favicon,
-                radioRoomModel.tags,
-                radioRoomModel.country,
-                radioRoomModel.state,
-                //var RadiostateDB: String?,
-                radioRoomModel.language,
-                radioRoomModel.streamurl,
-                    radioRoomModel.fav
-
-                )
-            }
             else -> {
                 RadioEntity(
                     radioRoomModel.radiouid,

@@ -1,9 +1,6 @@
 package com.amirami.simapp.radiostations.alarm
 
 import androidx.lifecycle.LiveData
-import com.amirami.simapp.radiostations.repository.RadioRoomBaseRepository
-import com.amirami.simapp.radiostations.room.RadioDAO
-import com.amirami.simapp.radiostations.room.RadioEntity
 import javax.inject.Inject
 
 class RepositoryRadiotAlarmRoom  @Inject constructor(
@@ -39,8 +36,8 @@ class RepositoryRadiotAlarmRoom  @Inject constructor(
         )
     }*/
 
-    override suspend fun delete(radiouid: String?) {
-        radioDAO.delete(radiouid)
+    override suspend fun delete(idradio: String?) {
+        radioDAO.delete(idradio)
     }
 
 

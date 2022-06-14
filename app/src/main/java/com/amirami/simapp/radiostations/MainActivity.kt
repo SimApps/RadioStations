@@ -31,6 +31,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.RadioFunction.allPermissionsGranted
+import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -51,7 +52,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         setContentView(view)
 
 
-        FirebaseappCheck()
+        firebaseappCheck()
 
         if(fromAlarm) getAlarmRadioRoom()
 
@@ -275,8 +275,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             binding.radioplayer.RadioImVFragBig.setImageResource(R.drawable.rec_on)
             binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.rec_on)
 
-            //maybe change maun faiv image like in mini palayer
+
             binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_recordings_folder)
+            binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_recordings_folder)
 
             binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.rec_on)
             //  RadioFunction.loadImageInt(R.drawable.recordings, imagedefaulterrorurl, binding.radioplayer.RadioImVFrag)
@@ -300,11 +301,30 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     radioVar.stationuuid,
                     radioVar.state
                 )
-            else DynamicToast.makeError(
-                this@MainActivity,
-                " Recorded files cannot be added to favorite radio ",
-                3
-            ).show()
+            else {
+                if (firstTimeopenRecordfolder) {
+                    firstTimeopenRecordfolder = false
+                    if (!isFinishing) {
+                        val navController = Navigation.findNavController(
+                            this@MainActivity,
+                            R.id.fragment_container
+                        )
+                        navController.navigateUp()
+                        val bundle = bundleOf(
+                            "title" to getString(R.string.Keep_in_mind),
+                            "msg" to getString(R.string.recordmessage)
+                        )
+                        navController.navigate(R.id.infoBottomSheetFragment, bundle)
+                    }
+
+                    preferencesViewModel.onFirstTimeopenRecordFolderChanged(
+                        firstTimeopenRecordfolder
+                    )
+                }
+                RadioFunction.openRecordFolder(this@MainActivity)
+
+
+            }
         }
         binding.radioplayer.likeImageView.setSafeOnClickListener {
             if (!Exoplayer.is_playing_recorded_file)
@@ -478,8 +498,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
                 }
             } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
-                //  seekbarUpdate()
-                Exoplayer.pausePlayer(this@MainActivity)
+                Exoplayer.pausePlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
             }
@@ -525,8 +544,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 }
             }
             else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" /*&& GlobalRadiourl!=""*/) {
-                //    seekbarUpdate()
-                Exoplayer.pausePlayer(this@MainActivity)
+                Exoplayer.pausePlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
 
@@ -636,14 +654,12 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
     }
 
-    fun FirebaseappCheck(){
+    private fun firebaseappCheck(){
         FirebaseApp.initializeApp(this@MainActivity)
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
             PlayIntegrityAppCheckProviderFactory.getInstance()
         )
-
-
     }
 
     private fun transitionBottomSheetBackgroundColor(slideOffset: Float) {
@@ -822,7 +838,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 */
 
-    val requestMultiplePermissions =
+    private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
                 if (it.value) {
@@ -843,7 +859,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                             getString(R.string.PermissionsNotgranted),
                             9
                         ).show()
-                        MainActivity.customdownloader?.cancelDownload()
+                        customdownloader?.cancelDownload()
                     }
 
             }
@@ -967,10 +983,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
                 GlobalRadiourl = list[0].streamurl
-                if(list[0].radiouid==""){
-                   // Exoplayer.is_playing_recorded_file=true
-                    Exoplayer.initializePlayer(this,true)
-                }
+                if(list[0].radiouid=="") Exoplayer.initializePlayer(this,true)
                 else Exoplayer.initializePlayer(this,false)
 
                 Exoplayer.startPlayer()
@@ -985,34 +998,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
 
-    private  fun hasInternetConnection(): Boolean {
-        val connectivityManager = getSystemService(
-            Context.CONNECTIVITY_SERVICE
-        ) as ConnectivityManager
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return when {
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } else {
-            connectivityManager.activeNetworkInfo?.run {
-                return when (type) {
-                    ConnectivityManager.TYPE_WIFI -> true
-                    ConnectivityManager.TYPE_MOBILE -> true
-                    ConnectivityManager.TYPE_ETHERNET -> true
-                    else -> false
-                }
-            }
-        }
-        return false
-    }
 
 
     private fun getFavRadioRoom() {
@@ -1163,11 +1148,11 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         //    setupRadioLisRV()
                         // getRadioRoomplayer()
 
-                        binding.radioplayer.RadioImVFrag.visibility = View.INVISIBLE
-                        binding.radioplayer.stopButton.visibility = View.INVISIBLE
-                        binding.radioplayer.pauseplayButton.visibility = View.INVISIBLE
-                        binding.radioplayer.likeImageView.visibility = View.INVISIBLE
-                        binding.radioplayer.datainfotxvw.visibility = View.INVISIBLE
+                        binding.radioplayer.RadioImVFrag.visibility = View.GONE
+                        binding.radioplayer.stopButton.visibility = View.GONE
+                        binding.radioplayer.pauseplayButton.visibility = View.GONE
+                        binding.radioplayer.likeImageView.visibility = View.GONE
+                        binding.radioplayer.datainfotxvw.visibility = View.GONE
                         isExpanded = true
                         //    DynamicToast.makeSuccess(this@MainActivity,"STATE_EXPANDED", 3).show()
                         loadNativeAdPlayer()
@@ -1339,9 +1324,10 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
         val addFavoritRadioIdInArrayFirestore =
-            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid)
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid,getCurrentDate())
         addFavoritRadioIdInArrayFirestore.observe(this) {
             //if (it != null)  if (it.data!!)  prod name array updated
+            RadioFunction.interatialadsShow(this@MainActivity)
             if (it.e != null) {
                 //prod bame array not updated
                 RadioFunction.errorToast(this, it.e!!)
@@ -1356,6 +1342,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         val deleteFavoriteRadiofromArrayInFirestore= favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
         deleteFavoriteRadiofromArrayInFirestore.observe(this) {
+            RadioFunction.interatialadsShow(this@MainActivity)
             //if (it != null)  if (it.data!!)  prod name array updated
             if (it.e != null) {
                 //prod bame array not updated
@@ -1475,7 +1462,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         navController.navigate(R.id.searchFragment)
     }
 
-    fun closesearchfrag() {
+    private fun closesearchfrag() {
         val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
         navController.navigateUp()
         //  navController.navigate(R.id.searchFragment)
@@ -1523,7 +1510,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     }
 
-    fun googleSearch() {
+    private fun googleSearch() {
         /*  val intent = Intent(Intent.ACTION_WEB_SEARCH)
     intent.putExtra(SearchManager.QUERY, uri)
     unwrap(context).startActivity(intent)
@@ -1550,7 +1537,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
 
-    fun Activity.turnScreenOnAndKeyguardOff() {
+    private fun Activity.turnScreenOnAndKeyguardOff() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
@@ -1568,7 +1555,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
     }
 
-    fun Activity.turnScreenOffAndKeyguardOn() {
+    private fun Activity.turnScreenOffAndKeyguardOn() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(false)
             setTurnScreenOn(false)

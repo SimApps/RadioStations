@@ -34,14 +34,13 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
 
 object Exoplayer {
+    var dismissNotification = false
     const val notifi_CHANNEL_ID = "SimAPPcganelIDradioApp"
-    var showWhen = false
-    var ongoing = false
+
     const val packagename = "com.amirami.simapp.radiostations"
     private const val PATH = "$packagename.action."
     const val NOTIFICATION_DISMISSED = PATH + "NOTIFICATION_DISMISSED"
     const val PLAYPAUSE = PATH + "PLAYPAUSE"
-    const val REC = PATH + "REC"
     const val STOP = PATH + "STOP"
     const val STOPALL = PATH + "STOPALL"
     var totalTime: Long = 0
@@ -53,22 +52,19 @@ object Exoplayer {
     private var playbackPosition: Long = 0
     private var currentWindow: Int = 0
     var playWhenReady = true
-    var playPauseIcon =
-        R.drawable.pause_2 //if (!getIsPlaying()) R.drawable.ic_pause else R.drawable.ic_play
+    var playPauseIcon = R.drawable.pause_2 //if (!getIsPlaying()) R.drawable.ic_pause else R.drawable.ic_play
 
     fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     fun initializePlayer(ctx: Context, is_playingrecordedfile: Boolean) {
         video_on = false
         is_playing_recorded_file = is_playingrecordedfile
-        //icyandState = ""
-        // icybackup = ""
-        showWhen = true
-        ongoing = true
+
+
         val eContext = ctx.applicationContext
 
-
-        releasePlayer(ctx)
+        if (is_downloading) downloader?.cancelDownload() //to cancel download before playing new station
+        releasePlayer(ctx) //if removed player sttate get mess up when play radio then rec file
 
         val trackSelector = DefaultTrackSelector(eContext).apply {
             setParameters(buildUponParameters().setMaxVideoSizeSd())
@@ -80,7 +76,7 @@ object Exoplayer {
             .setWakeMode(C.WAKE_MODE_NETWORK)
             .build()
 
-        mMediaSession = MediaSession.Builder(eContext, player!!).build()
+        if(!::mMediaSession.isInitialized) mMediaSession = MediaSession.Builder(eContext, player!!).build()
 
         player!!.seekTo(currentWindow, playbackPosition)
 
@@ -106,8 +102,7 @@ object Exoplayer {
             prepare()
         }
 
-        if (is_downloading) downloader?.cancelDownload()
-
+        RadioFunction.startServices(ctx)// THIS LINE BECAUSE NOTIF DONT RESHOW WHEN DISMMISSED (only for rec files)
     }
 
 
@@ -189,39 +184,21 @@ object Exoplayer {
     fun releasePlayer(context: Context) {
         if (player != null) {
 
-            if (is_downloading) {
-                downloader?.cancelDownload()
-                mMediaSession.release()
-            } else {
+            if (is_downloading) downloader?.cancelDownload()
+            else {
                 playbackPosition = player!!.currentPosition
                 currentWindow = player!!.currentMediaItemIndex
                 player!!.playWhenReady = player!!.playWhenReady
                 player!!.playbackState
+                player!!.removeListener(playbackStateListener(context))
+                mMediaSession.release()
                 player?.stop()
                 player!!.release()
-                mMediaSession.release()
-                player!!.removeListener(playbackStateListener(context))
+
+
                 player = null
-
                 video_on = false
-                //icyandState = ""
             }
-        }
-    }
-
-    fun releaseAlarmPlayer(context: Context) {
-        if (player != null) {
-            playbackPosition = player!!.currentPosition
-            currentWindow = player!!.currentMediaItemIndex
-            mMediaSession.release()
-            player!!.apply {
-                playWhenReady = true
-                playbackState
-                stop()
-                release()
-                removeListener(playbackStateListener(context))
-            }
-            player = null
         }
     }
 
@@ -272,20 +249,13 @@ object Exoplayer {
         }
     }
 
-    fun pausePlayer(context: Context) {
-        //  Observer.changeText("Main text view", icyandState)
-        //  Observer.changeText("text view", icyandState)
+    fun pausePlayer() {
         if (player != null) {
             player!!.playWhenReady = false
             player!!.playbackState
         }
 
-        if (is_downloading) {
-            //   Observer.changeImageRecord("Main stop image view", R.drawable.stop_2)
-            downloader?.cancelDownload()
-        }
-
-       // RadioFunction.startServices(context)
+        if (is_downloading) downloader?.cancelDownload()
     }
 
     fun startPlayer() {
@@ -301,17 +271,15 @@ object Exoplayer {
         }
     }
 
-    fun playbackStateListener(ctx: Context) = object : Player.Listener {
+    private fun playbackStateListener(ctx: Context) = object : Player.Listener {
         var icybackup=""
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
 
 
             getIsPlaying = isPlaying
-
-
-
             if (playWhenReady && isPlaying) {
+
                 if (is_playing_recorded_file) totalTime = player?.duration!!
                 else if ( GlobalstateString == "UNKNOWN_STATE" && !is_playing_recorded_file) {
                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
@@ -321,23 +289,22 @@ object Exoplayer {
                }
 
 
-
-
                 playPauseIcon = R.drawable.pause_2
                 GlobalstateString = "Player.STATE_READY"
                 changeImagePlayPause("Main image view", R.drawable.pause_2)
                 changeImagePlayPause("image view", R.drawable.pause_2)
 
-
             }
             else if (playWhenReady && !isPlaying && GlobalstateString != "Player.STATE_BUFFERING") {
+
                 playPauseIcon = R.drawable.play_2
                 GlobalstateString = "Player.STATE_PAUSED"
                 changeImagePlayPause("Main image view", R.drawable.play_2)
                 changeImagePlayPause("image view", R.drawable.play_2)
             }
 
-            RadioFunction.startServices(ctx)
+            if(!dismissNotification)  RadioFunction.startServices(ctx)
+
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -399,7 +366,11 @@ object Exoplayer {
                 }
             }
 
-            RadioFunction.startServices(ctx)
+        //    RadioFunction.stopService(ctx)
+
+            if(!dismissNotification)  RadioFunction.startServices(ctx)
+
+
         }
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {

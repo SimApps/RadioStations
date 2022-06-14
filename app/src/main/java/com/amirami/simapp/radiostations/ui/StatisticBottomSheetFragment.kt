@@ -1,41 +1,26 @@
 package com.amirami.simapp.radiostations.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
-import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import com.amirami.simapp.radiostations.databinding.StatisticsDialogueBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
-import com.amirami.simapp.radiostations.model.Resource
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.google.gson.JsonObject
-import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 @AndroidEntryPoint
 class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
@@ -123,7 +108,7 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-    fun showErrorConnection(msg:String){
+    private fun showErrorConnection(msg:String){
         binding.itemErrorMessage.root.visibility= View.VISIBLE
         binding.itemErrorMessage.tvErrorMessage.text = msg
     }
@@ -135,7 +120,7 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
         binding.spinKits.visibility = View.GONE
     }
 
-    fun <T> StatisticBottomSheetFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 flow.collectLatest(collect)

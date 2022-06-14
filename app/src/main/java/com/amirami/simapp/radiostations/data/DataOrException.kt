@@ -1,4 +1,4 @@
-package com.amirami.simapp.priceindicatortunisia.data
+package com.amirami.simapp.radiostations.data
 
 data class DataOrException<T, E : String?>(
     var data: T? = null,

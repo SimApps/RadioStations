@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
@@ -106,7 +105,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
             }
         }
     }
-    fun showErrorConnection(msg:String){
+    private fun showErrorConnection(msg:String){
         binding.itemErrorMessage.root.visibility= View.VISIBLE
         binding.itemErrorMessage.tvErrorMessage.text = msg
     }

@@ -5,6 +5,7 @@ object Constatnts {
    const val RADIO_FAVORITE_COLLECTION = "Radio_Favorite_Arrays"
   // const val RADIO_FAVORITE_DOCUMENT = "Radio Favorite Arrays"
    const val RADIO_FAVORITE_ARRAYS = "radio_favorites_list"
+    const val LAST_DATE_MODIFIED = "last_date_modified"
 
    //  val COUNTRY_FLAGS_BASE_URL= "https://flagcdn.com/"
 
