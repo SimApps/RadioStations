@@ -88,7 +88,7 @@ class SetTimerBottomSheetFragment : BottomSheetDialogFragment(),
                             binding.numberpikerLl.visibility = View.VISIBLE
                             binding.textViewCountdown.visibility = View.GONE
                             infoViewModel.stoptimer()
-                            Exoplayer.releasePlayer(requireContext())
+                          //  Exoplayer.releasePlayer(requireContext())
                         }
                         -1 -> {
                             binding.buttonStartPause.text = resources.getString(R.string.Start)
@@ -133,7 +133,7 @@ class SetTimerBottomSheetFragment : BottomSheetDialogFragment(),
                         binding.numberpikerLl.visibility = View.VISIBLE
                         binding.textViewCountdown.visibility = View.GONE
 
-                        Exoplayer.releasePlayer(requireContext())
+                      //  Exoplayer.releasePlayer(requireContext())
                     }
                 }
 

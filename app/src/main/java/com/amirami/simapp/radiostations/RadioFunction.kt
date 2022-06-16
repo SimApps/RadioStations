@@ -50,6 +50,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
+import com.amirami.simapp.radiostations.alarm.BootCompleteReceiver
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.utils.Constatnts.RECORDS_FILE_NAME
@@ -1560,6 +1561,38 @@ object RadioFunction {
             color2 = parseColor("#BABABA")
             color3 = parseColor("#BABABA")
             color4 = parseColor("#BABABA")
+        }
+        val gd1 =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
+        gd1.cornerRadius = 0f
+
+        val gd =
+            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
+        gd.cornerRadius = 0f
+
+
+        val color = arrayOf(gd, gd1)
+        val trans = TransitionDrawable(color)
+        container.background = trans
+        trans.startTransition(duration)
+
+    }
+
+    fun gradiancolorConstraintLayoutTransitionBottomsheet(
+        container: ConstraintLayout,
+        duration: Int,
+        theme: Boolean
+    ) {
+        if (theme) {
+            color1 = parseColor("#070326")//-256
+            color2 = parseColor("#070326")//-65536
+            color3 = parseColor("#070326")
+            color4 = parseColor("#070326")
+        } else {
+            color1 = parseColor("#F0FFFF")
+            color2 = parseColor("#F0FFFF")
+            color3 = parseColor("#F0FFFF")
+            color4 = parseColor("#F0FFFF")
         }
         val gd1 =
             GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))

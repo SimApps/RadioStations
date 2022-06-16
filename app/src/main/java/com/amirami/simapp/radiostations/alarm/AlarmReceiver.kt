@@ -2,10 +2,8 @@ package com.amirami.simapp.radiostations.alarm
 
 import android.app.*
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
@@ -14,6 +12,7 @@ import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.MainActivity.Companion.fromAlarm
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.alarm.Utils.diableBootReceiver
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_CHANNEL_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
@@ -132,15 +131,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
 
 
-    private fun diableBootReceiver(context: Context) {
-        val receiver = ComponentName(context, BootCompleteReceiver::class.java)
 
-        context.packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP
-        )
-    }
 
 
 

@@ -77,7 +77,7 @@ class NotificationChannelService : Service() {
             // Add the intent, which inflates the back stack
             addNextIntentWithParentStack(resultIntent)
             // Get the PendingIntent containing the entire back stack
-            getPendingIntent(0,immutableFlag or FLAG_UPDATE_CURRENT)
+            getPendingIntent(requestCode,immutableFlag or FLAG_UPDATE_CURRENT)
         }
         return resultPendingIntent!!
     }

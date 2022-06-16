@@ -10,7 +10,10 @@ import android.os.Build
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
+import androidx.media.AudioAttributesCompat.USAGE_ALARM
 import androidx.media3.common.*
+import androidx.media3.common.C.CONTENT_TYPE_SONIFICATION
+import androidx.media3.common.C.USAGE_ALARM
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -56,6 +59,8 @@ object Exoplayer {
 
     fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
+    val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+
     fun initializePlayer(ctx: Context, is_playingrecordedfile: Boolean) {
         video_on = false
         is_playing_recorded_file = is_playingrecordedfile
@@ -80,8 +85,9 @@ object Exoplayer {
 
         player!!.seekTo(currentWindow, playbackPosition)
 
+        val mediaItem = if(fromAlarm)   MediaItem.fromUri(soundUri)
+        else   MediaItem.fromUri(Uri.parse(GlobalRadiourl))
 
-        val mediaItem = MediaItem.fromUri(Uri.parse(GlobalRadiourl))
 
 
         if (is_playingrecordedfile) {
@@ -183,7 +189,6 @@ object Exoplayer {
 
     fun releasePlayer(context: Context) {
         if (player != null) {
-
             if (is_downloading) downloader?.cancelDownload()
             else {
                 playbackPosition = player!!.currentPosition
@@ -414,9 +419,12 @@ object Exoplayer {
     }
 
      fun PlaySystemAlarm(context: Context) {
-        fromAlarm = false
+         initializePlayer(context,true)
+         startPlayer()
 
-        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+         fromAlarm = false
+
+
 
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -424,10 +432,9 @@ object Exoplayer {
             val name: CharSequence = context.getString(R.string.alarm_backup)
             val description = context.getString(R.string.alarm_back_desc)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel =
-                NotificationChannel(ALARM_NOTIF_NAME, name, importance)
+            val channel = NotificationChannel(ALARM_NOTIF_NAME, name, importance)
             channel.description = description
-            val audioAttributes = android.media.AudioAttributes.Builder()
+            val audioAttributes = android.media.AudioAttributes.Builder()//android.media.AudioAttributes.Builder()
                 .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(android.media.AudioAttributes.USAGE_ALARM)
                 .build()

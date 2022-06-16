@@ -7,8 +7,6 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.*
 import android.util.DisplayMetrics
 import android.view.View
@@ -31,6 +29,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.RadioFunction.allPermissionsGranted
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
@@ -138,7 +137,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         val view = binding.root
         setContentView(view)
 
-
         firebaseappCheck()
 
         if(fromAlarm) getAlarmRadioRoom()
@@ -173,7 +171,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 // This happens when lifecycle is STARTED and stops
                 // collecting when the lifecycle is STOPPED
                 infoViewModel.putRadioPlayerInfo.collectLatest { radioVar ->
+
                     setPlayer(radioVar)
+
                 }
 
             }
@@ -186,32 +186,31 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private fun putTimer() {
         lifecycleScope.launch {
-            //  repeatOnLifecycle(Lifecycle.State.STARTED) { THIS IS NOT GOOD §§§§§§§§§§§§§
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                infoViewModel.putTimer.collectLatest {
+                    when (it) {
+                        1 -> {
+                            binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
 
-            infoViewModel.putTimer.collectLatest {
-                //    DynamicToast.makeSuccess(this@MainActivity, "intent", 9).show()
-                when (it) {
-                    1 -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        Exoplayer.releasePlayer(this@MainActivity)
-                        infoViewModel.stoptimer()
-                    }
-                    -1 -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                    }
-                    else -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
+                            infoViewModel.stoptimer()
+                     //       Exoplayer.releasePlayer(this@MainActivity)
+
+                        }
+                        -1 -> {
+                            binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                        }
+                        else -> {
+                            binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
+                        }
                     }
                 }
             }
-            //   }
         }
-
     }
 
     private fun dataConsuptionTimer() {
         lifecycleScope.launch {
-            //   repeatOnLifecycle(Lifecycle.State.STARTED) {
+              repeatOnLifecycle(Lifecycle.State.STARTED) {
 
             infoViewModel.putDataConsumptionTimer.collectLatest {
                 //      DynamicToast.makeError(this@MainActivity, it, 1).show()
@@ -221,16 +220,18 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                     }
                     it < 0L -> {
+                        //if (Exoplayer.is_downloading) downloader?.cancelDownload()
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        Exoplayer.releasePlayer(this@MainActivity)
                         infoViewModel.stopdatatimer()
+                      //  Exoplayer.releasePlayer(this@MainActivity)
+
                     }
                     else -> {
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
                     }
                 }
             }
-            //  }
+              }
         }
 
     }
@@ -929,7 +930,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
 
-    fun setDataConsumption() {
+    private fun setDataConsumption() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -1093,13 +1094,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     }
 
-    fun bottomsheetopenclose(){
+    private fun bottomsheetopenclose(){
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         else
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
-    fun setPlayerBottomSheet() {
+    private fun setPlayerBottomSheet() {
 
         binding.radioplayer.RadioImVFrag.setSafeOnClickListener {
             bottomsheetopenclose()
@@ -1126,7 +1127,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 binding.radioplayer.stopButton.alpha = 1 - slideOffset
                 binding.radioplayer.pauseplayButton.alpha = 1 - slideOffset
                 binding.radioplayer.likeImageView.alpha = 1 - slideOffset
-                binding.radioplayer.datainfotxvw.alpha = 1 - slideOffset
+               // binding.radioplayer.datainfotxvw.alpha = 1 - slideOffset
                 //    binding.radioplayer.RadioImVFrag.alpha = slideOffset
 
 
@@ -1141,18 +1142,18 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         binding.radioplayer.stopButton.visibility = View.VISIBLE
                         binding.radioplayer.pauseplayButton.visibility = View.VISIBLE
                         binding.radioplayer.likeImageView.visibility = View.VISIBLE
-                        binding.radioplayer.datainfotxvw.visibility = View.VISIBLE
+                       // binding.radioplayer.datainfotxvw.visibility = View.VISIBLE
                         isExpanded = false
                     }
                     BottomSheetBehavior.STATE_EXPANDED -> {
                         //    setupRadioLisRV()
                         // getRadioRoomplayer()
 
-                        binding.radioplayer.RadioImVFrag.visibility = View.GONE
-                        binding.radioplayer.stopButton.visibility = View.GONE
-                        binding.radioplayer.pauseplayButton.visibility = View.GONE
-                        binding.radioplayer.likeImageView.visibility = View.GONE
-                        binding.radioplayer.datainfotxvw.visibility = View.GONE
+                        binding.radioplayer.RadioImVFrag.visibility = View.INVISIBLE
+                        binding.radioplayer.stopButton.visibility = View.INVISIBLE
+                        binding.radioplayer.pauseplayButton.visibility = View.INVISIBLE
+                        binding.radioplayer.likeImageView.visibility = View.INVISIBLE
+                      //  binding.radioplayer.datainfotxvw.visibility = View.GONE
                         isExpanded = true
                         //    DynamicToast.makeSuccess(this@MainActivity,"STATE_EXPANDED", 3).show()
                         loadNativeAdPlayer()
@@ -1224,7 +1225,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private fun openSearch() {
         binding.searchView.searchInputText.setQuery("", false)//.setText("")
-        binding.searchView.opencloseSearchButton.setImageResource(R.drawable.ic_left_arrow)
+        binding.searchView.opencloseSearchButton.setImageResource(R.drawable.ic_right_arrow)
         binding.searchView.ActionBarTitle.visibility = View.INVISIBLE
         binding.searchView.searchInputText.visibility = View.VISIBLE
         binding.searchView.searchInputText.isEnabled = true

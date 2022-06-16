@@ -1,102 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/popupcountdownalarm"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:orientation="vertical">
+    android:background="@color/transparents"
+    android:fillViewport="true">
 
-
-    <TextView
-        android:id="@+id/infoalarm"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/popupcountdownalarm"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        android:gravity="center"
-        android:textColor="@color/defaultcolor"
-        android:textSize="20sp" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:paddingBottom="25dp">
 
-        <LinearLayout
+
+        <TextView
+            android:id="@+id/infoalarm"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textColor="@color/defaultcolor"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Hours"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/textView2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoalarm" />
+
+        <NumberPicker
+            android:id="@+id/hourPickers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toStartOf="@id/minutPickers"
+            app:layout_constraintStart_toEndOf="@id/minutPickers"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView" />
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:text="Hours"
-                android:textSize="14sp" />
 
-            <NumberPicker
-                android:id="@+id/hourPickers"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center_vertical" />
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/textView2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginStart="30dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Minute"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/textView"
+            app:layout_constraintTop_toBottomOf="@id/infoalarm" />
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:text="Minute"
-                android:textSize="14sp" />
-
-            <NumberPicker
-                android:id="@+id/minutPickers"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center_vertical" />
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <View
-        android:id="@+id/yesno_divider"
-        android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="3dp"
-
-        android:background="@color/defaultcolor" />
+        <NumberPicker
+            android:id="@+id/minutPickers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/hourPickers"
+            app:layout_constraintTop_toBottomOf="@id/textView" />
 
 
-    <TextView
-        android:id="@+id/button_start_cancelalarm"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
+        <View
+            android:id="@+id/yesno_divider"
+            android:layout_width="wrap_content"
+            android:layout_height="0.1dp"
 
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        android:gravity="center"
-        android:text="@string/Start_alarm"
-        android:textColor="@color/defaultcolor"
-        android:textSize="20sp" />
+            android:layout_marginTop="16dp"
+            android:background="@color/defaultcolor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/minutPickers" />
 
-</LinearLayout>
+
+        <TextView
+            android:id="@+id/button_start_cancelalarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/Start_alarm"
+            android:textColor="@color/defaultcolor"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/yesno_divider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

@@ -2,10 +2,8 @@ package com.amirami.simapp.radiostations.alarm
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,6 +21,8 @@ import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
 import com.amirami.simapp.radiostations.alarm.Utils.cancelAlarm
+import com.amirami.simapp.radiostations.alarm.Utils.diableBootReceiver
+import com.amirami.simapp.radiostations.alarm.Utils.enableBootReceiver
 import com.amirami.simapp.radiostations.databinding.BottomsheetAddalarmBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -69,7 +69,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
 
 
         collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorLinearlayoutTransition(binding.popupcountdownalarm, 0,it)
+            RadioFunction.gradiancolorConstraintLayoutTransitionBottomsheet(binding.popupcountdownalarm, 0,it)
             RadioFunction.maintextviewColor(binding.textView,it)
             RadioFunction.maintextviewColor(binding.textView2,it)
             RadioFunction.maintextviewColor(binding.buttonStartCancelalarm,it)
@@ -112,25 +112,9 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
 
     }
 
-    private fun enableBootReceiver() {
-        val receiver = ComponentName(requireContext(), BootCompleteReceiver::class.java)
 
-        requireContext().packageManager?.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
-    }
 
-    private fun diableBootReceiver() {
-        val receiver = ComponentName(requireContext(), BootCompleteReceiver::class.java)
 
-        requireContext().packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP
-        )
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -231,7 +215,7 @@ private fun formatRcordDescriptionName(description:String):String{
                         )
                         radioAlarmRoomViewModel.upsertRadioAlarm(radioroom, "Radio added")
 
-                        enableBootReceiver()
+                        enableBootReceiver(requireContext())
 
                         Utils.setAlarm(requireContext(), timeInMilliSeconds)
                     }
@@ -250,7 +234,7 @@ private fun formatRcordDescriptionName(description:String):String{
                     if (pInten != null) {
                         radioAlarmRoomViewModel.deleteAll("")
                         cancelAlarm(requireContext())
-                        diableBootReceiver()
+                        diableBootReceiver(requireContext())
                     }
 
 

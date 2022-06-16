@@ -145,16 +145,30 @@ class InfoViewModel  @Inject constructor(
 
     fun stoptimer() {
         viewModelScope.launch {
+            if (Exoplayer.is_downloading){
+                MainActivity.downloader?.cancelDownload()
+               Exoplayer.is_downloading = false // without this line player continue paly and rec stop
+            }
+
             job?.cancel()
             _putTimer.value=-1//.emit(-1)
+            Exoplayer.releasePlayer(getApplication<RadioApplication>())
+
+
         }
 
     }
 
     fun stopdatatimer() {
         viewModelScope.launch {
+            if (Exoplayer.is_downloading){
+                MainActivity.downloader?.cancelDownload()
+                    Exoplayer.is_downloading = false // without this line player continue paly and rec stop
+            }
             job?.cancel()
             _putDataConsumptionTimer.value= -1L
+            Exoplayer.releasePlayer(getApplication<RadioApplication>())
+
         }
 
     }
