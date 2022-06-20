@@ -25,6 +25,68 @@
         android:layout_marginTop="12dp"
         android:textColor="@color/defaultcolor" />
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/emailTXviewadd_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/enteremail"
+        android:textColorHint="@color/defaultcolor"
+
+        android:theme="@style/TextInputLayoutAppearance"
+        android:visibility="gone"
+        app:boxStrokeColor="@color/defaultcolor"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/defaultcolor"
+        app:hintTextColor="@color/defaultcolor">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/emailTXviewadd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:focusable="false"
+            android:inputType="textPersonName"
+            android:textCursorDrawable="@color/defaultcolor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordTXviewadd_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/enterpassword"
+        android:textColorHint="@color/defaultcolor"
+
+        android:theme="@style/TextInputLayoutAppearance"
+        android:visibility="gone"
+        app:boxStrokeColor="@color/defaultcolor"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/defaultcolor"
+        app:hintTextColor="@color/defaultcolor">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/passwordTXviewadd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textCursorDrawable="@color/defaultcolor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <ProgressBar
+        android:id="@+id/spin_kitYesNoDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:indeterminateDrawable="@drawable/indeterminate_progress"
+        android:visibility="gone" />
+
     <View
         android:id="@+id/yesno_divider"
         android:layout_width="match_parent"

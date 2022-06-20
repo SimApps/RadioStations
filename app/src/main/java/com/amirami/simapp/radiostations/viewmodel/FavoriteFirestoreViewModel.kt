@@ -47,4 +47,9 @@ class FavoriteFirestoreViewModel @Inject constructor(
     fun addUserDocumentInFirestore(favoriteFirestore: FavoriteFirestore) = liveData(Dispatchers.IO) {
         emit(repository.adduserDocumentInFirestore(favoriteFirestore))
     }
+
+
+    fun deleteUserDocumentinFirestore(id: String) = liveData(Dispatchers.IO) {
+        emit(repository.deleteUserDocumentInFirestore(id))
+    }
 }

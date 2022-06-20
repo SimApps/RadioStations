@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    // id 'kotlin-android-extensions'
 
     id 'kotlin-parcelize'
     id 'kotlin-kapt'
@@ -55,7 +54,6 @@ dependencies {
 
 
     implementation 'androidx.multidex:multidex:2.0.1'
-    // implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
@@ -72,7 +70,6 @@ dependencies {
     //splash screan
     implementation 'androidx.core:core-splashscreen:1.0.0-rc01'
     //in app review
-    implementation 'com.google.android.play:core:1.10.3'
     implementation 'com.google.android.play:core-ktx:1.8.1'
 
 
@@ -106,14 +103,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:30.1.0')
 
     //ads to remove in pro
-    //implementation  'com.google.firebase:firebase-ads-ktx'
     implementation 'com.google.android.gms:play-services-ads:21.0.0'
 
     // Add the Firebase Crashlytics SDK.
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
-    // Recommended: Add the Google Analytics SDK.
-    //   implementation 'com.google.firebase:firebase-analytics'
 
     // Declare the KTX library instead (which automatically has a dependency on the base library)
     implementation 'com.google.firebase:firebase-analytics-ktx'
@@ -147,30 +141,30 @@ dependencies {
     implementation 'com.github.alirezat775:downloader:1.0.2'
 
 
-//floating layout
-    // implementation 'com.github.HamedTaherpour:floating-layout-android:1.1.5'
 
     // this line below because a wierd warning about viewbinding
     compileOnly 'com.android.databinding:viewbinding:7.2.1'
 
 // Navigation Component dependencies
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.5.0-rc02"
+    implementation "androidx.navigation:navigation-ui-ktx:2.5.0-rc02"
 
     // ViewModel
     implementation "androidx.fragment:fragment-ktx:1.4.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation "androidx.navigation:navigation-fragment-ktx:2.4.2"
-    implementation "androidx.navigation:navigation-ui-ktx:2.4.2"
+
 
     //dager hilt
     implementation 'com.google.dagger:hilt-android:2.40.4'
-    kapt 'com.google.dagger:hilt-compiler:2.40.5'
+  //  implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    // kapt 'com.google.dagger:hilt-compiler:2.40.5'
     kapt "com.google.dagger:hilt-android-compiler:2.40.4"
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
-    kapt "androidx.hilt:hilt-compiler:1.0.0"
+ //  kapt "androidx.hilt:hilt-compiler:1.0.0"
+
+
+
 
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
@@ -179,22 +173,24 @@ dependencies {
 
 
     // - - Room Persistence Library
-    def room_version = "2.4.2"
-
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-runtime:2.4.2"
+    kapt "androidx.room:room-compiler:2.4.2"
     // optional - Kotlin Extensions and Coroutines support for Room
-    implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-ktx:2.4.2"
 
 
-    def lottieVersion = "5.0.3"
-    implementation "com.airbnb.android:lottie:$lottieVersion"
+   // def lottieVersion = "5.0.3"
+    implementation "com.airbnb.android:lottie:5.0.3"
 
 
     //ONLY FOR ALARMS MAYBE FIND HOW TO REMOVE IT??? REPLACE IT ...
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
 
+}
+
+kapt {
+    correctErrorTypes = true
 }
 allprojects {
     repositories {

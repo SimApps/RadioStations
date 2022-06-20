@@ -60,6 +60,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
+import com.google.firebase.auth.FirebaseAuth
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import java.io.File
 import java.lang.reflect.Field
@@ -177,7 +178,7 @@ object RadioFunction {
 
      fun startServices(context: Context) {
         if (player != null) {
-            Exoplayer.dismissNotification = false
+
             val serviceIntent = Intent(context, NotificationChannelService::class.java)
            // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
 
@@ -190,9 +191,9 @@ object RadioFunction {
         }
     }
     fun stopService(context: Context) {
-        Exoplayer.dismissNotification = true
         val serviceIntent = Intent(context, NotificationChannelService::class.java)
         context.stopService(serviceIntent)
+
     }
 
 
@@ -1155,52 +1156,38 @@ object RadioFunction {
         context: Context,
         mainiconSting: String,
         erroricon: Int,
-        imageview: ImageView
+        imageview: ImageView,
+        cornerRadius:Float
     ) {
 
-        if (!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)) {
+       if (!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)) {
             val imageLoader = ImageLoader.Builder(context)
                 .components {
                     add(SvgDecoder.Factory())
                     if (SDK_INT >= 28) add(ImageDecoderDecoder.Factory())
                     else add(GifDecoder.Factory())
-
                 }
                 .build()
 
             imageview.load(mainiconSting, imageLoader) {
-                // crossfade(true)
-                // crossfade(500)
-                if (mainiconSting.contains(COUNTRY_FLAGS_BASE_URL))
-                    transformations(RoundedCornersTransformation(16f))
-                else transformations(RoundedCornersTransformation(8f))
+               // if (mainiconSting.contains(COUNTRY_FLAGS_BASE_URL))
+                    transformations(RoundedCornersTransformation(/*16f*/cornerRadius))
+              //  else transformations(RoundedCornersTransformation(8f))
                 error(erroricon)
                 diskCachePolicy(CachePolicy.ENABLED)
                 memoryCachePolicy(CachePolicy.ENABLED)
                 placeholder(erroricon) //image shown when loading image
-             //   scale(Scale.FILL)
-                //   transformations(CircleCropTransformation())
-                // transformations(GrayscaleTransformation())
-                //   transformations(BlurTransformation(applicationContext))
-                //  transformations(BlurTransformation(applicationContext, 5f))
             }
         }
     }
 
     fun loadImageInt(mainiconSting: Int, erroricon: Int, imageview: ImageView) {
         imageview.load(mainiconSting) {
-            //   crossfade(true)
-            //   crossfade(500)
             transformations(RoundedCornersTransformation(8f))
             error(erroricon)
             diskCachePolicy(CachePolicy.ENABLED)
             memoryCachePolicy(CachePolicy.ENABLED)
-          //  scale(Scale.FIT)
             placeholder(erroricon) //image shown when loading image
-            //    transformations(CircleCropTransformation())
-            // transformations(GrayscaleTransformation())
-            //   transformations(BlurTransformation(applicationContext))
-            //  transformations(BlurTransformation(applicationContext, 5f))
         }
     }
 

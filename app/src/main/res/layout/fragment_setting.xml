@@ -52,6 +52,25 @@
 
 
         <TextView
+            android:id="@+id/delete_account_txVw"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="9dp"
+            android:foregroundGravity="center_vertical"
+
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+
+            android:text="@string/deleteaccount"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_user_delete" />
+
+
+        <TextView
             android:id="@+id/sync_fav_txVw"
             android:layout_width="match_parent"
             android:layout_height="48dp"

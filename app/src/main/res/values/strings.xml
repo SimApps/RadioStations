@@ -34,8 +34,8 @@
     <string name="shutdown">Stop playing after : </string>
     <string name="fab_content_desc">Add custom stream.</string>
 
-    <string name="appversion">Version : 2.2.588</string>
-    <string name="version">2.2.588</string>
+    <string name="appversion">Version : 2.2.599.6</string>
+    <string name="version">2.2.599.6</string>
 
 
 
@@ -48,6 +48,8 @@
     <string name="Déconnectersuccess">Successfully Disconnected.</string>
     <string name="connectionsuccess">Successfully Connected.</string>
     <string name="Connecter">Connect</string>
+
+    <string name="deleteaccount">Delete my account</string>
 
     <string name="Échec_connexion">Login Failed !</string>
 
@@ -65,6 +67,8 @@
 
     <string name="enternumber">Enter a number!</string>
 
+    <string name="enteremail">Enter Email</string>
+    <string name="enterpassword">Enter your password</string>
 
     <string name="click_to_expand">Click/Drag to expand </string>
     <string name="playernullinfo">Click here to copy/search </string>
@@ -92,6 +96,7 @@
     <string name="deleteallrecording">Do you really want to delete all recordings?</string>
     <string name="deleterecording">Do you really want to delete this recording?</string>
     <string name="DisconnectMsg">Do you really want to Disconnect?</string>
+    <string name="deleteuserMSG">Do you really want to Delete user profile?</string>
     <string name="disclaimermessage">This app is a tool for playing online radio. It is not affiliated with any media or radio. We respect the copyright of the owner. Therefore, please do not use illegale content without the permission of the owner. </string>
 
 
@@ -138,6 +143,8 @@
     <string name="statNbrTags">Tags : %s</string>
 
     <string name="stationinfo">%s  %s %s</string>
+
+    <string name="sucssessDeleteUser">User Deleted successfully</string>
 
     <string name="sucssessDeleteRecord">%s  Deleted successfully</string>
 

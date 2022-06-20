@@ -25,6 +25,7 @@ import com.amirami.simapp.radiostations.databinding.FragmentMainBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
+import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
@@ -126,10 +127,10 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
               //  retrofitRadioViewModel.getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
                 loadImageString(requireContext(),
                     COUNTRY_FLAGS_BASE_URL+preferencesViewModel.preferencesFlow.first().default_country.lowercase(Locale.ROOT),
-
                     imagedefaulterrorurl,
-
-                    binding.localradiomview)
+                    binding.localradiomview,
+                    Constatnts.CORNER_RADIUS_32F
+                )
 
             }
         }
@@ -554,17 +555,19 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             Exoplayer.initializePlayer(requireContext(),false)
             Exoplayer.startPlayer()
             val radioVariables=RadioVariables ()
+            radioVariables.apply {
+                name= radioRoom.name
+                bitrate= radioRoom.bitrate
+                country= radioRoom.country
+                stationuuid= radioRoom.radiouid
+                favicon= radioRoom.favicon
+                language= radioRoom.language
+                state= radioRoom.state
+                url_resolved= radioRoom.streamurl
+                homepage= radioRoom.homepage
+                tags=radioRoom.tags
+            }
 
-            radioVariables.name= radioRoom.name
-            radioVariables.bitrate= radioRoom.bitrate
-            radioVariables.country= radioRoom.country
-            radioVariables.stationuuid= radioRoom.radiouid
-            radioVariables.favicon= radioRoom.favicon
-            radioVariables.language= radioRoom.language
-            radioVariables.state= radioRoom.state
-            radioVariables.url_resolved= radioRoom.streamurl
-            radioVariables.homepage= radioRoom.homepage
-            radioVariables.tags=radioRoom.tags
             infoViewModel.putRadiopalyerInfo(radioVariables)
 
 

@@ -24,7 +24,8 @@ class ProductFirestoreRepository @Inject constructor(
 
 
             //db.firestoreSettings.isPersistenceEnabled
-            val products = disableOfflineMode(false).collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
+            val products = disableOfflineMode(false)
+                .collection(RADIO_FAVORITE_COLLECTION).document(getuserid ())//.document(RADIO_FAVORITE_COLLECTION)
                 //.orderBy(NAME_PROPERTY, Query.Direction.ASCENDING)
 
                 .get().await()
@@ -129,6 +130,20 @@ class ProductFirestoreRepository @Inject constructor(
         db.firestoreSettings = settings
 
         return db
+    }
+
+
+
+
+    suspend fun deleteUserDocumentInFirestore(id: String): DataOrException<Boolean, String> {
+        val dataOrException = DataOrException<Boolean, String>()
+        try {
+            disableOfflineMode(false).collection(RADIO_FAVORITE_COLLECTION).document(id).delete().await()
+            dataOrException.data = true
+        } catch (e: FirebaseFirestoreException) {
+            dataOrException.e = e.toString()
+        }
+        return dataOrException
     }
 
 }

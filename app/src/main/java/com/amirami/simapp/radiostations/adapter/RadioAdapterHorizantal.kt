@@ -10,6 +10,8 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.utils.Constatnts
+import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import java.util.*
 
@@ -70,7 +72,10 @@ import java.util.*
                             mainTxV.text = currentTvShow.name //globalCountriesJson[position]
 
                             RadioFunction.loadImageString( root.context,"https://i.ibb.co/B31L5GW/error.jpg",
-                                MainActivity.imagedefaulterrorurl, imageViewRv)
+                                MainActivity.imagedefaulterrorurl,
+                                imageViewRv,
+                                CORNER_RADIUS_8F
+                            )
 
                         }
                         else  {
@@ -80,7 +85,8 @@ import java.util.*
 
                                 MainActivity.imagedefaulterrorurl,
 
-                                imageViewRv
+                                imageViewRv,
+                                CORNER_RADIUS_8F
                             )
 
                         }
@@ -91,7 +97,8 @@ import java.util.*
                               root.context,
                               currentTvShow.favicon,
                               MainActivity.imagedefaulterrorurl,//R.drawable.ic_radio_svg,
-                              imageViewRv
+                              imageViewRv,
+                              CORNER_RADIUS_8F
                           )
                       }
 

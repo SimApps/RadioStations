@@ -123,17 +123,19 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
             initializePlayer(requireContext(),false)
             startPlayer()
             val radioVariables = RadioVariables()
+            radioVariables.apply {
+                name = radioRoom.name
+                bitrate = radioRoom.bitrate
+                country = radioRoom.country
+                stationuuid = radioRoom.radiouid
+                favicon = radioRoom.favicon
+                language = radioRoom.language
+                state = radioRoom.state
+                url_resolved = radioRoom.streamurl
+                homepage = radioRoom.homepage
+                tags = radioRoom.tags
+            }
 
-            radioVariables.name = radioRoom.name
-            radioVariables.bitrate = radioRoom.bitrate
-            radioVariables.country = radioRoom.country
-            radioVariables.stationuuid = radioRoom.radiouid
-            radioVariables.favicon = radioRoom.favicon
-            radioVariables.language = radioRoom.language
-            radioVariables.state = radioRoom.state
-            radioVariables.url_resolved = radioRoom.streamurl
-            radioVariables.homepage = radioRoom.homepage
-            radioVariables.tags = radioRoom.tags
             infoViewModel.putRadiopalyerInfo(radioVariables)
 
 

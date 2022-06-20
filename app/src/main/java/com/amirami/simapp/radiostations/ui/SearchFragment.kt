@@ -182,8 +182,6 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
 
 
     override fun onItemClick(radio: RadioVariables) {
-
-
         try {
             GlobalRadiourl=radio.url_resolved
             MainActivity.GlobalImage = radio.favicon
@@ -191,7 +189,6 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
             Exoplayer.startPlayer()
             infoViewModel.putRadiopalyerInfo(radio)
            // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
-
             //   startServices(context)
 
         } catch (e: IOException) {

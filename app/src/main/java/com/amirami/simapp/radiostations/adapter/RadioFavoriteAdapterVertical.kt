@@ -11,6 +11,7 @@ import com.amirami.simapp.radiostations.model.RadioRoom
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
+import com.amirami.simapp.radiostations.utils.Constatnts
 
 
 class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
@@ -78,7 +79,8 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
                     if(radioRoom.country!="")radioRoom.country +if (radioRoom.language!="")", " else "" else "",
                     if(radioRoom.language!="")radioRoom.language  else "")
 
-                RadioFunction.loadImageString(root.context, radioRoom.favicon, MainActivity.imagedefaulterrorurl, ImageView)
+                RadioFunction.loadImageString(root.context, radioRoom.favicon, MainActivity.imagedefaulterrorurl, ImageView,
+                    Constatnts.CORNER_RADIUS_8F)
 
             }
         }

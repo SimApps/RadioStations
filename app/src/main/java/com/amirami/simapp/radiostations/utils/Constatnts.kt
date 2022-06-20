@@ -24,4 +24,8 @@ object Constatnts {
     const val FROM_RECORDED_STREAM= "From recorded Stream"
 
     const val FROM_PLAYER ="fromplayer"
+
+    const val CORNER_RADIUS_8F = 8F
+    const val CORNER_RADIUS_16F = 16F
+    const val CORNER_RADIUS_32F = 32F
 }

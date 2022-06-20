@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -37,11 +38,16 @@ import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.SignInMethodQueryResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlin.collections.ArrayList
+
 
 @AndroidEntryPoint
 class SettingFragment : Fragment(R.layout.fragment_setting) {
@@ -67,12 +73,14 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             // ...
             getRadioUidListFromFirestoreAndITSaveInRoom(true)
 
-            binding.syncFavTxVw.visibility = View.VISIBLE
+            userTxtVwVisibiity(true)
+
 
         }
 
         else {
-            binding.syncFavTxVw.visibility = View.GONE
+            userTxtVwVisibiity(false)
+
             errorToast(requireContext(),resources.getString(R.string.Échec_connexion))
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
@@ -80,6 +88,17 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             // ...
         }
     }
+
+    private fun userTxtVwVisibiity(visible: Boolean) {
+if(visible){
+    binding.syncFavTxVw.visibility = View.VISIBLE
+    binding.deleteAccountTxVw.visibility = View.VISIBLE
+}
+        else {
+    binding.syncFavTxVw.visibility = View.GONE
+    binding.deleteAccountTxVw.visibility = View.GONE
+        }
+}
 
     private fun createUserDocument(favoriteFirestore : FavoriteFirestore) {
         val isProductAddLiveData = favoriteFirestoreViewModel.addUserDocumentInFirestore(favoriteFirestore)
@@ -109,7 +128,9 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         themeChange()
 
         conectDisconnectBtn()
-
+    /*    if(getuserid()!="no_user"){
+            userTxtVwVisibiity(true)
+        }*/
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 binding.favCountryTxv.text = getString(R.string.defaultCountry, countryCodeToName(preferencesViewModel.preferencesFlow.first().default_country))
@@ -150,6 +171,23 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                             }
 
                         }
+                        is InfoViewModel.ChooseDefBottomSheetEvents.PutDeleteUsersDialogueInfo -> {
+                            run {
+                                if(event.id=="deleteUser")
+                                {
+                                    val user = userRecord.currentUser!!
+                                    user.delete().addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                succesToast(requireContext(),getString(R.string.sucssessDeleteUser))
+                                                conectDisconnectBtn()
+                                            }
+                                        else errorToast(requireContext(),task.exception!!.message!!)
+
+                                        }
+                                }
+                            }
+
+                        }
                     }.exhaustive
 
                 }
@@ -173,7 +211,10 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             }
         }
 
-        if(getuserid()!="no_user") binding.syncFavTxVw.visibility = View.VISIBLE
+
+        binding.deleteAccountTxVw.setSafeOnClickListener {
+            goToDeleteUserDialog()
+        }
 
         binding.syncFavTxVw.setSafeOnClickListener {
             radioRoomViewModel.deleteAll("")
@@ -239,29 +280,46 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             removeAds()        }
     }
 
+    private fun checkEmailExistsOrNot() {
+        if(FirebaseAuth.getInstance().currentUser!=null){
+         FirebaseAuth.getInstance().fetchSignInMethodsForEmail(FirebaseAuth.getInstance().currentUser!!.email!!)
+             .addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        if (task.result.signInMethods!!.size == 0) setuserNotexistui()  // email not existed
+                        else  setuserexistui()  // email existed
+                    }
+                  //  else errorToast(requireContext(),task.exception!!.message.toString())// THIS LINE WORK BUT IT REDUNDENT
+                }
+             .addOnFailureListener { e -> errorToast(requireContext(),e.message.toString()) }
+        }
+        else setuserNotexistui()
+
+
+    }
+
+    private fun setuserexistui(){
+        userTxtVwVisibiity(true)
+        binding.signinOutItxVw.apply {
+            text=resources.getString(R.string.Déconnecter)
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
+        }
+
+    }
+    private fun setuserNotexistui(){
+        userTxtVwVisibiity(false)
+        binding.signinOutItxVw.apply {
+            text=resources.getString(R.string.Connecter)
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signin, 0, 0, 0)
+        }
+
+    }
     private fun conectDisconnectBtn() {
-        if(userRecord.currentUser!=null) {
-            binding.signinOutItxVw.text=resources.getString(R.string.Déconnecter)
-            binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
-            // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
-        }
-        else{
-            //no one loged in
-            binding.signinOutItxVw.text=resources.getString(R.string.Connecter)
-            binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signin, 0, 0, 0)
-            //    _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signin)
-        }
-
-
-
-
-
-
+        checkEmailExistsOrNot()
+        //getuserid()!= "no_user"
         binding.signinOutItxVw.setSafeOnClickListener {
-            if(userRecord.currentUser!=null)
+            if(binding.signinOutItxVw.text.toString()==resources.getString(R.string.Déconnecter))
                 goToLogInDialog()
-            else
-                createSignInIntent()
+            else createSignInIntent()
         }
 
     }
@@ -289,6 +347,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                     maintextviewColor(binding.moreappsTxvw,it)
                     maintextviewColor(binding.signinOutItxVw,it)
                     maintextviewColor(binding.syncFavTxVw,it)
+                    maintextviewColor(binding.deleteAccountTxVw,it)
 
 
                 }
@@ -363,6 +422,12 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         val action = SettingFragmentDirections.actionFragmentSettingToInfoBottomSheetFragment("signinOut")
         this@SettingFragment.findNavController().navigate(action) //     NavHostFragment.findNavController(requireParentFragment()).navigate(action)
     }
+
+    private fun goToDeleteUserDialog(){
+        val action = SettingFragmentDirections.actionFragmentSettingToInfoBottomSheetFragment("deleteUser")
+        this@SettingFragment.findNavController().navigate(action) //     NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+    }
+
     private fun createSignInIntent() {
         //when change theme !!! to check
         //val providers = emptyList<AuthUI.IdpConfig>()
@@ -399,14 +464,16 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signin)
                 binding.signinOutItxVw.text=resources.getString(R.string.Connecter)
                 errorToast(requireContext(),resources.getString(R.string.Déconnectersuccess))
-                binding.syncFavTxVw.visibility = View.GONE
+
+                userTxtVwVisibiity(false)
 
             }
             .addOnCanceledListener {
                 binding.signinOutItxVw.text=resources.getString(R.string.Déconnecter)
                 // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
                 binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
-                binding.syncFavTxVw.visibility = View.VISIBLE
+
+                userTxtVwVisibiity(true)
             }
         // [END auth_fui_signout]
     }

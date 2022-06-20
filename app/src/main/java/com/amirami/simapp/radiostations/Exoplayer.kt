@@ -10,10 +10,7 @@ import android.os.Build
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
-import androidx.media.AudioAttributesCompat.USAGE_ALARM
 import androidx.media3.common.*
-import androidx.media3.common.C.CONTENT_TYPE_SONIFICATION
-import androidx.media3.common.C.USAGE_ALARM
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -31,13 +28,14 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalstateString
 import com.amirami.simapp.radiostations.MainActivity.Companion.downloader
 import com.amirami.simapp.radiostations.MainActivity.Companion.fromAlarm
 import com.amirami.simapp.radiostations.MainActivity.Companion.video_on
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
+import java.util.*
 
 
 object Exoplayer {
-    var dismissNotification = false
     const val notifi_CHANNEL_ID = "SimAPPcganelIDradioApp"
 
     const val packagename = "com.amirami.simapp.radiostations"
@@ -62,7 +60,7 @@ object Exoplayer {
     val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
     fun initializePlayer(ctx: Context, is_playingrecordedfile: Boolean) {
-        video_on = false
+     //   video_on = false
         is_playing_recorded_file = is_playingrecordedfile
 
 
@@ -85,30 +83,16 @@ object Exoplayer {
 
         player!!.seekTo(currentWindow, playbackPosition)
 
-        val mediaItem = if(fromAlarm)   MediaItem.fromUri(soundUri)
-        else   MediaItem.fromUri(Uri.parse(GlobalRadiourl))
-
-
-
-        if (is_playingrecordedfile) {
-            val mediaSource = ProgressiveMediaSource
-                .Factory(DefaultDataSource.Factory(ctx))
-                .createMediaSource(mediaItem)
-            player!!.setMediaSource(mediaSource, true)
-
-        } else {
-            val mediaSource = buildMediaSource(Uri.parse(GlobalRadiourl))
-            player!!.setMediaSource(mediaSource, true)
-        }
+        val mediaSource = buildMediaSource(Uri.parse(GlobalRadiourl),ctx,is_playingrecordedfile)
+        player!!.setMediaSource(mediaSource, true)
         player!!.apply {
-            addMediaItem(mediaItem)
             playWhenReady = Exoplayer.playWhenReady
             addListener(playbackStateListener(ctx))
             repeatMode = Player.REPEAT_MODE_OFF
             prepare()
         }
 
-        RadioFunction.startServices(ctx)// THIS LINE BECAUSE NOTIF DONT RESHOW WHEN DISMMISSED (only for rec files)
+      //  RadioFunction.startServices(ctx)// THIS LINE BECAUSE NOTIF DONT RESHOW WHEN DISMMISSED (only for rec files)
     }
 
 
@@ -202,264 +186,283 @@ object Exoplayer {
 
 
                 player = null
-                video_on = false
+              //  video_on = false
             }
         }
     }
 
+    private fun buildMediaSource(uri: Uri,ctx:Context,isplayRecFil:Boolean): MediaSource {
 
-    private fun buildMediaSource(uri: Uri): MediaSource {
-        val type = Util.inferContentType(uri)
-        val mediaItem = MediaItem.Builder()
-            .setUri(uri)
-            //  .setMimeType(MimeTypes.APPLICATION_M3U8)
-            .build()
-        return when (type) {
 
-            C.TYPE_DASH -> {
-                video_on = true
 
-                val dashChunkSourceFactory =
-                    DefaultDashChunkSource.Factory(DefaultHttpDataSource.Factory())
+    val type = Util.inferContentType(uri)
+    val mediaItem = MediaItem.Builder()
+        .setUri(if(fromAlarm) soundUri else uri)
+        //  .setMimeType(MimeTypes.APPLICATION_M3U8)
+        .build()
 
-                val manifestDataSourceFactory = DefaultHttpDataSource.Factory()
+        player!!.addMediaItem(mediaItem)
 
-                DashMediaSource.Factory(dashChunkSourceFactory, manifestDataSourceFactory)
-                    .createMediaSource(mediaItem)
-
-            }
-            /*  C.TYPE_SS -> {
-                  video_on = true
-                  val ssSourceFactory = DefaultSsChunkSource.Factory(
-                      //   icyHttpDataSourceFactory
-                      DefaultHttpDataSource.Factory()
-                  )
-                  val manifestDataSourceFactory =  DefaultHttpDataSource.Factory()
-                  SsMediaSource.Factory(ssSourceFactory, manifestDataSourceFactory).createMediaSource(
-                      mediaItem
-                  )
-              }*/
-            C.TYPE_HLS -> {
-                video_on = true
-                HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
-                    .createMediaSource(mediaItem)
-            }
-            C.TYPE_OTHER -> {
-                ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
-                    .createMediaSource(mediaItem)
-            }
-            else -> {
-                throw IllegalStateException("Unsupported type: $type")
-            }
+    return if (isplayRecFil) {
+            ProgressiveMediaSource
+                .Factory(DefaultDataSource.Factory(ctx))
+                .createMediaSource(mediaItem)
         }
-    }
+        else when (type) {
 
-    fun pausePlayer() {
-        if (player != null) {
-            player!!.playWhenReady = false
-            player!!.playbackState
+      /*  C.TRACK_TYPE_VIDEO-> {
+
+        }
+        C.TYPE_RTSP-> {
+
+        }
+        C.TYPE_SS -> {
+            video_on = true
+            val ssSourceFactory = DefaultSsChunkSource.Factory(
+                //   icyHttpDataSourceFactory
+                DefaultHttpDataSource.Factory()
+            )
+            val manifestDataSourceFactory =  DefaultHttpDataSource.Factory()
+            SsMediaSource.Factory(ssSourceFactory, manifestDataSourceFactory).createMediaSource(
+                mediaItem
+            )
+        }
+        */
+        C.TYPE_DASH -> {
+            video_on = true
+
+            val dashChunkSourceFactory =
+                DefaultDashChunkSource.Factory(DefaultHttpDataSource.Factory())
+
+            val manifestDataSourceFactory = DefaultHttpDataSource.Factory()
+
+            DashMediaSource.Factory(dashChunkSourceFactory, manifestDataSourceFactory)
+                .createMediaSource(mediaItem)
+
         }
 
-        if (is_downloading) downloader?.cancelDownload()
-    }
-
-    fun startPlayer() {
-        if (player != null) {
-            player!!.playWhenReady = true
-            player!!.playbackState
+        C.TYPE_HLS -> {
+            video_on = true
+            HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
+                .createMediaSource(mediaItem)
+        }
+        C.TYPE_OTHER -> {
+            video_on = false
+            ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+                .createMediaSource(mediaItem)
+        }
+        else -> {
+            video_on = false
+            throw IllegalStateException("Unsupported type: $type")
         }
     }
+}
 
-    private fun soundPlayer(raw_id: Float) {
-        if (player != null) {
-            player!!.volume = raw_id
-        }
+fun pausePlayer() {
+    if (player != null) {
+        player!!.playWhenReady = false
+        player!!.playbackState
     }
 
-    private fun playbackStateListener(ctx: Context) = object : Player.Listener {
-        var icybackup=""
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
+    if (is_downloading) downloader?.cancelDownload()
+}
+
+fun startPlayer() {
+    if (player != null) {
+        player!!.playWhenReady = true
+        player!!.playbackState
+    }
+}
+
+private fun soundPlayer(raw_id: Float) {
+    if (player != null) {
+        player!!.volume = raw_id
+    }
+}
+
+private fun playbackStateListener(ctx: Context) = object : Player.Listener {
+    var icybackup=""
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
 
 
-            getIsPlaying = isPlaying
-            if (playWhenReady && isPlaying) {
+        getIsPlaying = isPlaying
+        if (playWhenReady && isPlaying) {
 
-                if (is_playing_recorded_file) totalTime = player?.duration!!
-                else if ( GlobalstateString == "UNKNOWN_STATE" && !is_playing_recorded_file) {
-                   Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
-                   Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
-                   Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+            if (is_playing_recorded_file) totalTime = player?.duration!!
+            else if ( GlobalstateString == "UNKNOWN_STATE" && !is_playing_recorded_file) {
+               Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+               Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+               Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
 
-               }
+           }
 
 
-                playPauseIcon = R.drawable.pause_2
-                GlobalstateString = "Player.STATE_READY"
-                changeImagePlayPause("Main image view", R.drawable.pause_2)
-                changeImagePlayPause("image view", R.drawable.pause_2)
+            playPauseIcon = R.drawable.pause_2
+            GlobalstateString = "Player.STATE_READY"
+            changeImagePlayPause("Main image view", R.drawable.pause_2)
+            changeImagePlayPause("image view", R.drawable.pause_2)
 
-            }
-            else if (playWhenReady && !isPlaying && GlobalstateString != "Player.STATE_BUFFERING") {
+        }
+        else if (playWhenReady && !isPlaying && GlobalstateString != "Player.STATE_BUFFERING") {
 
+            playPauseIcon = R.drawable.play_2
+            GlobalstateString = "Player.STATE_PAUSED"
+            changeImagePlayPause("Main image view", R.drawable.play_2)
+            changeImagePlayPause("image view", R.drawable.play_2)
+        }
+
+
+            RadioFunction.startServices(ctx)
+    }
+
+    override fun onPlaybackStateChanged(playbackState: Int) {
+
+
+        when (playbackState) {
+            Player.STATE_IDLE // The player does not have any media to play.
+            -> {
                 playPauseIcon = R.drawable.play_2
-                GlobalstateString = "Player.STATE_PAUSED"
+                GlobalstateString = "Player.STATE_IDLE"
+                Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+                Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+                Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
                 changeImagePlayPause("Main image view", R.drawable.play_2)
                 changeImagePlayPause("image view", R.drawable.play_2)
             }
-
-            if(!dismissNotification)  RadioFunction.startServices(ctx)
-
-        }
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-
-            when (playbackState) {
-                Player.STATE_IDLE // The player does not have any media to play.
-                -> {
-                    playPauseIcon = R.drawable.play_2
-                    GlobalstateString = "Player.STATE_IDLE"
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
-                    changeImagePlayPause("Main image view", R.drawable.play_2)
-                    changeImagePlayPause("image view", R.drawable.play_2)
-                }
-                Player.STATE_BUFFERING // The player needs to load media before playing.
-                -> {
-                    GlobalstateString = "Player.STATE_BUFFERING"
-                    playPauseIcon = R.drawable.pause_2
-                    // icyandState = "BUFFERING"
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
-                    changeImagePlayPause("Main image view", R.drawable.pause_2)
-                    changeImagePlayPause("image view", R.drawable.pause_2)
-                }
-                /*  Player.STATE_READY // The player is able to immediately play from its current position.
-                -> {
-                      GlobalstateString = "Player.STATE_READY"
-                     bufferingProgressBar.visibility = View.INVISIBLE
-                      bufferingProgressBarbig.visibility = View.INVISIBLE
-                     nowPlayingProgressBar.visibility = View.INVISIBLE
-
-                      play.visibility = View.VISIBLE
-                      pause.visibility = View.GONE
-                 }*/
-                Player.STATE_ENDED // The player has finished playing the media.
-                -> {
-                    GlobalstateString = "Player.STATE_ENDED"
-                    playPauseIcon = R.drawable.play_2
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
-                    changeImagePlayPause("Main image view", R.drawable.play_2)
-                    changeImagePlayPause("image view", R.drawable.play_2)
-                }
-                else -> {
-                    GlobalstateString = "UNKNOWN_STATE"
-                    /* playPauseIcon = R.drawable.play_2
-                     icyandState = "OoOps! Try another station! "
-                     icybackup = ""
-
-                     Observer.changeText("Main text view", icyandState)
-                     Observer.changeText("text view", icyandState)
-
-                     changeImagePlayPause("Main image view", R.drawable.play_2)
-                     changeImagePlayPause("image view", R.drawable.play_2)*/
-                }
+            Player.STATE_BUFFERING // The player needs to load media before playing.
+            -> {
+                GlobalstateString = "Player.STATE_BUFFERING"
+                playPauseIcon = R.drawable.pause_2
+                // icyandState = "BUFFERING"
+                Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
+                Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
+                Observer.changeText("text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
+                changeImagePlayPause("Main image view", R.drawable.pause_2)
+                changeImagePlayPause("image view", R.drawable.pause_2)
             }
+            /*  Player.STATE_READY // The player is able to immediately play from its current position.
+            -> {
+                  GlobalstateString = "Player.STATE_READY"
+                 bufferingProgressBar.visibility = View.INVISIBLE
+                  bufferingProgressBarbig.visibility = View.INVISIBLE
+                 nowPlayingProgressBar.visibility = View.INVISIBLE
 
-        //    RadioFunction.stopService(ctx)
+                  play.visibility = View.VISIBLE
+                  pause.visibility = View.GONE
+             }*/
+            Player.STATE_ENDED // The player has finished playing the media.
+            -> {
+                GlobalstateString = "Player.STATE_ENDED"
+                playPauseIcon = R.drawable.play_2
+                Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
 
-            if(!dismissNotification)  RadioFunction.startServices(ctx)
+                Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
+                Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
+                changeImagePlayPause("Main image view", R.drawable.play_2)
+                changeImagePlayPause("image view", R.drawable.play_2)
+            }
+            else -> {
+                GlobalstateString = "UNKNOWN_STATE"
+                /* playPauseIcon = R.drawable.play_2
+                 icyandState = "OoOps! Try another station! "
+                 icybackup = ""
 
+                 Observer.changeText("Main text view", icyandState)
+                 Observer.changeText("text view", icyandState)
 
+                 changeImagePlayPause("Main image view", R.drawable.play_2)
+                 changeImagePlayPause("image view", R.drawable.play_2)*/
+            }
         }
-
-        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-            super.onMediaMetadataChanged(mediaMetadata)
-            // icyandState = mediaMetadata.title.toString() //+ mediaMetadata.genre.toString()
-            // icybackup = mediaMetadata.title.toString()
-            icybackup =mediaMetadata.title.toString()
-            RadioFunction.startServices(ctx)
-            Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString() , ""))
-            Observer.changeText("text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
-            Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-            super.onPlayerError(error)
-            RadioFunction.startServices(ctx)
-            releasePlayer(ctx)
-
-            GlobalstateString = "onPlayerError"
-
-            //   icyandState = "OoOps! Try another station! "
-            //  icybackup = ""
-            Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
-
-            Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
-            Observer.changeText("text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
-            changeImagePlayPause("Main image view", R.drawable.play_2)
-            changeImagePlayPause("image view", R.drawable.play_2)
-            playPauseIcon = R.drawable.play_2
-
-
-
-            if (fromAlarm) PlaySystemAlarm(ctx)
-
-
-        }
-
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) = Unit
-        override fun onRepeatModeChanged(repeatMode: Int) = Unit
-        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = Unit
+        //    RadioFunction.startServices(ctx)
     }
 
-     fun PlaySystemAlarm(context: Context) {
-         initializePlayer(context,true)
-         startPlayer()
-
-         fromAlarm = false
-
-
-
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = context.getString(R.string.alarm_backup)
-            val description = context.getString(R.string.alarm_back_desc)
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(ALARM_NOTIF_NAME, name, importance)
-            channel.description = description
-            val audioAttributes = android.media.AudioAttributes.Builder()//android.media.AudioAttributes.Builder()
-                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
-                .build()
-            channel.setSound(soundUri, audioAttributes)
-
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            val notificationManager = context.getSystemService(
-                NotificationManager::class.java
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val mBuilder: NotificationCompat.Builder =
-            NotificationCompat.Builder(context, ALARM_NOTIF_NAME)
-                .setSmallIcon(R.drawable.ic_add_alarm)
-                .setContentTitle(context.getString(R.string.action_alarm))
-                .setContentText(context.getString(R.string.alarm_fallback_info))
-                .setDefaults(Notification.DEFAULT_SOUND)
-                .setSound(soundUri)
-                .setAutoCancel(true)
-                .setOnlyAlertOnce(true)
-        notificationManager.notify(ALARM_ID, mBuilder.build())
+    override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+        super.onMediaMetadataChanged(mediaMetadata)
+        // icyandState = mediaMetadata.title.toString() //+ mediaMetadata.genre.toString()
+        // icybackup = mediaMetadata.title.toString()
+        icybackup =mediaMetadata.title.toString()
+        RadioFunction.startServices(ctx)
+      //  errorToast(ctx,"3")
+        Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString() , ""))
+        Observer.changeText("text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
+        Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
     }
+
+    override fun onPlayerError(error: PlaybackException) {
+        super.onPlayerError(error)
+        if (fromAlarm) PlaySystemAlarm(ctx)
+        RadioFunction.startServices(ctx)
+     //   errorToast(ctx,"4")
+        releasePlayer(ctx)
+
+        GlobalstateString = "onPlayerError"
+
+        //   icyandState = "OoOps! Try another station! "
+        //  icybackup = ""
+        Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
+
+        Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
+        Observer.changeText("text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
+        changeImagePlayPause("Main image view", R.drawable.play_2)
+        changeImagePlayPause("image view", R.drawable.play_2)
+        playPauseIcon = R.drawable.play_2
+
+
+
+
+
+
+    }
+
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) = Unit
+    override fun onRepeatModeChanged(repeatMode: Int) = Unit
+    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = Unit
+}
+
+ fun PlaySystemAlarm(context: Context) {
+     initializePlayer(context,true)
+     startPlayer()
+
+     fromAlarm = false
+
+
+
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val name: CharSequence = context.getString(R.string.alarm_backup)
+        val description = context.getString(R.string.alarm_back_desc)
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(ALARM_NOTIF_NAME, name, importance)
+        channel.description = description
+        val audioAttributes = android.media.AudioAttributes.Builder()//android.media.AudioAttributes.Builder()
+            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+            .build()
+        channel.setSound(soundUri, audioAttributes)
+
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        val notificationManager = context.getSystemService(
+            NotificationManager::class.java
+        )
+        notificationManager.createNotificationChannel(channel)
+    }
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val mBuilder: NotificationCompat.Builder =
+        NotificationCompat.Builder(context, ALARM_NOTIF_NAME)
+            .setSmallIcon(R.drawable.ic_add_alarm)
+            .setContentTitle(context.getString(R.string.action_alarm))
+            .setContentText(context.getString(R.string.alarm_fallback_info))
+            .setDefaults(Notification.DEFAULT_SOUND)
+            .setSound(soundUri)
+            .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
+    notificationManager.notify(ALARM_ID, mBuilder.build())
+}
 
 
 }

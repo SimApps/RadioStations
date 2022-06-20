@@ -11,6 +11,7 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.*
 
@@ -98,7 +99,8 @@ import java.util.*
                         root.context,
                         currentTvShow.favicon ,
                         MainActivity.imagedefaulterrorurl,
-                        ImageView
+                        ImageView,
+                        Constatnts.CORNER_RADIUS_8F
                     )
 
 

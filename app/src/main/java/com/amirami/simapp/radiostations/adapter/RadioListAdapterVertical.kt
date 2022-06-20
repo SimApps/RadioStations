@@ -13,6 +13,7 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.*
@@ -90,7 +91,12 @@ import java.util.*
                         if (RadioFunction.isNumber(radioVariables.name/*   globalCountriesJson[position]*/)) {
                             mainTxVw.text = radioVariables.name //globalCountriesJson[position]
 
-                            RadioFunction.loadImageString(root.context, "https://i.ibb.co/B31L5GW/error.jpg", MainActivity.imagedefaulterrorurl, ImageView)
+                            RadioFunction.loadImageString(root.context,
+                                "https://i.ibb.co/B31L5GW/error.jpg",
+                                MainActivity.imagedefaulterrorurl,
+                                ImageView,
+                                Constatnts.CORNER_RADIUS_8F
+                            )
 
                         }
                         else  {
@@ -98,10 +104,9 @@ import java.util.*
                             RadioFunction.loadImageString(
                                 root.context,
                                 COUNTRY_FLAGS_BASE_URL + radioVariables.name.lowercase(Locale.ROOT),
-
                                 MainActivity.imagedefaulterrorurl,
-
-                                ImageView
+                                ImageView,
+                                Constatnts.CORNER_RADIUS_8F
                             )
 
                         }

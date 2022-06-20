@@ -12,6 +12,7 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
+import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
@@ -84,7 +85,9 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
                 //root.context.getString(R.string.stationinfo,radioRoom.bitrate,radioRoom.country,radioRoom.language)
                 descriptionTxV.visibility = View.GONE
                 RadioFunction.loadImageString( root.context,radioRoom.favicon,
-                    MainActivity.imagedefaulterrorurl,imageViewRv)
+                    MainActivity.imagedefaulterrorurl,imageViewRv,
+                    Constatnts.CORNER_RADIUS_8F
+                )
 
             }
         }

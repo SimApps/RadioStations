@@ -20,6 +20,7 @@ import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentMoreBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
@@ -329,7 +330,9 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
         else {
 
-            RadioFunction.loadImageString(requireContext(),it.favicon, MainActivity.imagedefaulterrorurl, binding.RadioImage)
+            RadioFunction.loadImageString(requireContext(),it.favicon, MainActivity.imagedefaulterrorurl, binding.RadioImage,
+                Constatnts.CORNER_RADIUS_8F
+            )
 
             binding.RadioNameTXview.text = getString(R.string.infoRadioname,it.name)
             binding.RadioHomepageTXview.text = getString(R.string.infoHomepage,it.homepage)
