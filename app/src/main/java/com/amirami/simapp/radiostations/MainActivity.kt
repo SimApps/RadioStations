@@ -34,6 +34,7 @@ import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
+import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.alarm.RadioAlarmRoomViewModel
 import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
@@ -385,16 +386,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                     binding.radioplayer.videoView.player = null
 
-                    if (video_on || Exoplayer.is_playing_recorded_file) {
-
-                        binding.radioplayer.videoView.player = Exoplayer.player
-                        binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                        binding.radioplayer.videoView.visibility = View.VISIBLE
-                        binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
-
-                    } else {
-                        binding.radioplayer.videoView.visibility = View.INVISIBLE
-                        binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
+                    if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
+                        else {
+                        vedeoisNotOnviews()
 
                         RadioFunction.loadImageString(
                             this@MainActivity,
@@ -408,9 +402,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 }
             }
 
-            /*     if(ExoPlayer.player !=null){
-                RadioFunction.startServices(this@MainActivity)
-            }*/
         }
         binding.radioplayer.stopButton.setSafeOnClickListener {
             if (isDownloadingCustomurl) {
@@ -433,17 +424,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                     binding.radioplayer.videoView.player = null
 
-                    if (video_on || Exoplayer.is_playing_recorded_file) {
-
-                        binding.radioplayer.videoView.player = Exoplayer.player
-                        binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                        binding.radioplayer.videoView.visibility = View.VISIBLE
-                        binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
-
-                    } else {
-                        binding.radioplayer.videoView.visibility = View.INVISIBLE
-                        binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-
+                    if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
+                    else {
+                        vedeoisNotOnviews()
                         RadioFunction.loadImageString(
                             this@MainActivity,
                             radioVar.favicon,
@@ -460,13 +443,11 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
             if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
                 Exoplayer.startPlayer()
-                //    seekbarUpdate()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
 
             } else if (Exoplayer.player == null) {
                 if (Exoplayer.is_playing_recorded_file) {
                     Exoplayer.initializePlayer(this@MainActivity,true)
-                    //    seekbarUpdate()
                 } else Exoplayer.initializePlayer(this@MainActivity,false)
 
                 Exoplayer.startPlayer()
@@ -490,45 +471,22 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             }
         }
         binding.radioplayer.pauseplayButton.setSafeOnClickListener {
-            /* DynamicToast.makeError(
-                 this@MainActivity,
-                 ff+GlobalstateString + Exoplayer.playWhenReady.toString(),
-                 3
-             ).show()*/
-            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED" /*&& GlobalRadiourl!=""*/) {
-
+            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
                 Exoplayer.startPlayer()
-                //   seekbarUpdate()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-                //binding.radioplayer.pauseplayButton.setImageResource(R.drawable.pause_2)
 
             }
-            else if (Exoplayer.player == null  /*&& GlobalRadiourl!=""*/) {
-                if (Exoplayer.is_playing_recorded_file) {
-                    Exoplayer.initializePlayer(this@MainActivity,true)
-                    //   seekbarUpdate()
-                } else {
-                    Exoplayer.initializePlayer(this@MainActivity,false)
-                    // video_view.player = player
-
-                }
-
+            else if (Exoplayer.player == null) {
+                if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity,true)
+                 else Exoplayer.initializePlayer(this@MainActivity,false)
                 Exoplayer.startPlayer()
 
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
 
-
-                if (video_on || Exoplayer.is_playing_recorded_file) {
-                    binding.radioplayer.videoView.player = Exoplayer.player
-                    binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                    binding.radioplayer.videoView.visibility = View.VISIBLE
-                    binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
-                } else {
-                    binding.radioplayer.videoView.visibility = View.INVISIBLE
-                    binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-                }
+                if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
+                 else vedeoisNotOnviews()
             }
-            else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" /*&& GlobalRadiourl!=""*/) {
+            else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
                 Exoplayer.pausePlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
@@ -546,20 +504,10 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
                 binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
             } else {
-                if (video_on || Exoplayer.is_playing_recorded_file) {
-                    DynamicToast.makeError(
-                        this@MainActivity,
-                        getString(R.string.VideoRecordNotAvailable),
-                        6
-                    ).show()
-                }
-                if (Exoplayer.is_playing_recorded_file) {
-                    DynamicToast.makeError(
-                        this@MainActivity,
-                        getString(R.string.cantRecordArecordedStream),
-                        6
-                    ).show()
-                }
+                if (video_on || Exoplayer.is_playing_recorded_file) errorToast(this@MainActivity, getString(R.string.VideoRecordNotAvailable))
+
+                if (Exoplayer.is_playing_recorded_file) errorToast(this@MainActivity, getString(R.string.cantRecordArecordedStream))
+
                 if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
 
                     if (!isDownloadingCustomurl) {
@@ -575,13 +523,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                         }
                         RadioFunction.interatialadsShow(this@MainActivity)
-                    } else {
-                        DynamicToast.makeError(
-                            this@MainActivity,
-                            getString(R.string.cantrecordwhendownload),
-                            6
-                        ).show()
-                    }
+                    } else errorToast(this@MainActivity, getString(R.string.cantrecordwhendownload))
+
+
                 }
             }
 
@@ -747,24 +691,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         adViewAdaptiveBanner.resume()
 
-        //Makes sure that the media controls pop up on resuming and when going between PIP and non-PIP states.
-
         if (Exoplayer.player != null) {
-            if (video_on || Exoplayer.is_playing_recorded_file) {
-                /*  if (videoPosition > 0L/* && !isInPipMode*/) {
-                      Exoplayer.player!!.seekTo(videoPosition)
-                  }*/
-                //Makes sure that the media controls pop up on resuming and when going between PIP and non-PIP states.
-                //     showSystemUi()
-                binding.radioplayer.videoView.player = Exoplayer.player
-                binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                binding.radioplayer.videoView.visibility = View.VISIBLE
-                binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
-
-            } else {
-                binding.radioplayer.videoView.visibility = View.INVISIBLE
-                binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-            }
+            if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
+                else vedeoisNotOnviews()
         } else {
             binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
             binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
@@ -829,21 +758,12 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 if (it.value) {
                     RadioFunction.getDownloader(this@MainActivity)
                     downloader?.download()
-                    DynamicToast.makeSuccess(
-                        this@MainActivity,
-                        getString(R.string.Permissionsgranted),
-                        3
-                    ).show()
-
-
+                    succesToast(this@MainActivity, getString(R.string.Permissionsgranted))
                     }
 
                     else {
-                        DynamicToast.makeError(
-                            this,
-                            getString(R.string.PermissionsNotgranted),
-                            9
-                        ).show()
+                        errorToast(this@MainActivity, getString(R.string.PermissionsNotgranted))
+
                         customdownloader?.cancelDownload()
                     }
 
@@ -1304,7 +1224,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             RadioFunction.interatialadsShow(this@MainActivity)
             if (it.e != null) {
                 //prod bame array not updated
-                RadioFunction.errorToast(this, it.e!!)
+                errorToast(this, it.e!!)
             }
 
         }
@@ -1419,20 +1339,20 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         TODO("Not yet implemented")
     }
 
-    fun opensettingfrag() {
+    private fun opensettingfrag() {
         val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
         navController.navigateUp()
         navController.navigate(R.id.fragmentSetting)
     }
 
 
-    fun openCountdownTimer() {
+    private fun openCountdownTimer() {
         val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
         //  navController.navigateUp()
         navController.navigate(R.id.setTimerBottomSheetFragment)
     }
 
-    fun opensearchfrag() {
+    private fun opensearchfrag() {
         val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
         navController.navigateUp()
         navController.navigate(R.id.searchFragment)
