@@ -1,6 +1,7 @@
 package com.amirami.simapp.radiostations.ui
 
 import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +14,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
@@ -75,7 +75,8 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
                 retrofitRadioViewModel.changeBseUrl()
                 infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
 
-                retrofitRadioViewModel.getListRadios(argsFrom.msg)
+             //   retrofitRadioViewModel.getListRadios(argsFrom.msg)
+                retrofitRadioViewModel.getListCountrieRadios()
             }
             else binding.itemErrorMessage.root.visibility= View.INVISIBLE
         }
@@ -268,10 +269,8 @@ class ListRadioFragment  : Fragment(R.layout.fragment_listradio), RadioListAdapt
     }
 
     override fun onRecItemClick(recordInfo: RecordInfo) {
-            GlobalRadiourl = recordInfo.uri.toString()
-
-
-            Exoplayer.initializePlayer(requireContext(),true)
+            Exoplayer.initializePlayer(requireContext(),true,recordInfo.uri!!
+               /* if(recordInfo.uri!=null) recordInfo.uri!! else Uri.parse("")*/)
 
             val radioVariables=RadioVariables ()
         radioVariables.url_resolved= recordInfo.uri.toString()

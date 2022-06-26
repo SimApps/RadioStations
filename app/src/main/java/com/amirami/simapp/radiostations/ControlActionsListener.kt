@@ -3,6 +3,7 @@ package com.amirami.simapp.radiostations
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.amirami.simapp.radiostations.Exoplayer.PLAYPAUSE
 import com.amirami.simapp.radiostations.Exoplayer.STOP
 import com.amirami.simapp.radiostations.Exoplayer.STOPALL
@@ -15,8 +16,9 @@ class ControlActionsListener : BroadcastReceiver() {
             if (Exoplayer.playWhenReady && Exoplayer.getIsPlaying) Exoplayer.pausePlayer()
             else {
                 if(Exoplayer.player ==null){
-                    if(Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(context, true)
-                    else Exoplayer.initializePlayer(context, false)
+                    if(Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(context, true,
+                        Uri.parse(""))
+                    else Exoplayer.initializePlayer(context, false,Uri.parse(""))
                 }
                 Exoplayer.startPlayer()
             }

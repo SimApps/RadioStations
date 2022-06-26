@@ -197,15 +197,15 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
             permissions.entries.forEach {
                 if (it.value) {
 
-                    if ("https" in MainActivity.GlobalRadiourl) RadioFunction.getCutomDownloader(
+                    if ("https" in binding.RadioStreamlinkTXviewadd.text.toString()) RadioFunction.getCutomDownloader(
                         requireContext(),
-                        MainActivity.GlobalRadioName,
-                        MainActivity.GlobalRadiourl
+                        binding.RadioNameTXviewadd.text.toString(),
+                        binding.RadioStreamlinkTXviewadd.text.toString()
                     )
                     else RadioFunction.getCutomDownloader(
                         requireContext(),
-                        MainActivity.GlobalRadioName,
-                        MainActivity.GlobalRadiourl.replace(
+                        binding.RadioNameTXviewadd.text.toString(),
+                        binding.RadioStreamlinkTXviewadd.text.toString().replace(
                             Regex(resources.getString(R.string.http)),
                             resources.getString(R.string.https)
                         )

@@ -1,7 +1,12 @@
 package com.amirami.simapp.radiostations.ui
 
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.content.IntentSender
+import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -9,11 +14,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.Exoplayer.initializePlayer
 import com.amirami.simapp.radiostations.Exoplayer.startPlayer
+import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentFavoriteBinding
@@ -21,6 +27,14 @@ import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.ActivityResult.RESULT_IN_APP_UPDATE_FAILED
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -37,10 +51,15 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
     private lateinit var binding: FragmentFavoriteBinding
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterVertical
 
-
+       lateinit   var appUpdateManager: AppUpdateManager
+       private val REQUEST_APP_UPDATE = 560
+       private var installStateUpdatedListener: InstallStateUpdatedListener? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFavoriteBinding.bind(view)
+
+          appUpdateManager = AppUpdateManagerFactory.create(requireContext())
+
 
         setTheme()
         infoViewModel.putTitleText(getString(R.string.Favoris))
@@ -118,9 +137,8 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
 
     override fun onItemClick(radioRoom: RadioRoom) {
         try {
-            GlobalRadiourl = radioRoom.streamurl
-            MainActivity.GlobalImage = radioRoom.favicon
-            initializePlayer(requireContext(),false)
+            MainActivity.imageLinkForNotification = radioRoom.favicon
+            initializePlayer(requireContext(),false, Uri.parse(radioRoom.streamurl))
             startPlayer()
             val radioVariables = RadioVariables()
             radioVariables.apply {
@@ -169,4 +187,128 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         infoViewModel.putRadioInfo(radioVariables)
         this@FavoriteRadioFragment.findNavController().navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment) //      NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment)
     }
+
+
+
+
+    private fun checkUpdate(){
+       // appUpdateManager = AppUpdateManagerFactory.create(requireContext())
+
+        /*
+// Returns an intent object that you use to check for an update.
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            //   DynamicToast.makeWarning(requireContext(),  appUpdateInfo.updateAvailability().toString(), 9).show()
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                // This example applies an immediate update. To apply a flexible update
+                // instead, pass in AppUpdateType.FLEXIBLE
+                //   && (appUpdateInfo.clientVersionStalenessDays() ?: -1) >=0// DAYS_FOR_FLEXIBLE_UPDATE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                // Request the update.
+
+                appUpdateManager.startUpdateFlowForResult(
+                    // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                    appUpdateInfo,
+                    // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                    // AppUpdateType.IMMEDIATE,
+                    AppUpdateType.FLEXIBLE,
+                    // The current activity making the update request.
+                    requireActivity() /* Functions.unwrap(context)*/,
+                    // Include a request code to later monitor this update request.
+                    1)
+
+                appUpdateManager.registerListener(listener)
+            }
+            else {
+                appUpdateManager.unregisterListener(listener)
+                Log.d(ContentValues.TAG, "No Update available")
+            }
+        }
+
+*/
+
+        installStateUpdatedListener = InstallStateUpdatedListener { state ->
+                when {
+                    state.installStatus() == InstallStatus.DOWNLOADED -> {
+                        appUpdateManager.completeUpdate()
+                    }
+                    state.installStatus() == InstallStatus.INSTALLED -> {
+                        // if (appUpdateManager != null) {
+                        appUpdateManager.unregisterListener(installStateUpdatedListener!!)
+                        // }
+                    }
+                    else -> {
+                      //  Log.i(TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
+                    }
+                }
+            }
+
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo: AppUpdateInfo ->
+            //    Log.d("TAG", "here")
+                // Checks that the platform will allow the specified type of update.
+                if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
+                    || (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)) {
+                    // Request the update.
+                    try {
+                    //    Log.d("TAG", "here")
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            requireActivity(),
+                            REQUEST_APP_UPDATE
+                        )
+                    } catch (e: IntentSender.SendIntentException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+        appUpdateManager.registerListener(installStateUpdatedListener!!)
+
+    }
+
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_APP_UPDATE) {
+            if (resultCode == RESULT_CANCELED) {
+                errorToast(requireContext(), "Update canceled!")
+              //  checkUpdate()
+            }
+            else if(resultCode != RESULT_IN_APP_UPDATE_FAILED){
+                errorToast(requireContext(), resultCode.toString())
+                checkUpdate()
+            }
+            else if (resultCode != RESULT_OK){
+                errorToast(requireContext(), resultCode.toString())
+                checkUpdate()
+            }
+        }
+    }
+
+
+
+    override fun onStop() {
+        super.onStop()
+        appUpdateManager.unregisterListener(installStateUpdatedListener!!)
+    }
+    override fun onResume() {
+        super.onResume()
+        checkUpdate()
+
+    /*    appUpdateManager
+            .appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+
+                // If the update is downloaded but not installed,
+                // notify the user to complete the update.
+                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    appUpdateManager.completeUpdate()                }
+            }*/
+    }
+
 }

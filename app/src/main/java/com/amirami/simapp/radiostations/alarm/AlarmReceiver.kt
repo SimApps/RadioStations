@@ -25,7 +25,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
 
-        override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context?, intent: Intent?) {
 
 
         // Generate an Id for each notification
@@ -44,8 +44,8 @@ class AlarmReceiver : BroadcastReceiver() {
                 description = "Channel description"
                 enableLights(true)
                 lightColor = Color.RED
-              //  enableVibration(true)
-               // vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
+                //  enableVibration(true)
+                // vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
                 notificationManager.createNotificationChannel(this)
             }
         }
@@ -68,18 +68,18 @@ class AlarmReceiver : BroadcastReceiver() {
                 immutableFlag or PendingIntent.FLAG_UPDATE_CURRENT)
         }
         diableBootReceiver(context)
-            fromAlarm=true
+        fromAlarm=true
 
-   /*     if (hasInternetConnection(context)) {
-            MainActivity.GlobalRadiourl = androidx.preference.PreferenceManager
-                .getDefaultSharedPreferences(context).getString("radioURL", "http://icecast4.play.cz/crojazz256.mp3")!!
-            Exoplayer.initializePlayer(context,false)
+        /*     if (hasInternetConnection(context)) {
+                 MainActivity.GlobalRadiourl = androidx.preference.PreferenceManager
+                     .getDefaultSharedPreferences(context).getString("radioURL", "http://icecast4.play.cz/crojazz256.mp3")!!
+                 Exoplayer.initializePlayer(context,false)
 
-            Exoplayer.startPlayer()
+                 Exoplayer.startPlayer()
 
-        }
-        else PlaySystemAlarm(context)
-*/
+             }
+             else PlaySystemAlarm(context)
+     */
 
         androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
@@ -87,11 +87,11 @@ class AlarmReceiver : BroadcastReceiver() {
 
 
 
-            fun getfullScreenPendingIntent(): PendingIntent {
-                val fullScreenIntent = Intent(context, MainActivity::class.java)
-                return PendingIntent.getActivity(context, 0,
-                    fullScreenIntent, immutableFlag or PendingIntent.FLAG_UPDATE_CURRENT)
-            }
+        fun getfullScreenPendingIntent(): PendingIntent {
+            val fullScreenIntent = Intent(context, MainActivity::class.java)
+            return PendingIntent.getActivity(context, 0,
+                fullScreenIntent, immutableFlag or PendingIntent.FLAG_UPDATE_CURRENT)
+        }
 
         // Create the notification to be shown
         val mBuilder = NotificationCompat.Builder(context,ALARM_CHANNEL_ID )
@@ -105,13 +105,13 @@ class AlarmReceiver : BroadcastReceiver() {
             .setFullScreenIntent(getfullScreenPendingIntent(), true)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setColor(Color.BLUE)
-           // .setOngoing(true)
+            // .setOngoing(true)
             .setLights(0xFFFFFF, 1000, 1000)
             .setContentIntent(getIntent(Exoplayer.STOP))
             .setAutoCancel(true)
             .setOnlyAlertOnce(true)
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-         //   .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
+            //   .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
             //  .addAction(R.mipmap.ic_launcher, "Toast", actionIntent)
             .setStyle(NotificationCompat.BigTextStyle())
 
@@ -119,12 +119,12 @@ class AlarmReceiver : BroadcastReceiver() {
         am.notify(ALARM_ID, mBuilder.build())
 
 
-            val intent1 = Intent()
-            intent1.setClassName(context.packageName, MainActivity::class.java.name).apply {
-                putExtra(EXTRA_MESSAGE, EXTRA_MESSAGE_VALUE)
-            }
-            intent1.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent1)
+        val intent1 = Intent()
+        intent1.setClassName(context.packageName, MainActivity::class.java.name).apply {
+            putExtra(EXTRA_MESSAGE, EXTRA_MESSAGE_VALUE)
+        }
+        intent1.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent1)
     }
 
 

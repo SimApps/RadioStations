@@ -1,5 +1,6 @@
 package com.amirami.simapp.radiostations.ui
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import java.io.IOException
@@ -12,7 +13,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction.countryCodeToName
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -150,12 +150,9 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
         }
     }
     override fun onItemClick(radio: RadioVariables) {
-
-
             try {
-                GlobalRadiourl=radio.url_resolved
-                MainActivity.GlobalImage = radio.favicon
-                Exoplayer.initializePlayer(requireContext(),false)
+                MainActivity.imageLinkForNotification = radio.favicon
+                Exoplayer.initializePlayer(requireContext(),false, Uri.parse(radio.url_resolved))
                 Exoplayer.startPlayer()
                 infoViewModel.putRadiopalyerInfo(radio)
                 // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)

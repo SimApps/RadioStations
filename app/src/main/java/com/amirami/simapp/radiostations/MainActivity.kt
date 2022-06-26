@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.*
 import android.util.DisplayMetrics
 import android.view.View
@@ -25,6 +26,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.Util
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +36,7 @@ import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
+import com.amirami.simapp.radiostations.RadioFunction.startServices
 import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.alarm.RadioAlarmRoomViewModel
@@ -53,7 +56,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
-import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -70,7 +72,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterHorizantal
     private var isExpanded = false
 
-    private var videoPosition: Long = 0L
 
     var stationuuid: String = ""
 
@@ -193,7 +194,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         1 -> {
                             binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
 
-                            infoViewModel.stoptimer()
+                            infoViewModel.stoptimer(true)
                      //       Exoplayer.releasePlayer(this@MainActivity)
 
                         }
@@ -223,7 +224,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     it < 0L -> {
                         //if (Exoplayer.is_downloading) downloader?.cancelDownload()
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        infoViewModel.stopdatatimer()
+                        infoViewModel.stopdatatimer(true)
                       //  Exoplayer.releasePlayer(this@MainActivity)
 
                     }
@@ -237,7 +238,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     }
 
-    fun vedeoisOnviews(){
+    private fun vedeoisOnviews(){
         binding.radioplayer.apply {
             videoView.player = Exoplayer.player
             RadioImVFragBig.visibility = View.GONE
@@ -245,15 +246,16 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
         }
     }
-    fun vedeoisNotOnviews(){
+    private  fun vedeoisNotOnviews(){
         binding.radioplayer.apply {
             videoView.visibility = View.INVISIBLE
             RadioImVFragBig.visibility = View.VISIBLE
         }
     }
+
     private fun setPlayer(radioVar: RadioVariables) {
         stationuuid = radioVar.stationuuid
-        GlobalImage = radioVar.favicon
+        imageLinkForNotification = radioVar.favicon
         GlobalRadioName = radioVar.name
 
         if (!Exoplayer.is_playing_recorded_file) {
@@ -375,8 +377,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     if (!Exoplayer.is_downloading) {
                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                         binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-                        Exoplayer.releasePlayer(this@MainActivity)
-                        RadioFunction.stopService(this@MainActivity)
+
+                        RadioFunction.stopService(this@MainActivity,true)
                     } else {
                         downloader?.cancelDownload()
                         binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
@@ -413,8 +415,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     if (!Exoplayer.is_downloading) {
                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                         binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-                        Exoplayer.releasePlayer(this@MainActivity)
-                        RadioFunction.stopService(this@MainActivity)
+
+                        RadioFunction.stopService(this@MainActivity,true)
                     } else {
                         downloader?.cancelDownload()
                         binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
@@ -447,24 +449,18 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
             } else if (Exoplayer.player == null) {
                 if (Exoplayer.is_playing_recorded_file) {
-                    Exoplayer.initializePlayer(this@MainActivity,true)
-                } else Exoplayer.initializePlayer(this@MainActivity,false)
+                    Exoplayer.initializePlayer(this@MainActivity,true,Uri.parse(""))
+                } else Exoplayer.initializePlayer(this@MainActivity,false,Uri.parse(""))
 
                 Exoplayer.startPlayer()
 
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
 
+                if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
+                else vedeoisNotOnviews()
 
-                if (video_on || Exoplayer.is_playing_recorded_file) {
-                    binding.radioplayer.videoView.player = Exoplayer.player
-                    binding.radioplayer.RadioImVFragBig.visibility = View.GONE
-                    binding.radioplayer.videoView.visibility = View.VISIBLE
-                    binding.radioplayer.videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
-                } else {
-                    binding.radioplayer.videoView.visibility = View.GONE
-                    binding.radioplayer.RadioImVFragBig.visibility = View.VISIBLE
-                }
-            } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
+            }
+            else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
                 Exoplayer.pausePlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
@@ -477,8 +473,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
             }
             else if (Exoplayer.player == null) {
-                if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity,true)
-                 else Exoplayer.initializePlayer(this@MainActivity,false)
+                if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity,true,Uri.parse(""))
+                 else Exoplayer.initializePlayer(this@MainActivity,false,Uri.parse(""))
                 Exoplayer.startPlayer()
 
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
@@ -659,13 +655,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
         var GlobalRadioName = ""
-        var GlobalRadiourl = ""
+        var GlobalRadiourl: Uri = Uri.parse("")
 
         var fromAlarm=false
 
         var video_on = false
 
-        var GlobalImage = ""
+        var imageLinkForNotification = ""
         var GlobalstateString = ""
 
 
@@ -689,68 +685,42 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     public override fun onResume() {
         super.onResume()
 
-        adViewAdaptiveBanner.resume()
-
         if (Exoplayer.player != null) {
+            if (video_on) binding.radioplayer.videoView.onResume()
+
             if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
-                else vedeoisNotOnviews()
+            else vedeoisNotOnviews()
         } else {
             binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
             binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
         }
 
 
-
-        binding.radioplayer.videoView.onResume()
+        // startServices(this@MainActivity)
     }
 
-    override fun onStop() {
-        super.onStop()
-        binding.radioplayer.videoView.player = null
+    /*  override fun onStop() {
+         super.onStop()
+         if (Exoplayer.player != null && video_on) {
+             if (Util.SDK_INT > 23) binding.radioplayer.videoView.onPause()
+
+         }
+
+     }
+
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        turnScreenOffAndKeyguardOn()
     }
 
     override fun onPause() {
         super.onPause()
-        if (Exoplayer.player != null) {
-            videoPosition = Exoplayer.player!!.currentPosition
-        }
-        adViewAdaptiveBanner.pause()
-        binding.radioplayer.videoView.onPause()
-
+        if (Exoplayer.player != null && video_on) binding.radioplayer.videoView.onPause()
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (::adViewAdaptiveBanner.isInitialized) {
-            adViewAdaptiveBanner.destroy()
-        }
-        currentNativeAd?.destroy()
 
-        turnScreenOffAndKeyguardOn()
-
-        /*   if (Build.VERSION.SDK_INT > 23 && !isChangingConfigurations) {
-               ExoPlayer.releasePlayer()
-           }
-   */
-
-
-
-    }
-
-    /*
-    override fun onStop() {
-        super.onStop()
-
-        //     player.release()
-        //PIPmode activity.finish() does not remove the activity from the recents stack.
-        //Only finishAndRemoveTask does this.
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
-            finishAndRemoveTask()
-            if(allowStopPlayer) ExoPlayer.releasePlayer()
-        }
-    }
-*/
 
     private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -886,10 +856,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 )
 
 
-
-                GlobalRadiourl = list[0].streamurl
-                if(list[0].radiouid=="") Exoplayer.initializePlayer(this,true)
-                else Exoplayer.initializePlayer(this,false)
+                if(list[0].radiouid=="") Exoplayer.initializePlayer(this,true,Uri.parse(list[0].streamurl))
+                else Exoplayer.initializePlayer(this,false,Uri.parse(list[0].streamurl))
 
                 Exoplayer.startPlayer()
                 setPlayer(radioVar)
@@ -955,7 +923,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                     infoViewModel.putRadiopalyerInfo(radioVariables)
 
-                    GlobalRadiourl = list[0].streamurl
+                    GlobalRadiourl = Uri.parse(list[0].streamurl)
                     stationuuid = list[0].radiouid
 
                     if (setfavIcons(list[0].radiouid)) {
@@ -1152,23 +1120,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         val radio = RadioVariables()
 
-        /*   var idIn = false
-
-           var position = -1
-           if (radioRoom.size > 0) {
-
-           loop@ for (i in 0 until radioRoom.size) {
-
-            if (idListJson == radioRoom[i].radiouid) {
-
-                idIn = true
-                position = i
-
-                break@loop
-            }
-           }
-           }
-       */
 
         if (!setfavIcons(radioVar.stationuuid) && radioVar.stationuuid != "") {
             // jsonCall = api.addclick(idListJson)
@@ -1203,7 +1154,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             )
             addFavoriteRadioIdInArrayFirestore(radioVar.stationuuid)
             radioRoomViewModel.upsertRadio(radioroom, "Radio added")
-        } else if (setfavIcons(radioVar.stationuuid)) {
+        }
+        else if (setfavIcons(radioVar.stationuuid)) {
             binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_like)
             binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_like)
             radioRoomViewModel.delete(radioVar.stationuuid,
@@ -1299,9 +1251,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     override fun onItemFavClick(radioRoom: RadioRoom) {
         try {
             populateFavRv = false
-            GlobalRadiourl = radioRoom.streamurl
-            GlobalImage = radioRoom.favicon
-            Exoplayer.initializePlayer(this,false)
+            imageLinkForNotification = radioRoom.favicon
+            Exoplayer.initializePlayer(this,false,Uri.parse(radioRoom.streamurl))
             Exoplayer.startPlayer()
 
             val radioVariables = RadioVariables()

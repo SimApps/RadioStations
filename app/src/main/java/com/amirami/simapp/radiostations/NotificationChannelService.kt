@@ -19,43 +19,37 @@ import com.amirami.simapp.radiostations.Exoplayer.NOTIFICATION_DISMISSED
 import com.amirami.simapp.radiostations.Exoplayer.PLAYPAUSE
 import com.amirami.simapp.radiostations.Exoplayer.STOP
 import com.amirami.simapp.radiostations.Exoplayer.STOPALL
-import com.amirami.simapp.radiostations.Exoplayer.getIsPlaying
-import com.amirami.simapp.radiostations.Exoplayer.initializePlayer
 import com.amirami.simapp.radiostations.Exoplayer.isOreoPlus
 import com.amirami.simapp.radiostations.Exoplayer.is_downloading
 import com.amirami.simapp.radiostations.Exoplayer.is_playing_recorded_file
 import com.amirami.simapp.radiostations.Exoplayer.mMediaSession
 import com.amirami.simapp.radiostations.Exoplayer.notifi_CHANNEL_ID
-import com.amirami.simapp.radiostations.Exoplayer.pausePlayer
 import com.amirami.simapp.radiostations.Exoplayer.playPauseIcon
-import com.amirami.simapp.radiostations.Exoplayer.playWhenReady
 import com.amirami.simapp.radiostations.Exoplayer.player
-import com.amirami.simapp.radiostations.Exoplayer.releasePlayer
-import com.amirami.simapp.radiostations.Exoplayer.startPlayer
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalImage
+import com.amirami.simapp.radiostations.MainActivity.Companion.imageLinkForNotification
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterrorurl
-import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
+import com.amirami.simapp.radiostations.utils.Constatnts
 
 
 class NotificationChannelService : Service() {
     val notifID=93696
     val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
 
-  /*  private fun handlePlayPause() {
-       if (playWhenReady && getIsPlaying) pausePlayer()
-        else {
-            if(player==null){
-                if(is_playing_recorded_file) initializePlayer(this,true)
-                else initializePlayer(this,false)
-            }
-            startPlayer()
-        }
-    }
+    /*  private fun handlePlayPause() {
+         if (playWhenReady && getIsPlaying) pausePlayer()
+          else {
+              if(player==null){
+                  if(is_playing_recorded_file) initializePlayer(this,true)
+                  else initializePlayer(this,false)
+              }
+              startPlayer()
+          }
+      }
 
-*/
+  */
 
     /* private fun  handleSTOP(){
         // releasePlayer(this)
@@ -93,7 +87,7 @@ class NotificationChannelService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) return START_STICKY_COMPATIBILITY
-         else {
+        else {
 
             if (isOreoPlus()) {
                 val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -106,14 +100,14 @@ class NotificationChannelService : Service() {
                 }
             }
 
-         /*   when (intent.action) {
-                PLAYPAUSE -> handlePlayPause()
-                STOP -> handleSTOP()
-                STOPALL -> handleSTOPALL()
+            /*   when (intent.action) {
+                   PLAYPAUSE -> handlePlayPause()
+                   STOP -> handleSTOP()
+                   STOPALL -> handleSTOPALL()
+               }*/
+            /*   if (isOreoPlus()) {
+                setupFakeNotification()
             }*/
-           /*   if (isOreoPlus()) {
-               setupFakeNotification()
-           }*/
 
             Exoplayer.Observer.subscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icyandState, ""))
 
@@ -122,13 +116,14 @@ class NotificationChannelService : Service() {
             val notificationDismissedIntent = Intent(this, NotificationDismissedReceiver::class.java).apply {
                 action = NOTIFICATION_DISMISSED
             }
-         //   intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            //   intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             val notificationDismissedPendingIntent =  getBroadcast(this, notifID, notificationDismissedIntent, immutableFlag or FLAG_UPDATE_CURRENT)
 
 
 
             val request = ImageRequest.Builder(this@NotificationChannelService)
-                .data( if (is_playing_recorded_file || GlobalImage=="") imagedefaulterrorurl else GlobalImage)
+                .data(if (is_playing_recorded_file || imageLinkForNotification=="") imagedefaulterrorurl
+                else imageLinkForNotification)
                 .allowConversionToBitmap(true)
                 .target(
                     onStart = { placeholder ->
@@ -146,8 +141,8 @@ class NotificationChannelService : Service() {
                             // .setSubText("Sub Text")
                             .setColor(Color.BLUE)
                             //.setWhen(0L)
-                           // .setShowWhen(showWhen) // to verifie because in simple music player it go from false to true when state palyer is playin
-                          //  .setOngoing(ongoing)
+                            // .setShowWhen(showWhen) // to verifie because in simple music player it go from false to true when state palyer is playin
+                            //  .setOngoing(ongoing)
                             .setSmallIcon(R.drawable.radio)
                             .setContentIntent(/*pendingIntent*/getContentIntent())
                             // .setAutoCancel(true) // remove when clicked
@@ -161,7 +156,7 @@ class NotificationChannelService : Service() {
                             //.setContentIntent(playpauseactionIntent)
                             //.setDeleteIntent(pendingIntent)
                             .setDeleteIntent(notificationDismissedPendingIntent)
-                         //   .setChannelId(notifi_CHANNEL_ID)
+                            //   .setChannelId(notifi_CHANNEL_ID)
                             .setCategory(NotificationCompat.CATEGORY_SERVICE)
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
@@ -200,7 +195,7 @@ class NotificationChannelService : Service() {
                             .setColor(Color.BLUE)
                             //.setWhen(notifWhen)
                             //.setShowWhen(showWhen) // to verifie because in simple music player it go from false to true when state palyer is playin
-                           // .setOngoing(ongoing)
+                            // .setOngoing(ongoing)
                             .setSmallIcon(R.drawable.radio)
                             .setContentIntent(/*pendingIntent*/getContentIntent())
                             // .setAutoCancel(true) // remove when clicked
@@ -215,7 +210,7 @@ class NotificationChannelService : Service() {
                             //.setContentIntent(playpauseactionIntent)
                             //.setDeleteIntent(pendingIntent)
                             .setDeleteIntent(notificationDismissedPendingIntent)
-                         //   .setChannelId(notifi_CHANNEL_ID)
+                            //   .setChannelId(notifi_CHANNEL_ID)
                             .setCategory(NotificationCompat.CATEGORY_SERVICE)
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setStyle(MediaStyleNotificationHelper.MediaStyle(mMediaSession)
@@ -241,7 +236,7 @@ class NotificationChannelService : Service() {
                 .build()
             this@NotificationChannelService.imageLoader.enqueue(request)
 
-        //    return START_STICKY  //START_NOT_STICKY
+            //    return START_STICKY  //START_NOT_STICKY
         }
         return START_STICKY
 
@@ -264,18 +259,18 @@ class NotificationChannelService : Service() {
         // after onUnbind() has already been called
     }
 
+    /* override fun onTaskRemoved(rootIntent: Intent?) {
+         super.onTaskRemoved(rootIntent)
+         stopSelf()
+         stopForeground(true)
+     }*/
 
     override fun onDestroy() {
         super.onDestroy()
         // The service is no longer used and is being destroyed
-       // if (player == null){
-            stopSelf()
-            stopForeground(true)
-       // }
-       // mMediaSession?.isActive = false
-        //Toast.makeText(application, "onDestroy", Toast.LENGTH_SHORT).show()
-
-
+        Exoplayer.releasePlayer(this)
+        stopSelf()
+        stopForeground(true)
     }
 
     /*

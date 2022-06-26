@@ -18,6 +18,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.dash.DefaultDashChunkSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -32,7 +33,6 @@ import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
-import java.util.*
 
 
 object Exoplayer {
@@ -57,17 +57,19 @@ object Exoplayer {
 
     fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
-    val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
-    fun initializePlayer(ctx: Context, is_playingrecordedfile: Boolean) {
-     //   video_on = false
-        is_playing_recorded_file = is_playingrecordedfile
+    fun initializePlayer(ctx: Context, isRecfile: Boolean, streamUrl:Uri) {
+        if(streamUrl!=Uri.parse("")) GlobalRadiourl= streamUrl
+        is_playing_recorded_file = isRecfile
 
 
         val eContext = ctx.applicationContext
 
-        if (is_downloading) downloader?.cancelDownload() //to cancel download before playing new station
-        releasePlayer(ctx) //if removed player sttate get mess up when play radio then rec file
+        if (is_downloading) {
+            downloader?.cancelDownload()  //to cancel download before playing new station
+            is_downloading=false  // when play and rec then press new station it wont work properly without this line
+        }
+        releasePlayer(ctx) //if removed player sttate get mess up
 
         val trackSelector = DefaultTrackSelector(eContext).apply {
             setParameters(buildUponParameters().setMaxVideoSizeSd())
@@ -83,7 +85,8 @@ object Exoplayer {
 
         player!!.seekTo(currentWindow, playbackPosition)
 
-        val mediaSource = buildMediaSource(Uri.parse(GlobalRadiourl),ctx,is_playingrecordedfile)
+        val mediaSource = buildMediaSource(if(streamUrl!=Uri.parse("")) streamUrl else GlobalRadiourl, ctx,isRecfile)
+
         player!!.setMediaSource(mediaSource, true)
         player!!.apply {
             playWhenReady = Exoplayer.playWhenReady
@@ -184,20 +187,16 @@ object Exoplayer {
                 player?.stop()
                 player!!.release()
 
-
                 player = null
-              //  video_on = false
             }
         }
     }
 
     private fun buildMediaSource(uri: Uri,ctx:Context,isplayRecFil:Boolean): MediaSource {
 
-
-
     val type = Util.inferContentType(uri)
     val mediaItem = MediaItem.Builder()
-        .setUri(if(fromAlarm) soundUri else uri)
+        .setUri( uri)
         //  .setMimeType(MimeTypes.APPLICATION_M3U8)
         .build()
 
@@ -213,10 +212,10 @@ object Exoplayer {
       /*  C.TRACK_TYPE_VIDEO-> {
 
         }
-        C.TYPE_RTSP-> {
 
-        }
-        C.TYPE_SS -> {
+
+
+        C.CONTENT_TYPE_SS -> {
             video_on = true
             val ssSourceFactory = DefaultSsChunkSource.Factory(
                 //   icyHttpDataSourceFactory
@@ -227,12 +226,16 @@ object Exoplayer {
                 mediaItem
             )
         }
-        */
-        C.TYPE_DASH -> {
+
+       */
+        C.CONTENT_TYPE_RTSP-> {
+            video_on = true
+            RtspMediaSource.Factory().createMediaSource(mediaItem)
+        }
+        C.CONTENT_TYPE_DASH  -> {
             video_on = true
 
-            val dashChunkSourceFactory =
-                DefaultDashChunkSource.Factory(DefaultHttpDataSource.Factory())
+            val dashChunkSourceFactory = DefaultDashChunkSource.Factory(DefaultHttpDataSource.Factory())
 
             val manifestDataSourceFactory = DefaultHttpDataSource.Factory()
 
@@ -241,12 +244,13 @@ object Exoplayer {
 
         }
 
-        C.TYPE_HLS -> {
+        C.CONTENT_TYPE_HLS -> {
             video_on = true
             HlsMediaSource.Factory(DefaultHttpDataSource.Factory())
                 .createMediaSource(mediaItem)
         }
-        C.TYPE_OTHER -> {
+
+        C.CONTENT_TYPE_OTHER -> {
             video_on = false
             ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
                 .createMediaSource(mediaItem)
@@ -288,13 +292,11 @@ private fun playbackStateListener(ctx: Context) = object : Player.Listener {
 
         getIsPlaying = isPlaying
         if (playWhenReady && isPlaying) {
-
             if (is_playing_recorded_file) totalTime = player?.duration!!
             else if ( GlobalstateString == "UNKNOWN_STATE" && !is_playing_recorded_file) {
                Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
                Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
                Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
-
            }
 
 
@@ -392,10 +394,10 @@ private fun playbackStateListener(ctx: Context) = object : Player.Listener {
 
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
-        if (fromAlarm) PlaySystemAlarm(ctx)
-        RadioFunction.startServices(ctx)
-     //   errorToast(ctx,"4")
+
         releasePlayer(ctx)
+        if (fromAlarm) playSystemAlarm(ctx)
+        RadioFunction.startServices(ctx)
 
         GlobalstateString = "onPlayerError"
 
@@ -421,9 +423,16 @@ private fun playbackStateListener(ctx: Context) = object : Player.Listener {
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = Unit
 }
 
- fun PlaySystemAlarm(context: Context) {
-     initializePlayer(context,true)
-     startPlayer()
+ fun playSystemAlarm(context: Context) {
+      // errorToast(context,defaultAlarmsoundUri.toString())
+
+     val defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
+         context,
+         RingtoneManager.TYPE_ALARM
+     )
+
+       initializePlayer(context,true,defaultRingtoneUri)
+       startPlayer()
 
      fromAlarm = false
 
@@ -441,7 +450,7 @@ private fun playbackStateListener(ctx: Context) = object : Player.Listener {
             .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .setUsage(android.media.AudioAttributes.USAGE_ALARM)
             .build()
-        channel.setSound(soundUri, audioAttributes)
+        channel.setSound(defaultRingtoneUri, audioAttributes)
 
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
@@ -458,7 +467,7 @@ private fun playbackStateListener(ctx: Context) = object : Player.Listener {
             .setContentTitle(context.getString(R.string.action_alarm))
             .setContentText(context.getString(R.string.alarm_fallback_info))
             .setDefaults(Notification.DEFAULT_SOUND)
-            .setSound(soundUri)
+            .setSound(defaultRingtoneUri)
             .setAutoCancel(true)
             .setOnlyAlertOnce(true)
     notificationManager.notify(ALARM_ID, mBuilder.build())

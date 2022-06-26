@@ -9,6 +9,7 @@ import androidx.lifecycle.*
 import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.stopService
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.utils.datamonitor.DataUsageManager
@@ -143,34 +144,36 @@ class InfoViewModel  @Inject constructor(
         job?.cancel()
     }
 
-    fun stoptimer() {
+    fun stoptimer(stopplayer:Boolean) {
         viewModelScope.launch {
-            if (Exoplayer.is_downloading){
-                MainActivity.downloader?.cancelDownload()
-               Exoplayer.is_downloading = false // without this line player continue paly and rec stop
-            }
 
             job?.cancel()
             _putTimer.value=-1//.emit(-1)
-            Exoplayer.releasePlayer(getApplication<RadioApplication>())
+          if(stopplayer)  stopPlayer()
 
 
         }
 
     }
 
-    fun stopdatatimer() {
+    fun stopdatatimer(stopplayer:Boolean) {
         viewModelScope.launch {
-            if (Exoplayer.is_downloading){
-                MainActivity.downloader?.cancelDownload()
-                    Exoplayer.is_downloading = false // without this line player continue paly and rec stop
-            }
+
             job?.cancel()
             _putDataConsumptionTimer.value= -1L
-            Exoplayer.releasePlayer(getApplication<RadioApplication>())
 
+            if(stopplayer)   stopPlayer()
         }
 
+    }
+
+    private fun stopPlayer(){
+        if (Exoplayer.is_downloading){
+            MainActivity.downloader?.cancelDownload()
+            Exoplayer.is_downloading = false // without this line player continue paly and rec stop
+        }
+        stopService(getApplication<RadioApplication>(),true)
+     //   Exoplayer.releasePlayer(getApplication<RadioApplication>())
     }
 
 /*

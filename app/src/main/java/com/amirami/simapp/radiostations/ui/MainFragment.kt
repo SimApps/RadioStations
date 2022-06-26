@@ -1,6 +1,7 @@
 package com.amirami.simapp.radiostations.ui
 
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -494,9 +495,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
         else if(radio.stationuuid!=""){
             try {
-                MainActivity.GlobalImage = radio.favicon
-                MainActivity.GlobalRadiourl = radio.url_resolved
-                Exoplayer.initializePlayer(requireContext(),false)
+                MainActivity.imageLinkForNotification = radio.favicon
+                Exoplayer.initializePlayer(requireContext(),false, Uri.parse(radio.url_resolved))
                 Exoplayer.startPlayer()
 
                 infoViewModel.putRadiopalyerInfo(radio)
@@ -550,9 +550,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     override fun onItemFavClick(radioRoom: RadioRoom) {
         try {
-            MainActivity.GlobalRadiourl =radioRoom.streamurl
-            MainActivity.GlobalImage = radioRoom.favicon
-            Exoplayer.initializePlayer(requireContext(),false)
+            MainActivity.imageLinkForNotification = radioRoom.favicon
+            Exoplayer.initializePlayer(requireContext(),false, Uri.parse(radioRoom.streamurl))
             Exoplayer.startPlayer()
             val radioVariables=RadioVariables ()
             radioVariables.apply {

@@ -64,7 +64,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
             retrofitRadioViewModel.changeBseUrl()
             infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
             when (argsFrom.msg) {
-                "defcountry" -> retrofitRadioViewModel.getListRadios(getString(R.string.Countries))
+                "defcountry" ->  retrofitRadioViewModel.getListCountrieRadios()//retrofitRadioViewModel.getListRadios(getString(R.string.Countries))
                 "defserver" -> retrofitRadioViewModel.getListservers()
                 else -> binding.itemErrorMessage.root.visibility= View.INVISIBLE
             }

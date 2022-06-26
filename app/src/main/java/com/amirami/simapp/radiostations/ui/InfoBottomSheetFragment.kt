@@ -43,7 +43,7 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private val binding get() = _binding!!
-    val argsFrom: InfoBottomSheetFragmentArgs by navArgs()
+    private val argsFrom: InfoBottomSheetFragmentArgs by navArgs()
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
 
@@ -63,90 +63,96 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
 
-        if (argsFrom.title == getString(R.string.discaimertitle) || argsFrom.title == getString(R.string.Keep_in_mind)) {
-            binding.apply {
-                emailTXviewaddLayout.visibility = View.GONE
-                passwordTXviewaddLayout.visibility = View.GONE
-                TitleTxtVw.text = argsFrom.title
-                messageTxtVw.text = argsFrom.msg
-                //binding.btnNon.text = getString(R.string.Exit)
-                yesnoDivider.visibility = View.GONE
-                verticalDividerDialogue.visibility = View.GONE
-                btnOui.visibility = View.GONE
-                btnNon.visibility = View.GONE
+        when (argsFrom.title) {
+            getString(R.string.discaimertitle), getString(R.string.Keep_in_mind) -> {
+                binding.apply {
+                    emailTXviewaddLayout.visibility = View.GONE
+                    passwordTXviewaddLayout.visibility = View.GONE
+                    TitleTxtVw.text = argsFrom.title
+                    messageTxtVw.text = argsFrom.msg
+                    //binding.btnNon.text = getString(R.string.Exit)
+                    yesnoDivider.visibility = View.GONE
+                    verticalDividerDialogue.visibility = View.GONE
+                    btnOui.visibility = View.GONE
+                    btnNon.visibility = View.GONE
+                }
+
+
             }
+            "BatterieOptimisation" -> {
 
+                // Display a message on alert dialog
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val packageName = requireContext().packageName
+                    val pm: PowerManager =
+                        requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
+                    if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                        binding.messageTxtVw.text =
+                            resources.getString(R.string.batterieoptimisationmessages)
 
-        } else if (argsFrom.title == "BatterieOptimisation") {
-
-            // Display a message on alert dialog
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val packageName = requireContext().packageName
-                val pm: PowerManager =
-                    requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
-                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                    binding.messageTxtVw.text =
-                        resources.getString(R.string.batterieoptimisationmessages)
-
+                    } else {
+                        binding.messageTxtVw.text =
+                            resources.getString(R.string.batterieoptimisationmessageson)
+                        go = resources.getString(R.string.Exit)
+                        binding.btnOui.visibility = View.GONE
+                        binding.yesnoDivider.visibility = View.GONE
+                        binding.verticalDividerDialogue.visibility = View.GONE
+                    }
                 } else {
                     binding.messageTxtVw.text =
-                        resources.getString(R.string.batterieoptimisationmessageson)
-                    go = resources.getString(R.string.Exit)
-                    binding.btnOui.visibility = View.GONE
-                    binding.yesnoDivider.visibility = View.GONE
-                    binding.verticalDividerDialogue.visibility = View.GONE
+                        resources.getString(R.string.nobatterieoptimisationmessageso)
                 }
-            } else {
-                binding.messageTxtVw.text =
-                    resources.getString(R.string.nobatterieoptimisationmessageso)
-            }
 
-            binding.btnOui.text = go
-            binding.TitleTxtVw.visibility = View.GONE
-            binding.verticalDividerDialogue.visibility = View.GONE
-            binding.btnNon.visibility = View.GONE
+                binding.btnOui.text = go
+                binding.TitleTxtVw.visibility = View.GONE
+                binding.verticalDividerDialogue.visibility = View.GONE
+                binding.btnNon.visibility = View.GONE
 
-            binding.apply {
-                emailTXviewaddLayout.visibility = View.GONE
-                passwordTXviewaddLayout.visibility = View.GONE
+                binding.apply {
+                    emailTXviewaddLayout.visibility = View.GONE
+                    passwordTXviewaddLayout.visibility = View.GONE
+                }
             }
-        } else if (argsFrom.title == getString(R.string.Recordings)) {
-            binding.apply {
-                emailTXviewaddLayout.visibility = View.GONE
-                passwordTXviewaddLayout.visibility = View.GONE
-                TitleTxtVw.visibility = View.VISIBLE
-                TitleTxtVw.text = getString(R.string.deleterecording)
-                messageTxtVw.text = argsFrom.recordname
-                //binding.btnNon.text = getString(R.string.Exit)
-                yesnoDivider.visibility = View.VISIBLE
-                verticalDividerDialogue.visibility = View.VISIBLE
-                btnOui.visibility = View.VISIBLE
-                btnNon.visibility = View.VISIBLE
-            }
+            getString(R.string.Recordings) -> {
+                binding.apply {
+                    emailTXviewaddLayout.visibility = View.GONE
+                    passwordTXviewaddLayout.visibility = View.GONE
+                    TitleTxtVw.visibility = View.VISIBLE
+                    TitleTxtVw.text = getString(R.string.deleterecording)
+                    messageTxtVw.text = argsFrom.recordname
+                    //binding.btnNon.text = getString(R.string.Exit)
+                    yesnoDivider.visibility = View.VISIBLE
+                    verticalDividerDialogue.visibility = View.VISIBLE
+                    btnOui.visibility = View.VISIBLE
+                    btnNon.visibility = View.VISIBLE
+                }
 
-        } else if (argsFrom.title == "signinOut") {
-            binding.apply {
-                emailTXviewaddLayout.visibility = View.GONE
-                passwordTXviewaddLayout.visibility = View.GONE
-                TitleTxtVw.visibility = View.VISIBLE
-                btnOui.visibility = View.VISIBLE
-                btnNon.visibility = View.VISIBLE
-                yesnoDivider.visibility = View.VISIBLE
-                verticalDividerDialogue.visibility = View.VISIBLE
-                TitleTxtVw.text = getString(R.string.DisconnectMsg)
             }
-        } else if (argsFrom.title == "deleteUser") {
-            val user = MainActivity.userRecord.currentUser!!.email
-            binding.apply {
-                emailTXviewadd.setText(user!!)
-                emailTXviewaddLayout.visibility = View.VISIBLE
-                passwordTXviewaddLayout.visibility = View.VISIBLE
-                TitleTxtVw.visibility = View.VISIBLE
-                btnOui.visibility = View.VISIBLE
-                btnNon.visibility = View.VISIBLE
-                yesnoDivider.visibility = View.VISIBLE
-                verticalDividerDialogue.visibility = View.VISIBLE
-                TitleTxtVw.text = getString(R.string.deleteuserMSG)
+            "signinOut" -> {
+                binding.apply {
+                    emailTXviewaddLayout.visibility = View.GONE
+                    passwordTXviewaddLayout.visibility = View.GONE
+                    TitleTxtVw.visibility = View.VISIBLE
+                    btnOui.visibility = View.VISIBLE
+                    btnNon.visibility = View.VISIBLE
+                    yesnoDivider.visibility = View.VISIBLE
+                    verticalDividerDialogue.visibility = View.VISIBLE
+                    TitleTxtVw.text = getString(R.string.DisconnectMsg)
+                }
+            }
+            "deleteUser" -> {
+                val user = MainActivity.userRecord.currentUser!!.email
+                binding.apply {
+                    emailTXviewadd.setText(user!!)
+                    emailTXviewaddLayout.visibility = View.VISIBLE
+                    passwordTXviewaddLayout.visibility = View.VISIBLE
+                    TitleTxtVw.visibility = View.VISIBLE
+                    btnOui.visibility = View.VISIBLE
+                    btnNon.visibility = View.VISIBLE
+                    yesnoDivider.visibility = View.VISIBLE
+                    verticalDividerDialogue.visibility = View.VISIBLE
+                    TitleTxtVw.text = getString(R.string.deleteuserMSG)
+                }
             }
         }
 
@@ -173,7 +179,7 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
             } else if (argsFrom.title == getString(R.string.Recordings)) {
                 if (RadioFunction.getRecordedFiles(requireContext()).size > 0 && argsFrom.msg.toInt() != -2) {
                     infoViewModel.putUpdateRecordInfo(true, argsFrom.msg.toInt())
-
+                    dismiss()
                 }
             } else if (argsFrom.title == "signinOut") {
                 infoViewModel.putLogInInfo("signinOut")

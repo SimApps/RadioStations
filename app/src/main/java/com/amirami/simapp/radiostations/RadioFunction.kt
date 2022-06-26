@@ -177,20 +177,18 @@ object RadioFunction {
 
 
      fun startServices(context: Context) {
-        if (player != null) {
-
+       if (player != null) {
             val serviceIntent = Intent(context, NotificationChannelService::class.java)
            // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
 
-            if (isOreoPlus()) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                // Pre-O behavior.
-                context.startService(serviceIntent)
-            }
+            if (isOreoPlus()) context.startForegroundService(serviceIntent)
+             else context.startService(serviceIntent)
+
         }
+
     }
-    fun stopService(context: Context) {
+    fun stopService(context: Context, stopplayer:Boolean) {
+        if(stopplayer) Exoplayer.releasePlayer(context)
         val serviceIntent = Intent(context, NotificationChannelService::class.java)
         context.stopService(serviceIntent)
 
@@ -480,7 +478,7 @@ object RadioFunction {
         //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
 
 
-        downloader = Downloader.Builder(context, GlobalRadiourl)
+        downloader = Downloader.Builder(context, GlobalRadiourl.toString())
             .downloadListener(object : OnDownloadListener {
                 override fun onStart() {
                     Exoplayer.is_downloading = true
