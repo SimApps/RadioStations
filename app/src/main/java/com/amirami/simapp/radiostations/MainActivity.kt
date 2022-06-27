@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private fun putTimer() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+          //  repeatOnLifecycle(Lifecycle.State.STARTED) { //not used becuase player dont stop when app is in background
                 infoViewModel.putTimer.collectLatest {
                     when (it) {
                         1 -> {
@@ -206,13 +206,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         }
                     }
                 }
-            }
+           // }
         }
     }
 
     private fun dataConsuptionTimer() {
         lifecycleScope.launch {
-              repeatOnLifecycle(Lifecycle.State.STARTED) {
+             // repeatOnLifecycle(Lifecycle.State.STARTED) {//not used becuase player dont stop when app is in background
 
             infoViewModel.putDataConsumptionTimer.collectLatest {
                 //      DynamicToast.makeError(this@MainActivity, it, 1).show()
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     }
                 }
             }
-              }
+           //   }
         }
 
     }
