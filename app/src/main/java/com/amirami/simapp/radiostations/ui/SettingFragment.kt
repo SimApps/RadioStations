@@ -69,7 +69,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             // Successfully signed in
-
+// lo
             binding.signinOutItxVw.text = resources.getString(R.string.Déconnecter)
             // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
             binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
