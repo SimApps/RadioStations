@@ -46,19 +46,21 @@ import java.io.IOException
 import java.util.*
 
 @AndroidEntryPoint
-class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.OnItemClickListener, TagsAdapterHorizantal.OnItemClickListener , RadioFavoriteAdapterHorizantal.OnItemClickListener{
+class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.OnItemClickListener, TagsAdapterHorizantal.OnItemClickListener, RadioFavoriteAdapterHorizantal.OnItemClickListener {
     // private lateinit var fragmentClass: Class<*>
     private lateinit var adViewSmallActivitymain: NativeAdView
 
     private var currentNativeAdActivityMain: NativeAd? = null
+
     // lateinit var adView: NativeAdView
     private lateinit var adViewBigActivityMain: NativeAdView
+
     // Initializing an empty ArrayList to be filled with animals
     private val popularTagList: ArrayList<String> = ArrayList()
     private val popularImagetagList: ArrayList<Int> = ArrayList()
     private lateinit var binding: FragmentMainBinding
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val preferencesViewModel : PreferencesViewModel by activityViewModels()
+    private val preferencesViewModel: PreferencesViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
 
@@ -76,14 +78,13 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         adsLooad()
         setUpTagsRv()
         getLastPlayedRadio()
-
     }
     private fun setUpTagsRv() {
-        if(popularTagList.size==0 && popularImagetagList.size==0){
+        if (popularTagList.size == 0 && popularImagetagList.size == 0) {
             addtagpopulat()
             addimagetagpopulat()
         }
-        tagsAdapterHorizantal = TagsAdapterHorizantal(popularTagList, popularImagetagList,this)
+        tagsAdapterHorizantal = TagsAdapterHorizantal(popularTagList, popularImagetagList, this)
 
         binding.localPopularTagsRecycleView.apply {
             adapter = tagsAdapterHorizantal
@@ -120,23 +121,19 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         popularImagetagList.add(R.drawable.codec)
     }
 
-
     private fun getLocalcountryName() {
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-              //  retrofitRadioViewModel.getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
-                loadImageString(requireContext(),
-                    COUNTRY_FLAGS_BASE_URL+preferencesViewModel.preferencesFlow.first().default_country.lowercase(Locale.ROOT),
+                //  retrofitRadioViewModel.getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
+                loadImageString(
+                    requireContext(),
+                    COUNTRY_FLAGS_BASE_URL + preferencesViewModel.preferencesFlow.first().default_country.lowercase(Locale.ROOT),
                     imagedefaulterrorurl,
                     binding.localradiomview,
                     Constatnts.CORNER_RADIUS_32F
                 )
-
             }
         }
-
-
     }
 
     override fun onDestroy() {
@@ -149,29 +146,19 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         if (::adViewBigActivityMain.isInitialized) {
             adViewBigActivityMain.destroy()
         }
-
     }
-
-
-
 
     override fun onResume() {
         super.onResume()
         setupTheme()
     }
 
-
-
-
-
-    private fun nativeAds1(){
+    private fun nativeAds1() {
         fun populateUnifiedNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
-
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.
             currentNativeAdActivityMain?.destroy()
             currentNativeAdActivityMain = nativeAd
-
 
             // Set the media view. Media content will be automatically populated in the media view once
             // adView.setNativeAd() is called.
@@ -187,8 +174,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             adView.storeView = adView.findViewById(R.id.ad_store)
             adView.advertiserView = adView.findViewById(R.id.ad_advertiser)
 
-
-            if(adView.headlineView!=null){
+            if (adView.headlineView != null) {
                 RadioFunction.nativeadstexViewColor(
                     adView.headlineView as TextView,
                     adView.advertiserView as TextView,
@@ -198,34 +184,27 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                     darkTheme
                 )
 
-
                 // The headline is guaranteed to be in every UnifiedNativeAd.
                 (adView.headlineView as TextView).text = nativeAd.headline
-
-
 
                 // These assets aren't guaranteed to be in every UnifiedNativeAd, so it's important to
                 // check before trying to display them.
                 if (nativeAd.body == null) {
-                    adView.bodyView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.bodyView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.bodyView!!.visibility = View.VISIBLE
                     (adView.bodyView as TextView).text = nativeAd.body
                 }
 
                 if (nativeAd.callToAction == null) {
-                    adView.callToActionView!!.visibility = View.INVISIBLE//INVISIBLE
-
-
+                    adView.callToActionView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.callToActionView!!.visibility = View.VISIBLE
                     (adView.callToActionView as Button).text = nativeAd.callToAction
-
-
                 }
 
                 if (nativeAd.icon == null) {
-                    adView.iconView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.iconView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     (adView.iconView as ImageView).setImageDrawable(
                         nativeAd.icon!!.drawable
@@ -234,28 +213,28 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 }
 
                 if (nativeAd.price == null) {
-                    adView.priceView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.priceView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.priceView!!.visibility = View.VISIBLE
                     (adView.priceView as TextView).text = nativeAd.price
                 }
 
                 if (nativeAd.store == null) {
-                    adView.storeView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.storeView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.storeView!!.visibility = View.VISIBLE
                     (adView.storeView as TextView).text = nativeAd.store
                 }
 
                 if (nativeAd.starRating == null) {
-                    adView.starRatingView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.starRatingView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     (adView.starRatingView as RatingBar).rating = nativeAd.starRating!!.toFloat()
                     adView.starRatingView!!.visibility = View.VISIBLE
                 }
 
                 if (nativeAd.advertiser == null) {
-                    adView.advertiserView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.advertiserView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     (adView.advertiserView as TextView).text = nativeAd.advertiser
                     adView.advertiserView!!.visibility = View.VISIBLE
@@ -297,11 +276,12 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
               }*/
         }
 
-
         fun refreshAd() {
-            //refresh_button.isEnabled = false
+            // refresh_button.isEnabled = false
 
-            val builder = AdLoader.Builder(requireContext(), resources.getString(R.string.native_Advanced_adUnitId)/*"ca-app-pub-5900899997553420/8708850645"*/
+            val builder = AdLoader.Builder(
+                requireContext(),
+                resources.getString(R.string.native_Advanced_adUnitId)/*"ca-app-pub-5900899997553420/8708850645"*/
             )
 
             builder.forNativeAd { unifiedNativeAd ->
@@ -314,10 +294,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
                 //    binding.adsFrames.removeView(binding.adsFrame)
                 binding.adsFrames.addView(adViewBigActivityMain)
-
-
             }
-
 
             val videoOptions = VideoOptions.Builder()
                 // .setStartMuted(start_muted_checkbox.isChecked)
@@ -329,13 +306,11 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
             builder.withNativeAdOptions(adOptions)
 
-
             val adLoader = builder.withAdListener(object : AdListener() {
 
                 override fun onAdLoaded() {
                     // Code to be executed when an ad finishes loading.
                 }
-
 
                 override fun onAdOpened() {
                     // Code to be executed when the ad is displayed.
@@ -347,24 +322,21 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
                 override fun onAdClosed() {
                     // Code to be executed when the interstitial ad is closed.
-
                 }
             }).build()
-
 
             adLoader.loadAd(AdRequest.Builder().build())
         }
         refreshAd()
     }
 
-
-    private fun getPref(){
+    private fun getPref() {
         viewLifecycleOwner.lifecycleScope.launch {
-            MainActivity.saveData =  preferencesViewModel.preferencesFlow.first().save_data
+            MainActivity.saveData = preferencesViewModel.preferencesFlow.first().save_data
 
             MainActivity.firstTimeOpened = preferencesViewModel.preferencesFlow.first().first_open
 
-            if(!preferencesViewModel.preferencesFlow.first().first_open) {
+            if (!preferencesViewModel.preferencesFlow.first().first_open) {
                 val action = MainFragmentDirections.actionMainFragmentToInfoBottomSheetFragment("BatterieOptimisation")
                 this@MainFragment.findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
 
@@ -372,79 +344,71 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 preferencesViewModel.onFirstTimeopenRecordFolderChanged(true)
             }
 
-
-            MainActivity.BASE_URL =  preferencesViewModel.preferencesFlow.first().choosen_server
-            if(preferencesViewModel.preferencesFlow.first().choosen_server !in MainActivity.server_arraylist){
-                val randomNumber: Int = Random().nextInt(MainActivity.server_arraylist.size-1)
-                MainActivity.BASE_URL = MainActivity.server_arraylist[randomNumber] //"http://91.132.145.114"   remove this line when all user dont use 2.2.35
+            MainActivity.BASE_URL = preferencesViewModel.preferencesFlow.first().choosen_server
+            if (preferencesViewModel.preferencesFlow.first().choosen_server !in MainActivity.server_arraylist) {
+                val randomNumber: Int = Random().nextInt(MainActivity.server_arraylist.size - 1)
+                MainActivity.BASE_URL = MainActivity.server_arraylist[randomNumber] // "http://91.132.145.114"   remove this line when all user dont use 2.2.35
             }
 
-
-          //  binding.localcountryTxtVw.text= RadioFunction.countryCodeToName(preferencesViewModel.preferencesFlow.first().default_country)
+            //  binding.localcountryTxtVw.text= RadioFunction.countryCodeToName(preferencesViewModel.preferencesFlow.first().default_country)
             defaultCountry = preferencesViewModel.preferencesFlow.first().default_country
-
 
             MainActivity.firstTimeopenRecordfolder = preferencesViewModel.preferencesFlow.first().first_timeopen_record_folder
 
             MainActivity.BASE_URL = preferencesViewModel.preferencesFlow.first().choosen_server
             if (preferencesViewModel.preferencesFlow.first().choosen_server !in MainActivity.server_arraylist) {
                 val randomNumber: Int = Random().nextInt(MainActivity.server_arraylist.size - 1)
-                MainActivity.BASE_URL = MainActivity.server_arraylist[randomNumber] //"http://91.132.145.114"   remove this line when all user dont use 2.2.35
+                MainActivity.BASE_URL = MainActivity.server_arraylist[randomNumber] // "http://91.132.145.114"   remove this line when all user dont use 2.2.35
             }
         }
     }
-    private fun setupTheme(){
-
+    private fun setupTheme() {
         lifecycleScope.launchWhenStarted {
             infoViewModel.putTheme.collectLatest {
                 RadioFunction.gradiancolorNativeAdslayout(binding.adsFrame, 0)
                 RadioFunction.gradiancolorNativeAdslayout(binding.adsFrames, 0)
-                RadioFunction.gradiancolorConstraintLayoutTransition(binding.Radiomain, 4,it)
+                RadioFunction.gradiancolorConstraintLayoutTransition(binding.Radiomain, 4, it)
 
-               // RadioFunction.maintextviewColor(binding.countryTxtVw,it)
-                RadioFunction.maintextviewColor(binding.recentrecentlyplayedTxV,it)
-                RadioFunction.maintextviewColor(binding.tagsTxtVw,it)
+                // RadioFunction.maintextviewColor(binding.countryTxtVw,it)
+                RadioFunction.maintextviewColor(binding.recentrecentlyplayedTxV, it)
+                RadioFunction.maintextviewColor(binding.tagsTxtVw, it)
             }
-
-
         }
-        if(MainActivity.systemTheme)  {
+        if (MainActivity.systemTheme) {
             when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                Configuration.UI_MODE_NIGHT_YES -> darkTheme =true
-                Configuration.UI_MODE_NIGHT_NO -> darkTheme =false
+                Configuration.UI_MODE_NIGHT_YES -> darkTheme = true
+                Configuration.UI_MODE_NIGHT_NO -> darkTheme = false
             }
             preferencesViewModel.onDarkThemeChanged(darkTheme)
         }
     }
 
-
-
-    private fun btnClick(){
+    private fun btnClick() {
         binding.btnAllcountry.setSafeOnClickListener {
             //   retrofitRadioViewModel.getListRadios(getString(R.string.countries))
             val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
             findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
         }
         binding.localradiomview.setSafeOnClickListener {
-            retrofitRadioViewModel.getRadios(defaultCountry,"Empty")
-            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(defaultCountry )
+            retrofitRadioViewModel.getRadios(defaultCountry, "Empty")
+            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(defaultCountry)
             findNavController().navigate(action) // NavHostFragment.findNavController(requireParentFragment()).navigate(action)
         }
 
         binding.viewAllFavRadio.setSafeOnClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToFavoriteRadioFragment( )
+            val action = MainFragmentDirections.actionMainFragmentToFavoriteRadioFragment()
             findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
         }
 
         binding.btnTopClicks.setSafeOnClickListener {
-            retrofitRadioViewModel.getRadios("Top clicks","300")
-            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top clicks","300")
+            retrofitRadioViewModel.getRadios("Top clicks", "300")
+            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top clicks", "300")
             findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
         }
 
         binding.btnTopVotes.setSafeOnClickListener {
-            retrofitRadioViewModel.getRadios("Top Votes","300")
-            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top Votes","300")
+            retrofitRadioViewModel.getRadios("Top Votes", "300")
+            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top Votes", "300")
             findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
         }
         binding.btnRecodedFiles.setSafeOnClickListener {
@@ -465,23 +429,21 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
     }
 
-
-    private fun adsLooad(){
-        adViewSmallActivitymain  =  View.inflate(requireContext(),R.layout.ads_small,null) as NativeAdView
-        adViewBigActivityMain  =  View.inflate(requireContext(),R.layout.ads_big,null) as NativeAdView
+    private fun adsLooad() {
+        adViewSmallActivitymain = View.inflate(requireContext(), R.layout.ads_small, null) as NativeAdView
+        adViewBigActivityMain = View.inflate(requireContext(), R.layout.ads_big, null) as NativeAdView
 
         nativeAds1()
         RadioFunction.nativeSmallAds(requireContext(), binding.adsFrame, adViewSmallActivitymain)
     }
 
     override fun onItemClick(radio: RadioVariables) {
-        if(radio.stationuuid==""){
+        if (radio.stationuuid == "") {
             try {
                 //   RadioFunction.countryCodeToName(radio.name)
-                retrofitRadioViewModel.getRadios(getString(R.string.countries),radio.name)
-                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(getString(R.string.countries), radio.name )
+                retrofitRadioViewModel.getRadios(getString(R.string.countries), radio.name)
+                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(getString(R.string.countries), radio.name)
                 this@MainFragment.findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-
             } catch (e: IOException) {
                 // Catch the exception
                 e.printStackTrace()
@@ -492,17 +454,14 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             } catch (e: IllegalStateException) {
                 e.printStackTrace()
             }
-        }
-        else if(radio.stationuuid!=""){
+        } else if (radio.stationuuid != "") {
             try {
                 MainActivity.imageLinkForNotification = radio.favicon
-                Exoplayer.initializePlayer(requireContext(),false, Uri.parse(radio.url_resolved))
+                Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.url_resolved))
                 Exoplayer.startPlayer()
 
                 infoViewModel.putRadiopalyerInfo(radio)
                 //    jsonLocalRadioCall = api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
-
-
             } catch (e: IOException) {
                 // Catch the exception
                 e.printStackTrace()
@@ -514,12 +473,11 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 e.printStackTrace()
             }
         }
-
     }
 
     override fun onItemTagsClick(item: String, image: Int) {
         //   val intentActivityRadio = Intent(context, RadiosFragment::class.java)
-        //val intentActivityListRadio = Intent(context, ListRadioFragment::class.java)
+        // val intentActivityListRadio = Intent(context, ListRadioFragment::class.java)
 
         when (item) {
             getString(R.string.Languages) -> {
@@ -540,10 +498,9 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             else -> {
                 //  intentActivityRadio.putExtra("TagName", items[position])
 
-                retrofitRadioViewModel.getRadios(item,"Empty")
+                retrofitRadioViewModel.getRadios(item, "Empty")
                 val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(item)
                 this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
-
             }
         }
     }
@@ -551,27 +508,25 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     override fun onItemFavClick(radioRoom: RadioRoom) {
         try {
             MainActivity.imageLinkForNotification = radioRoom.favicon
-            Exoplayer.initializePlayer(requireContext(),false, Uri.parse(radioRoom.streamurl))
+            Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radioRoom.streamurl))
             Exoplayer.startPlayer()
-            val radioVariables=RadioVariables ()
+            val radioVariables = RadioVariables()
             radioVariables.apply {
-                name= radioRoom.name
-                bitrate= radioRoom.bitrate
-                country= radioRoom.country
-                stationuuid= radioRoom.radiouid
-                favicon= radioRoom.favicon
-                language= radioRoom.language
-                state= radioRoom.state
-                url_resolved= radioRoom.streamurl
-                homepage= radioRoom.homepage
-                tags=radioRoom.tags
+                name = radioRoom.name
+                bitrate = radioRoom.bitrate
+                country = radioRoom.country
+                stationuuid = radioRoom.radiouid
+                favicon = radioRoom.favicon
+                language = radioRoom.language
+                state = radioRoom.state
+                url_resolved = radioRoom.streamurl
+                homepage = radioRoom.homepage
+                tags = radioRoom.tags
             }
 
             infoViewModel.putRadiopalyerInfo(radioVariables)
 
-
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
-
         } catch (e: IOException) {
             // Catch the exception
             e.printStackTrace()
@@ -592,27 +547,17 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 radioAdapterLastPlayedRadioHorizantal = RadioFavoriteAdapterHorizantal(this)
                 binding.lastPlayedRadioRv.apply {
                     adapter = radioAdapterLastPlayedRadioHorizantal
-                    layoutManager = GridLayoutManager(requireContext(), 1 ,LinearLayoutManager.HORIZONTAL, false)
+                    layoutManager = GridLayoutManager(requireContext(), 1, LinearLayoutManager.HORIZONTAL, false)
                     setHasFixedSize(true)
                 }
                 radioAdapterLastPlayedRadioHorizantal.setItems(list)
 
                 binding.lastPlayedRadioRv.visibility = View.VISIBLE
                 binding.recentrecentlyplayedTxV.visibility = View.VISIBLE
-            }
-            else {
+            } else {
                 binding.recentrecentlyplayedTxV.visibility = View.GONE
                 binding.lastPlayedRadioRv.visibility = View.GONE
             }
-
-
-
         }
-
     }
-
-
-
-
-
 }

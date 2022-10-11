@@ -7,11 +7,17 @@ import android.content.Intent
 class BootCompleteReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent?.action.equals(Intent.ACTION_BOOT_COMPLETED)
-            || intent?.action == "android.intent.action.BOOT_COMPLETED"
-            || intent?.action == "android.intent.action.QUICKBOOT_POWERON") {
-            Utils.setAlarm(context!!,
-                androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).getLong("timeInMilli", 1))
+        if (intent?.action.equals(Intent.ACTION_BOOT_COMPLETED) ||
+            intent?.action == "android.intent.action.BOOT_COMPLETED" ||
+            intent?.action == "android.intent.action.QUICKBOOT_POWERON"
+        ) {
+            if(androidx.preference.PreferenceManager.getDefaultSharedPreferences(context!!).getLong("timeInMilli", 1L)!=1L){
+                Utils.setAlarm(
+                    context,
+                    androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).getLong("timeInMilli", 1L)
+                )
+            }
+
         }
         /*
         if (intent?.action == "android.intent.action.BOOT_COMPLETED"
@@ -31,6 +37,5 @@ class BootCompleteReceiver : BroadcastReceiver() {
 
         }
    */
-
     }
 }

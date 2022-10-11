@@ -19,7 +19,7 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideProdShopListDataBase(application : Application, roomCallback : RoomDatabase.Callback) : RadioDatabase {
+    fun provideProdShopListDataBase(application: Application, roomCallback: RoomDatabase.Callback): RadioDatabase {
         return Room.databaseBuilder(
             application.applicationContext,
             RadioDatabase::class.java,
@@ -30,10 +30,9 @@ object DataModule {
             .build()
     }
 
-
     @Provides
     @Singleton
-    fun provideRadioAlarmDataBase(application : Application, roomCallback : RoomDatabase.Callback) : AlarmRadioDatabase {
+    fun provideRadioAlarmDataBase(application: Application, roomCallback: RoomDatabase.Callback): AlarmRadioDatabase {
         return Room.databaseBuilder(
             application.applicationContext,
             AlarmRadioDatabase::class.java,
@@ -46,18 +45,17 @@ object DataModule {
     }
 
     @Provides
-    fun provideRadioDAO(radioDatabase : RadioDatabase) : RadioDAO {
+    fun provideRadioDAO(radioDatabase: RadioDatabase): RadioDAO {
         return radioDatabase.customDao()
     }
 
     @Provides
-    fun provideRadioAlarmtDAO(radioDatabase : AlarmRadioDatabase) : AlarmRadioDAO {
+    fun provideRadioAlarmtDAO(radioDatabase: AlarmRadioDatabase): AlarmRadioDAO {
         return radioDatabase.customDao()
     }
 
-
     @Provides
-    fun provideRoomDatabaseCallback() : RoomDatabase.Callback {
+    fun provideRoomDatabaseCallback(): RoomDatabase.Callback {
         return object : RoomDatabase.Callback() {
         }
     }

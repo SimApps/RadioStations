@@ -50,7 +50,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         var go = resources.getString(R.string.GO)
 
         collectLatestLifecycleFlow(infoViewModel.putTheme) {
@@ -62,7 +61,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
             RadioFunction.maintextviewColor(binding.messageTxtVw, it)
         }
 
-
         when (argsFrom.title) {
             getString(R.string.discaimertitle), getString(R.string.Keep_in_mind) -> {
                 binding.apply {
@@ -70,17 +68,14 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     passwordTXviewaddLayout.visibility = View.GONE
                     TitleTxtVw.text = argsFrom.title
                     messageTxtVw.text = argsFrom.msg
-                    //binding.btnNon.text = getString(R.string.Exit)
+                    // binding.btnNon.text = getString(R.string.Exit)
                     yesnoDivider.visibility = View.GONE
                     verticalDividerDialogue.visibility = View.GONE
                     btnOui.visibility = View.GONE
                     btnNon.visibility = View.GONE
                 }
-
-
             }
             "BatterieOptimisation" -> {
-
                 // Display a message on alert dialog
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val packageName = requireContext().packageName
@@ -89,7 +84,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     if (!pm.isIgnoringBatteryOptimizations(packageName)) {
                         binding.messageTxtVw.text =
                             resources.getString(R.string.batterieoptimisationmessages)
-
                     } else {
                         binding.messageTxtVw.text =
                             resources.getString(R.string.batterieoptimisationmessageson)
@@ -120,13 +114,12 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     TitleTxtVw.visibility = View.VISIBLE
                     TitleTxtVw.text = getString(R.string.deleterecording)
                     messageTxtVw.text = argsFrom.recordname
-                    //binding.btnNon.text = getString(R.string.Exit)
+                    // binding.btnNon.text = getString(R.string.Exit)
                     yesnoDivider.visibility = View.VISIBLE
                     verticalDividerDialogue.visibility = View.VISIBLE
                     btnOui.visibility = View.VISIBLE
                     btnNon.visibility = View.VISIBLE
                 }
-
             }
             "signinOut" -> {
                 binding.apply {
@@ -158,16 +151,13 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
 
         val requestMultiplePermissions =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-
             }
-
 
         binding.btnOui.setSafeOnClickListener {
             if (argsFrom.title == "BatterieOptimisation") {
                 // Do something when user press the positive button
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
                     if (go == resources.getString(R.string.Exit)) {
                         dismiss()
                     } else {
@@ -184,7 +174,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
             } else if (argsFrom.title == "signinOut") {
                 infoViewModel.putLogInInfo("signinOut")
                 dismiss()
-
             } else if (argsFrom.title == "deleteUser") {
                 setprogressbarVisible()
                 val user = FirebaseAuth.getInstance().currentUser
@@ -217,15 +206,13 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                                         setprogressbarGone()
                                         infoViewModel.putDeleteUsersDialogueInfo("deleteUser")
                                         dismiss()
-
                                     }
                                 }
                             } else {
                                 setprogressbarGone()
                                 it.exception!!.message
-                                binding.passwordTXviewaddLayout.error = it.exception!!.message//it.exception.toString()
+                                binding.passwordTXviewaddLayout.error = it.exception!!.message // it.exception.toString()
                             }
-
                         }
                 }
             }

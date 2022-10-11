@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "872978178105-dji2t0tpfles0lgt9cjtuq4rmmbpejlk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amirami.simapp.radiostations",
+            "certificate_hash": "e14833e348077dac191ff64aa8ef695cc019909f"
+          }
+        },
+        {
           "client_id": "872978178105-tjtab4gml0htgflb7qic5j1d7rd8rfn2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

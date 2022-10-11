@@ -26,7 +26,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.util.Util
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +35,6 @@ import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.parseColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
-import com.amirami.simapp.radiostations.RadioFunction.startServices
 import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.alarm.RadioAlarmRoomViewModel
@@ -63,25 +61,21 @@ import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil
 import java.io.IOException
 
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemClickListener {
 
-    var populateFavRv = true //temoprary mesure
+    var populateFavRv = true // temoprary mesure
 
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterHorizantal
     private var isExpanded = false
-
 
     var stationuuid: String = ""
 
     private lateinit var adViewSmallActivityplayer: NativeAdView
 
-
     private lateinit var adViewAdaptiveBanner: AdView
 
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by viewModels()
-
 
     private val infoViewModel: InfoViewModel by viewModels()
     private val preferencesViewModel: PreferencesViewModel by viewModels()
@@ -91,7 +85,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private val radioRoom: MutableList<RadioRoom> = mutableListOf()
 
-  var recordDrawable= R.drawable.pop
+    var recordDrawable = R.drawable.pop
+
     // Determine the screen width (less decorations) to use for the ad width.
     // If the ad hasn't been laid out, default to the full screen width.
     private val adSize: AdSize
@@ -142,7 +137,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         firebaseappCheck()
 
-        if(fromAlarm) getAlarmRadioRoom()
+        if (fromAlarm) getAlarmRadioRoom()
 
         getPref()
         setTheme()
@@ -164,9 +159,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         btnsClicks()
 
-
-
-
         lifecycleScope.launch {
             // repeatOnLifecycle launches the block in a new coroutine every time the
             // lifecycle is in the STARTED state (or above) and cancels it when it's STOPPED.
@@ -177,68 +169,61 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 infoViewModel.putRadioPlayerInfo.collectLatest { radioVar ->
                     setPlayer(radioVar)
                 }
-
             }
         }
 
-
         AppRater.applaunched(this@MainActivity)
-
     }
 
     private fun putTimer() {
         lifecycleScope.launch {
-          //  repeatOnLifecycle(Lifecycle.State.STARTED) { //not used becuase player dont stop when app is in background
-                infoViewModel.putTimer.collectLatest {
-                    when (it) {
-                        1 -> {
-                            binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-
-                            infoViewModel.stoptimer(true)
-                     //       Exoplayer.releasePlayer(this@MainActivity)
-
-                        }
-                        -1 -> {
-                            binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        }
-                        else -> {
-                            binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
-                        }
-                    }
-                }
-           // }
-        }
-    }
-
-    private fun dataConsuptionTimer() {
-        lifecycleScope.launch {
-             // repeatOnLifecycle(Lifecycle.State.STARTED) {//not used becuase player dont stop when app is in background
-
-            infoViewModel.putDataConsumptionTimer.collectLatest {
-                //      DynamicToast.makeError(this@MainActivity, it, 1).show()
-                when {
-                    it == -1L -> {
+            //  repeatOnLifecycle(Lifecycle.State.STARTED) { //not used becuase player dont stop when app is in background
+            infoViewModel.putTimer.collectLatest {
+                when (it) {
+                    1 -> {
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
 
+                        infoViewModel.stoptimer(true)
+                        //       Exoplayer.releasePlayer(this@MainActivity)
                     }
-                    it < 0L -> {
-                        //if (Exoplayer.is_downloading) downloader?.cancelDownload()
+                    -1 -> {
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
-                        infoViewModel.stopdatatimer(true)
-                      //  Exoplayer.releasePlayer(this@MainActivity)
-
                     }
                     else -> {
                         binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
                     }
                 }
             }
-           //   }
+            // }
         }
-
     }
 
-    private fun vedeoisOnviews(){
+    private fun dataConsuptionTimer() {
+        lifecycleScope.launch {
+            // repeatOnLifecycle(Lifecycle.State.STARTED) {//not used becuase player dont stop when app is in background
+
+            infoViewModel.putDataConsumptionTimer.collectLatest {
+                //      DynamicToast.makeError(this@MainActivity, it, 1).show()
+                when {
+                    it == -1L -> {
+                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                    }
+                    it < 0L -> {
+                        // if (Exoplayer.is_downloading) downloader?.cancelDownload()
+                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                        infoViewModel.stopdatatimer(true)
+                        //  Exoplayer.releasePlayer(this@MainActivity)
+                    }
+                    else -> {
+                        binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
+                    }
+                }
+            }
+            //   }
+        }
+    }
+
+    private fun vedeoisOnviews() {
         binding.radioplayer.apply {
             videoView.player = Exoplayer.player
             RadioImVFragBig.visibility = View.GONE
@@ -246,7 +231,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
         }
     }
-    private  fun vedeoisNotOnviews(){
+    private fun vedeoisNotOnviews() {
         binding.radioplayer.apply {
             videoView.visibility = View.INVISIBLE
             RadioImVFragBig.visibility = View.VISIBLE
@@ -269,14 +254,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     radioVar.tags,
                     radioVar.country,
                     radioVar.state,
-                    //var RadiostateDB: String?,
+                    // var RadiostateDB: String?,
                     radioVar.language,
                     radioVar.url_resolved,
                     false
                 )
                 radioRoomViewModel.upsertRadio(radioroom, "Radio added")
                 radioRoomViewModel.deletelistened(false, "Radio listened deleted")
-
             }
             if (video_on) vedeoisOnviews()
             else vedeoisNotOnviews()
@@ -295,24 +279,21 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 binding.radioplayer.RadioImVFragBig,
                 CORNER_RADIUS_8F
             )
-        }
-        else {
+        } else {
             vedeoisOnviews()
             binding.radioplayer.apply {
-            //    RadioImVFragBig.setImageResource(R.drawable.rec_on)
+                //    RadioImVFragBig.setImageResource(R.drawable.rec_on)
                 RadioImVFrag.setImageResource(R.drawable.rec_on)
 
                 likeImageView.setImageResource(R.drawable.ic_recordings_folder)
                 likeImageViewPlayermain.setImageResource(R.drawable.ic_recordings_folder)
             }
-
         }
 
-
         binding.radioplayer.likeImageViewPlayermain.setSafeOnClickListener {
-            if (!Exoplayer.is_playing_recorded_file)
+            if (!Exoplayer.is_playing_recorded_file) {
                 favRadio(radioVar)
-            else {
+            } else {
                 if (firstTimeopenRecordfolder) {
                     firstTimeopenRecordfolder = false
                     if (!isFinishing) {
@@ -333,14 +314,12 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     )
                 }
                 RadioFunction.openRecordFolder(this@MainActivity)
-
-
             }
         }
         binding.radioplayer.likeImageView.setSafeOnClickListener {
-            if (!Exoplayer.is_playing_recorded_file)
+            if (!Exoplayer.is_playing_recorded_file) {
                 favRadio(radioVar)
-            else {
+            } else {
                 if (firstTimeopenRecordfolder) {
                     firstTimeopenRecordfolder = false
                     if (!isFinishing) {
@@ -361,11 +340,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     )
                 }
                 RadioFunction.openRecordFolder(this@MainActivity)
-
-
             }
-            //getRadioRoom()
-            //infoViewModel.putRadiopalyerInfo(radioVar)
+            // getRadioRoom()
+            // infoViewModel.putRadiopalyerInfo(radioVar)
         }
 
         binding.radioplayer.stopButtonMain.setSafeOnClickListener {
@@ -378,18 +355,16 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                         binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
 
-                        RadioFunction.stopService(this@MainActivity,true)
+                        RadioFunction.stopService(this@MainActivity, true)
                     } else {
                         downloader?.cancelDownload()
                         binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
                     }
 
-
-
                     binding.radioplayer.videoView.player = null
 
                     if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
-                        else {
+                    else {
                         vedeoisNotOnviews()
 
                         RadioFunction.loadImageString(
@@ -400,29 +375,24 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                             CORNER_RADIUS_8F
                         )
                     }
-
                 }
             }
-
         }
         binding.radioplayer.stopButton.setSafeOnClickListener {
             if (isDownloadingCustomurl) {
                 customdownloader?.cancelDownload()
                 binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
-            }
-            else
+            } else {
                 if (Exoplayer.player != null) {
                     if (!Exoplayer.is_downloading) {
                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                         binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
 
-                        RadioFunction.stopService(this@MainActivity,true)
+                        RadioFunction.stopService(this@MainActivity, true)
                     } else {
                         downloader?.cancelDownload()
                         binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
                     }
-
-
 
                     binding.radioplayer.videoView.player = null
 
@@ -437,20 +407,18 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                             CORNER_RADIUS_8F
                         )
                     }
-
                 }
+            }
         }
 
         binding.radioplayer.pauseplayButtonMain.setSafeOnClickListener {
-
             if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
                 Exoplayer.startPlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-
             } else if (Exoplayer.player == null) {
                 if (Exoplayer.is_playing_recorded_file) {
-                    Exoplayer.initializePlayer(this@MainActivity,true,Uri.parse(""))
-                } else Exoplayer.initializePlayer(this@MainActivity,false,Uri.parse(""))
+                    Exoplayer.initializePlayer(this@MainActivity, true, Uri.parse(""))
+                } else Exoplayer.initializePlayer(this@MainActivity, false, Uri.parse(""))
 
                 Exoplayer.startPlayer()
 
@@ -458,9 +426,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                 if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
                 else vedeoisNotOnviews()
-
-            }
-            else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
+            } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
                 Exoplayer.pausePlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
@@ -470,23 +436,19 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
                 Exoplayer.startPlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-
-            }
-            else if (Exoplayer.player == null) {
-                if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity,true,Uri.parse(""))
-                 else Exoplayer.initializePlayer(this@MainActivity,false,Uri.parse(""))
+            } else if (Exoplayer.player == null) {
+                if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity, true, Uri.parse(""))
+                else Exoplayer.initializePlayer(this@MainActivity, false, Uri.parse(""))
                 Exoplayer.startPlayer()
 
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
 
                 if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
-                 else vedeoisNotOnviews()
-            }
-            else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
+                else vedeoisNotOnviews()
+            } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
                 Exoplayer.pausePlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-
             }
         }
 
@@ -494,7 +456,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         binding.radioplayer.RadioNameImVFrag.text = radioVar.name
 
         binding.radioplayer.recordOffONButton.setSafeOnClickListener {
-
             if (Exoplayer.is_downloading) {
                 downloader?.cancelDownload()
                 binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
@@ -505,35 +466,28 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 if (Exoplayer.is_playing_recorded_file) errorToast(this@MainActivity, getString(R.string.cantRecordArecordedStream))
 
                 if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
-
                     if (!isDownloadingCustomurl) {
                         if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
                         else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
-
 
                         downloader?.download()
 
                         if (Exoplayer.is_downloading) {
                             binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_on)
                             binding.radioplayer.stopButton.setImageResource(R.drawable.rec_on)
-
                         }
                         RadioFunction.interatialadsShow(this@MainActivity)
                     } else errorToast(this@MainActivity, getString(R.string.cantrecordwhendownload))
-
-
                 }
             }
-
         }
 
         binding.radioplayer.radioInfotxV.setSafeOnClickListener {
-            if (binding.radioplayer.radioInfotxV.text.toString().isNotEmpty()
-                && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.playernullinfo)
-                && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.BUFFERING)
-                && binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.OoOps_Try_another_station)
+            if (binding.radioplayer.radioInfotxV.text.toString().isNotEmpty() &&
+                binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.playernullinfo) &&
+                binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.BUFFERING) &&
+                binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.OoOps_Try_another_station)
             ) {
-
                 RadioFunction.copytext(
                     this@MainActivity,
                     binding.radioplayer.radioInfotxV.text.toString()
@@ -541,7 +495,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                 googleSearch()
             }
-
         }
 
         binding.radioplayer.moreButtons.setSafeOnClickListener {
@@ -552,13 +505,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 Navigation.findNavController(this@MainActivity, R.id.fragment_container)
             // navController.navigateUp()
             navController.navigate(R.id.moreBottomSheetFragment)
-
-
         }
-
-
-
-
     }
 
     private fun btnsClicks() {
@@ -570,7 +517,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 closeSearch()
                 closesearchfrag()
             } else openSearch()
-
         }
 
         binding.searchView.addAlarmButton.setSafeOnClickListener {
@@ -579,7 +525,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
     }
 
-    private fun firebaseappCheck(){
+    private fun firebaseappCheck() {
         FirebaseApp.initializeApp(this@MainActivity)
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
@@ -617,15 +563,15 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         val endG = endValue shr 8 and 0xff
         val endB = endValue and 0xff
         return startA + (fraction * (endA - startA)).toInt() shl 24 or
-                (startR + (fraction * (endR - startR)).toInt() shl 16) or
-                (startG + (fraction * (endG - startG)).toInt() shl 8) or
-                startB + (fraction * (endB - startB)).toInt()
+            (startR + (fraction * (endR - startR)).toInt() shl 16) or
+            (startG + (fraction * (endG - startG)).toInt() shl 8) or
+            startB + (fraction * (endB - startB)).toInt()
     }
 
     companion object {
         val userRecord = FirebaseAuth.getInstance()
-        var color1 = parseColor("#03071e")//-256
-        var color2 = parseColor("#03071e")//-65536
+        var color1 = parseColor("#03071e") // -256
+        var color2 = parseColor("#03071e") // -65536
         var color3 = parseColor("#03071e")
         var color4 = parseColor("#03071e")
         var darkTheme = true
@@ -637,33 +583,30 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         var mInterstitialAd: InterstitialAd? = null
 
-
         var isDownloadingCustomurl = false
         var repeat_tryconnect_server = -1
         var server_arraylist = arrayOf(
             "http://91.132.145.114",
             "http://89.58.16.19",
-            "http://95.179.139.106"//,
-          //  "http://all.api.radio-browser.info"
+            "http://95.179.139.106" // ,
+            //  "http://all.api.radio-browser.info"
         )
         var downloader: Downloader? = null
         var customdownloader: Downloader? = null
 
-        val handlers: Handler = Handler(Looper.getMainLooper())// Handler()
+        val handlers: Handler = Handler(Looper.getMainLooper()) // Handler()
 
         var BASE_URL = "http://91.132.145.114"
-
 
         var GlobalRadioName = ""
         var GlobalRadiourl: Uri = Uri.parse("")
 
-        var fromAlarm=false
+        var fromAlarm = false
 
         var video_on = false
 
         var imageLinkForNotification = ""
         var GlobalstateString = ""
-
 
         var defaultCountry = ""
 
@@ -676,11 +619,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         var firstTimeOpened = false
         var firstTimeopenRecordfolder = true
         var imagedefaulterrorurl = R.drawable.radioerror
-
     }
-
-
-
 
     public override fun onResume() {
         super.onResume()
@@ -694,7 +633,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
             binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
         }
-
 
         // startServices(this@MainActivity)
     }
@@ -717,10 +655,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     override fun onPause() {
         super.onPause()
         if (Exoplayer.player != null && video_on) binding.radioplayer.videoView.onPause()
-
     }
-
-
 
     private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -729,23 +664,16 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     RadioFunction.getDownloader(this@MainActivity)
                     downloader?.download()
                     succesToast(this@MainActivity, getString(R.string.Permissionsgranted))
-                    }
+                } else {
+                    errorToast(this@MainActivity, getString(R.string.PermissionsNotgranted))
 
-                    else {
-                        errorToast(this@MainActivity, getString(R.string.PermissionsNotgranted))
-
-                        customdownloader?.cancelDownload()
-                    }
-
+                    customdownloader?.cancelDownload()
+                }
             }
         }
 
-
-
-
     private fun subsucribers() {
         Exoplayer.Observer.subscribe("text view", binding.radioplayer.radioInfotxV)
-
 
         Exoplayer.Observer.subscribeImagePlayPause(
             "Main image view",
@@ -770,13 +698,12 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         )
     }
 
-
     private fun setTheme() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 infoViewModel.putTheme.collectLatest {
-                    RadioFunction.cardViewColor(binding.searchView.searchcardview,  it)
-                  //  RadioFunction.gradiancolorTransition(binding.searchView.searchVwframe, 4, it)
+                    RadioFunction.cardViewColor(binding.searchView.searchcardview, it)
+                    //  RadioFunction.gradiancolorTransition(binding.searchView.searchVwframe, 4, it)
                     RadioFunction.textcolorSearchviewTransition(binding.searchView.searchInputText, it)
                     RadioFunction.maintextviewColor(binding.searchView.ActionBarTitle, it)
 
@@ -791,21 +718,14 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     )
                     RadioFunction.gradiancolorNativeAdslayout(binding.radioplayer.adsFrame, 0)
 
-
                     setupRadioLisRV()
                     populateRecyclerView(radioRoom)
                 }
-
-
             }
         }
-
-
     }
 
-
     private fun setDataConsumption() {
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 infoViewModel.putDataConsumption.collectLatest {
@@ -813,11 +733,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     else binding.radioplayer.datainfotxvw.visibility = View.GONE
                 }
             }
-
-
         }
     }
-
 
     fun loadNativeAdPlayer() {
         //  adViewSmallActivityplayer = LayoutInflater.from(this@MainActivity).inflate(R.layout.ads_small, null) as NativeAdView
@@ -833,31 +750,29 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
     private fun getAlarmRadioRoom() {
-
         turnScreenOnAndKeyguardOff()
         radioAlarmRoomViewModel.getAll().observe(this) { list ->
             if (list.isNotEmpty() && fromAlarm) {
-                val radioVar =RadioVariables(
+                val radioVar = RadioVariables(
                     1,
                     list[0].name,
                     /*ip*/"",
                     /*stationcount*/"",
-                list[0].homepage,
-                list[0].favicon,
-                list[0].tags,
-                list[0].country,
-                list[0].state,
-                list[0].language,
-                list[0].streamurl,
-                list[0].bitrate,
-                list[0].radiouid,
-                /*iso_639*/"",
+                    list[0].homepage,
+                    list[0].favicon,
+                    list[0].tags,
+                    list[0].country,
+                    list[0].state,
+                    list[0].language,
+                    list[0].streamurl,
+                    list[0].bitrate,
+                    list[0].radiouid,
+                    /*iso_639*/"",
                     list[0].moreinfo
                 )
 
-
-                if(list[0].radiouid=="") Exoplayer.initializePlayer(this,true,Uri.parse(list[0].streamurl))
-                else Exoplayer.initializePlayer(this,false,Uri.parse(list[0].streamurl))
+                if (list[0].radiouid == "") Exoplayer.initializePlayer(this, true, Uri.parse(list[0].streamurl))
+                else Exoplayer.initializePlayer(this, false, Uri.parse(list[0].streamurl))
 
                 Exoplayer.startPlayer()
                 setPlayer(radioVar)
@@ -867,18 +782,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 bottomsheetopenclose()
             }
         }
-
     }
 
-
-
-
     private fun getFavRadioRoom() {
-
         radioRoomViewModel.getAll(true).observe(this) { list ->
             if (populateFavRv) {
-            setupRadioLisRV()
-            populateRecyclerView(list)
+                setupRadioLisRV()
+                populateRecyclerView(list)
             }
             populateFavRv = true
 
@@ -890,15 +800,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     if (setfavIcons(stationuuid)) {
                         binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_liked)
                         binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_liked)
-                    }
-                    else {
+                    } else {
                         binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_like)
                         binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_like)
                     }
                 }
             }
         }
-
     }
 
     private fun getLastPlayedRadioRoom() {
@@ -906,7 +814,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
             if (Exoplayer.player == null) {
                 if (list.isNotEmpty()) {
-
                     val radioVariables = RadioVariables()
                     radioVariables.apply {
                         name = list[0].name
@@ -934,11 +841,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_like)
                     }
                     //  getFavRadioRoom(list[0].radiouid)
-
-
-                }
-                else {
-
+                } else {
                     binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_like)
                     binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_like)
                     binding.radioplayer.RadioNameImVFrag.text = getString(R.string.click_to_expand)
@@ -949,29 +852,24 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                     icyandStateWhenPlayRecordFiles(getString(R.string.playernullinfo), "")
                     // icyandState = getString(R.string.playernullinfo)
-
-
                 }
             }
         }
-
     }
-
 
     override fun onBackPressed() {
         if (isExpanded) bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         else super.onBackPressed()
-
     }
 
-    private fun bottomsheetopenclose(){
-        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+    private fun bottomsheetopenclose() {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        else
+        } else {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
     private fun setPlayerBottomSheet() {
-
         binding.radioplayer.RadioImVFrag.setSafeOnClickListener {
             bottomsheetopenclose()
         }
@@ -985,74 +883,71 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         bottomSheetBehavior = BottomSheetBehavior.from(binding.radioplayer.containermainplayer)
 
         bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
+                BottomSheetBehavior.BottomSheetCallback() {
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                //  if (isAdded()) {
-                transitionBottomSheetBackgroundColor(slideOffset)
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    //  if (isAdded()) {
+                    transitionBottomSheetBackgroundColor(slideOffset)
 
-                //   binding.radioplayer.miniPaleryy.visibility = View.VISIBLE
-                //    binding.radioplayer.toolbarLayoutPlayermain.visibility = View.VISIBLE
-                binding.radioplayer.RadioImVFrag.alpha = 1 - slideOffset
-                binding.radioplayer.stopButton.alpha = 1 - slideOffset
-                binding.radioplayer.pauseplayButton.alpha = 1 - slideOffset
-                binding.radioplayer.likeImageView.alpha = 1 - slideOffset
-               // binding.radioplayer.datainfotxvw.alpha = 1 - slideOffset
-                //    binding.radioplayer.RadioImVFrag.alpha = slideOffset
+                    //   binding.radioplayer.miniPaleryy.visibility = View.VISIBLE
+                    //    binding.radioplayer.toolbarLayoutPlayermain.visibility = View.VISIBLE
+                    binding.radioplayer.RadioImVFrag.alpha = 1 - slideOffset
+                    binding.radioplayer.stopButton.alpha = 1 - slideOffset
+                    binding.radioplayer.pauseplayButton.alpha = 1 - slideOffset
+                    binding.radioplayer.likeImageView.alpha = 1 - slideOffset
+                    // binding.radioplayer.datainfotxvw.alpha = 1 - slideOffset
+                    //    binding.radioplayer.RadioImVFrag.alpha = slideOffset
 
+                    //  }
+                }
 
-                //  }
-            }
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_COLLAPSED -> {
+                            if (::adViewSmallActivityplayer.isInitialized) adViewSmallActivityplayer.destroy()
+                            binding.radioplayer.RadioImVFrag.visibility = View.VISIBLE
+                            binding.radioplayer.stopButton.visibility = View.VISIBLE
+                            binding.radioplayer.pauseplayButton.visibility = View.VISIBLE
+                            binding.radioplayer.likeImageView.visibility = View.VISIBLE
+                            // binding.radioplayer.datainfotxvw.visibility = View.VISIBLE
+                            isExpanded = false
+                        }
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            //    setupRadioLisRV()
+                            // getRadioRoomplayer()
 
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-                        if (::adViewSmallActivityplayer.isInitialized) adViewSmallActivityplayer.destroy()
-                        binding.radioplayer.RadioImVFrag.visibility = View.VISIBLE
-                        binding.radioplayer.stopButton.visibility = View.VISIBLE
-                        binding.radioplayer.pauseplayButton.visibility = View.VISIBLE
-                        binding.radioplayer.likeImageView.visibility = View.VISIBLE
-                       // binding.radioplayer.datainfotxvw.visibility = View.VISIBLE
-                        isExpanded = false
-                    }
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-                        //    setupRadioLisRV()
-                        // getRadioRoomplayer()
-
-                        binding.radioplayer.RadioImVFrag.visibility = View.INVISIBLE
-                        binding.radioplayer.stopButton.visibility = View.INVISIBLE
-                        binding.radioplayer.pauseplayButton.visibility = View.INVISIBLE
-                        binding.radioplayer.likeImageView.visibility = View.INVISIBLE
-                      //  binding.radioplayer.datainfotxvw.visibility = View.GONE
-                        isExpanded = true
-                        //    DynamicToast.makeSuccess(this@MainActivity,"STATE_EXPANDED", 3).show()
-                        loadNativeAdPlayer()
-
-                    }
-                    BottomSheetBehavior.STATE_DRAGGING -> {
-                        //DynamicToast.makeSuccess(this@MainActivity,"STATE_DRAGGING", 3).show()
-                        isExpanded = false
-                    }
-                    BottomSheetBehavior.STATE_SETTLING -> {
-                        isExpanded = false
-                    }
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        //DynamicToast.makeSuccess(this@MainActivity,"STATE_HIDDEN", 3).show()
-                        isExpanded = false
-                    }
-                    else -> {
-                        isExpanded = false
-                        Toast.makeText(this@MainActivity, "OTHER_STATE", Toast.LENGTH_SHORT).show()
+                            binding.radioplayer.RadioImVFrag.visibility = View.INVISIBLE
+                            binding.radioplayer.stopButton.visibility = View.INVISIBLE
+                            binding.radioplayer.pauseplayButton.visibility = View.INVISIBLE
+                            binding.radioplayer.likeImageView.visibility = View.INVISIBLE
+                            //  binding.radioplayer.datainfotxvw.visibility = View.GONE
+                            isExpanded = true
+                            //    DynamicToast.makeSuccess(this@MainActivity,"STATE_EXPANDED", 3).show()
+                            loadNativeAdPlayer()
+                        }
+                        BottomSheetBehavior.STATE_DRAGGING -> {
+                            // DynamicToast.makeSuccess(this@MainActivity,"STATE_DRAGGING", 3).show()
+                            isExpanded = false
+                        }
+                        BottomSheetBehavior.STATE_SETTLING -> {
+                            isExpanded = false
+                        }
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            // DynamicToast.makeSuccess(this@MainActivity,"STATE_HIDDEN", 3).show()
+                            isExpanded = false
+                        }
+                        else -> {
+                            isExpanded = false
+                            Toast.makeText(this@MainActivity, "OTHER_STATE", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
-            }
-        })
+            })
     }
 
     private fun loadBannerAD() {
-
 // Step 1: Create an inline adaptive banner ad size using the activity context.
-   //     val adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 320)
+        //     val adSize = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(this, 320)
 
 // Step 2: Create banner using activity context and set the inline ad size and
 // ad unit ID.
@@ -1066,7 +961,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         adViewAdaptiveBanner.loadAd(adRequest)
     }
 
-
     private fun setTitleText() {
         lifecycleScope.launchWhenStarted {
             infoViewModel.putTitleText.collectLatest { title ->
@@ -1079,8 +973,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 }
             }
         }
-
-
     }
 
     private fun closeSearch() {
@@ -1094,7 +986,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
     private fun openSearch() {
-        binding.searchView.searchInputText.setQuery("", false)//.setText("")
+        binding.searchView.searchInputText.setQuery("", false) // .setText("")
         binding.searchView.opencloseSearchButton.setImageResource(R.drawable.ic_right_arrow)
         binding.searchView.ActionBarTitle.visibility = View.INVISIBLE
         binding.searchView.searchInputText.visibility = View.VISIBLE
@@ -1120,12 +1012,11 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         val radio = RadioVariables()
 
-
         if (!setfavIcons(radioVar.stationuuid) && radioVar.stationuuid != "") {
             // jsonCall = api.addclick(idListJson)
             binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_liked)
             binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_liked)
-            //DB BEGIN
+            // DB BEGIN
 
             //  dbHandler= DBHandler(this@SearchResultsActivity,null,null,1)
             radio.name = radioVar.name
@@ -1147,18 +1038,18 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 radioVar.tags,
                 radioVar.country,
                 radioVar.state,
-                //var RadiostateDB: String?,
+                // var RadiostateDB: String?,
                 radioVar.language,
                 radioVar.url_resolved,
                 true
             )
             addFavoriteRadioIdInArrayFirestore(radioVar.stationuuid)
             radioRoomViewModel.upsertRadio(radioroom, "Radio added")
-        }
-        else if (setfavIcons(radioVar.stationuuid)) {
+        } else if (setfavIcons(radioVar.stationuuid)) {
             binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_like)
             binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_like)
-            radioRoomViewModel.delete(radioVar.stationuuid,
+            radioRoomViewModel.delete(
+                radioVar.stationuuid,
                 true,
                 "Radio Deleted"
             )
@@ -1167,37 +1058,30 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
     }
 
-
     private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
         val addFavoritRadioIdInArrayFirestore =
-            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid,getCurrentDate())
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid, getCurrentDate())
         addFavoritRadioIdInArrayFirestore.observe(this) {
-            //if (it != null)  if (it.data!!)  prod name array updated
+            // if (it != null)  if (it.data!!)  prod name array updated
             RadioFunction.interatialadsShow(this@MainActivity)
             if (it.e != null) {
-                //prod bame array not updated
+                // prod bame array not updated
                 errorToast(this, it.e!!)
             }
-
         }
-
-
     }
 
-    private fun deleteFavoriteRadioFromArrayinfirestore(radioUid:String){
-
-        val deleteFavoriteRadiofromArrayInFirestore= favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
+    private fun deleteFavoriteRadioFromArrayinfirestore(radioUid: String) {
+        val deleteFavoriteRadiofromArrayInFirestore = favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
         deleteFavoriteRadiofromArrayInFirestore.observe(this) {
             RadioFunction.interatialadsShow(this@MainActivity)
-            //if (it != null)  if (it.data!!)  prod name array updated
+            // if (it != null)  if (it.data!!)  prod name array updated
             if (it.e != null) {
-                //prod bame array not updated
+                // prod bame array not updated
                 RadioFunction.dynamicToast(this, it.e!!)
-
             }
         }
     }
-
 
     private fun setfavIcons(stationuuid: String): Boolean {
         var idIn = false
@@ -1211,11 +1095,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
         // DynamicToast.makeSuccess(this, k+ " " +b.toString()+" "+stationuuid , 9).show()
         return idIn
-
     }
 
-
-    private  fun getPref() {
+    private fun getPref() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 darkTheme = preferencesViewModel.preferencesFlow.first().dark_theme
@@ -1223,13 +1105,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                 infoViewModel.putThemes(preferencesViewModel.preferencesFlow.first().dark_theme)
             }
-
-
         }
-
-
     }
-
 
     private fun populateRecyclerView(radioRoom: MutableList<RadioRoom>) {
         if (radioRoom.isNotEmpty()) {
@@ -1252,7 +1129,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         try {
             populateFavRv = false
             imageLinkForNotification = radioRoom.favicon
-            Exoplayer.initializePlayer(this,false,Uri.parse(radioRoom.streamurl))
+            Exoplayer.initializePlayer(this, false, Uri.parse(radioRoom.streamurl))
             Exoplayer.startPlayer()
 
             val radioVariables = RadioVariables()
@@ -1271,9 +1148,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
             infoViewModel.putRadiopalyerInfo(radioVariables)
 
-
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
-
         } catch (e: IOException) {
             // Catch the exception
             e.printStackTrace()
@@ -1296,7 +1171,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         navController.navigate(R.id.fragmentSetting)
     }
 
-
     private fun openCountdownTimer() {
         val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
         //  navController.navigateUp()
@@ -1315,46 +1189,40 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         //  navController.navigate(R.id.searchFragment)
     }
 
-
     private fun searchquerry() {
-
         binding.searchView.searchInputText.setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                if (binding.searchView.searchInputText.query.toString().count() > 2) {
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(binding.searchView.searchInputText.windowToken, 0)
+                SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    if (binding.searchView.searchInputText.query.toString().count() > 2) {
+                        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(binding.searchView.searchInputText.windowToken, 0)
 
+                        retrofitRadioViewModel.getRadiosByName(binding.searchView.searchInputText.query.toString())
+                        infoViewModel.putSearchquery(binding.searchView.searchInputText.query.toString())
 
-                    retrofitRadioViewModel.getRadiosByName(binding.searchView.searchInputText.query.toString())
-                    infoViewModel.putSearchquery(binding.searchView.searchInputText.query.toString())
+                        infoViewModel.putTitleText(
+                            binding.searchView.searchInputText.query.toString()
+                                .replaceFirstChar { it.uppercase() }
+                        )
+                        binding.searchView.searchInputText.clearFocus()
 
-                    infoViewModel.putTitleText(
-                        binding.searchView.searchInputText.query.toString()
-                            .replaceFirstChar { it.uppercase() })
-                    binding.searchView.searchInputText.clearFocus()
+                        opensearchfrag()
+                    } else {
+                        binding.searchView.searchInputText.setQuery("", false)
+                        // search_input_text.setHintTextColor(resources.getColor(R.color.primaryDark))
+                        binding.searchView.searchInputText.queryHint =
+                            getString(R.string.not_vaid_search)
+                    }
 
-                    opensearchfrag()
-
-                } else {
-
-                    binding.searchView.searchInputText.setQuery("", false)
-                    // search_input_text.setHintTextColor(resources.getColor(R.color.primaryDark))
-                    binding.searchView.searchInputText.queryHint =
-                        getString(R.string.not_vaid_search)
+                    return false
                 }
 
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    // Start filtering the list as user start entering the characters
 
-                return false
-            }
-
-            override fun onQueryTextChange(p0: String?): Boolean {
-                //Start filtering the list as user start entering the characters
-
-                return false
-            }
-        })
-
+                    return false
+                }
+            })
     }
 
     private fun googleSearch() {
@@ -1370,19 +1238,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         //   .setData(Uri.fromParts("http", "", null))
 
         startActivity(browserIntent)
-
-
     }
-
-
-
-
-
-
-
-
-
-
 
     private fun Activity.turnScreenOnAndKeyguardOff() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -1391,7 +1247,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         } else {
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+                    or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
             )
         }
 
@@ -1409,11 +1265,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         } else {
             window.clearFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+                    or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
             )
         }
     }
-
-
-
 }

@@ -10,20 +10,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class RadioAlarmRoomViewModel  @Inject constructor(
-    private val  sholistRoomBaseRepository : RadioAlarmRoomBaseRepository
-    ): ViewModel() {
+class RadioAlarmRoomViewModel @Inject constructor(
+    private val sholistRoomBaseRepository: RadioAlarmRoomBaseRepository
+) : ViewModel() {
 
     private val tasksEventChannel = Channel<ShopListEvents>()
     val shopListEvents = tasksEventChannel.receiveAsFlow()
 
-
-
-
-    fun getInstance() : String {
+    fun getInstance(): String {
         return this.toString()
     }
-
 
 /*
     @Deprecated("For Static Data")
@@ -58,24 +54,14 @@ class RadioAlarmRoomViewModel  @Inject constructor(
     }
 */
 
-
-
-
-
-
-
-    fun upsertRadioAlarm(item : RadioAlarmRoom, msg:String) {
+    fun upsertRadioAlarm(item: RadioAlarmRoom, msg: String) {
         Coroutines.io(this@RadioAlarmRoomViewModel) {
-            if(item.name!=""){//prevent add alarm played station
+            if (item.name != "") { // prevent add alarm played station
                 sholistRoomBaseRepository.upsert(ConvertRadioAlarmClass.toEntity(item))
                 tasksEventChannel.send(ShopListEvents.ProdAddToShopMsg(msg))
-
             }
-
         }
     }
-
-
 
     /*fun updateQuantity(quantity : Double,id:Long) {
         Coroutines.io(this@RadioRoomViewModel) {
@@ -83,49 +69,28 @@ class RadioAlarmRoomViewModel  @Inject constructor(
         }
     }*/
 
-
-    fun delete(raduiuid : String?, msg:String) {
+    fun delete(raduiuid: String?, msg: String) {
         Coroutines.io(this@RadioAlarmRoomViewModel) {
             sholistRoomBaseRepository.delete(raduiuid)
             tasksEventChannel.send(ShopListEvents.ProdDeleteShopMsg(msg))
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    fun deleteAll(msg:String) {
+    fun deleteAll(msg: String) {
         Coroutines.io(this@RadioAlarmRoomViewModel) {
             sholistRoomBaseRepository.deleteAll()
             tasksEventChannel.send(ShopListEvents.ProdDeleteShopMsg(msg))
-
         }
     }
 
-     fun getAll() : LiveData<MutableList<RadioAlarmRoom>> { //return  liveList
+    fun getAll(): LiveData<MutableList<RadioAlarmRoom>> { // return  liveList
         return ConvertRadioAlarmClass.toLiveDataListModel(
             sholistRoomBaseRepository.getAll()
         )
     }
 
-
-
-
-
     sealed class ShopListEvents {
-        data class ProdAddToShopMsg(val msg:String) : ShopListEvents()
-        data class ProdDeleteShopMsg(val msg:String) : ShopListEvents()
+        data class ProdAddToShopMsg(val msg: String) : ShopListEvents()
+        data class ProdDeleteShopMsg(val msg: String) : ShopListEvents()
     }
-
-
-
 }
-

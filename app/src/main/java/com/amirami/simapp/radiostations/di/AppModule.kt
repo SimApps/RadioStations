@@ -18,14 +18,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRadioListRepository(provideRadioDAO : RadioDAO) : RadioRoomBaseRepository {
+    fun provideRadioListRepository(provideRadioDAO: RadioDAO): RadioRoomBaseRepository {
         return RepositoryRadiotRoom(provideRadioDAO)
     }
 
-
     @Provides
     @Singleton
-    fun provideRadioAlarmListRepository(provideRadioDAO : AlarmRadioDAO) : RadioAlarmRoomBaseRepository {
+    fun provideRadioAlarmListRepository(provideRadioDAO: AlarmRadioDAO): RadioAlarmRoomBaseRepository {
         return RepositoryRadiotAlarmRoom(provideRadioDAO)
     }
 }

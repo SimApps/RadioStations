@@ -9,26 +9,23 @@ interface AlarmRadioDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(radioEntity: AlarmRadioRoomEntity): Long
 
-    //@Delete
-    //fun delete(customEntity: CustomEntity)
+    // @Delete
+    // fun delete(customEntity: CustomEntity)
 
     //  @Query("DELETE FROM custom_table WHERE Id = :id")
     // fun delete(id : Int?)
 
     @Query("DELETE FROM radio_alarm_table WHERE radiouid = :radiouid")
-    fun delete(radiouid : String?)
+    fun delete(radiouid: String?)
 
-
-  //  @Query("UPDATE radio_table SET quantity=:quantity WHERE radiouid = :radiouid")
+    //  @Query("UPDATE radio_table SET quantity=:quantity WHERE radiouid = :radiouid")
 //    fun updateQuantity(quantity: Double?, id: Long?)
 
     @Query("DELETE FROM radio_alarm_table")
     fun deleteAll()
 
-    //@Query("SELECT * FROM custom_table")
-   // @Query("SELECT * FROM radio_table WHERE fav=:fav ORDER BY radioname ASC")
+    // @Query("SELECT * FROM custom_table")
+    // @Query("SELECT * FROM radio_table WHERE fav=:fav ORDER BY radioname ASC")
     @Query("SELECT * FROM radio_alarm_table ORDER BY radioid DESC")
-    fun getAll() : LiveData<List<AlarmRadioRoomEntity>>
-
-
+    fun getAll(): LiveData<List<AlarmRadioRoomEntity>>
 }

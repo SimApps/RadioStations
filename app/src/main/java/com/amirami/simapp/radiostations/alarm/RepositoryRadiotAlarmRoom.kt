@@ -3,22 +3,17 @@ package com.amirami.simapp.radiostations.alarm
 import androidx.lifecycle.LiveData
 import javax.inject.Inject
 
-class RepositoryRadiotAlarmRoom  @Inject constructor(
-    private val radioDAO : AlarmRadioDAO
-): RadioAlarmRoomBaseRepository {
+class RepositoryRadiotAlarmRoom @Inject constructor(
+    private val radioDAO: AlarmRadioDAO
+) : RadioAlarmRoomBaseRepository {
 
-
-
-    override fun giveRepository() : String {
+    override fun giveRepository(): String {
         return this.toString()
     }
 
-
-
     //region CRUD Operation
 
-
-    override suspend fun upsert(radioEntity : AlarmRadioRoomEntity) {
+    override suspend fun upsert(radioEntity: AlarmRadioRoomEntity) {
         radioDAO.upsert(radioEntity)
     }
 
@@ -27,7 +22,6 @@ class RepositoryRadiotAlarmRoom  @Inject constructor(
             quantity,id
         )
     }*/
-
 
     /*override suspend fun delete(customEntity: CustomEntity) {
         println("${customEntity.name}")
@@ -40,13 +34,11 @@ class RepositoryRadiotAlarmRoom  @Inject constructor(
         radioDAO.delete(idradio)
     }
 
-
-
     override suspend fun deleteAll() {
         radioDAO.deleteAll()
     }
 
-    override fun getAll() : LiveData<List<AlarmRadioRoomEntity>> {
+    override fun getAll(): LiveData<List<AlarmRadioRoomEntity>> {
         return radioDAO.getAll()
     }
     //endregion

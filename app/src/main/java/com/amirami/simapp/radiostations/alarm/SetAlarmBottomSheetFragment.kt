@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
+class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var hourPicker: NumberPicker? = null
     private var munitPicker: NumberPicker? = null
@@ -50,7 +50,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by activityViewModels()
     private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
 
-    private lateinit var radioVariable:RadioVariables
+    private lateinit var radioVariable: RadioVariables
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,42 +65,29 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
-
         collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorConstraintLayoutTransitionBottomsheet(binding.popupcountdownalarm, 0,it)
-            RadioFunction.maintextviewColor(binding.textView,it)
-            RadioFunction.maintextviewColor(binding.textView2,it)
-            RadioFunction.maintextviewColor(binding.buttonStartCancelalarm,it)
+            RadioFunction.gradiancolorConstraintLayoutTransitionBottomsheet(binding.popupcountdownalarm, 0, it)
+            RadioFunction.maintextviewColor(binding.textView, it)
+            RadioFunction.maintextviewColor(binding.textView2, it)
+            RadioFunction.maintextviewColor(binding.buttonStartCancelalarm, it)
 
-
-            RadioFunction.setNumberPickerTextColor(binding.hourPickers,it)
-            RadioFunction.setNumberPickerTextColor(binding.minutPickers,it)
-
+            RadioFunction.setNumberPickerTextColor(binding.hourPickers, it)
+            RadioFunction.setNumberPickerTextColor(binding.minutPickers, it)
         }
         collectLatestLifecycleFlow(infoViewModel.putRadioAlarmInfo) {
             it.also { radioVariable = it }
         }
 
-
         getAlarmRadioRoom()
-
-
-
-
-
-
 
         val rightNow = Calendar.getInstance()
         //  hour =  rightNow.get(Calendar.HOUR_OF_DAY) //(System.currentTimeMillis().toInt() / (1000 * 60 * 60) % 24)//androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()).getInt("hour", 8)
         //  minute = rightNow.get(Calendar.MINUTE)//(System.currentTimeMillis().toInt() / (1000 * 60) % 60)// androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()).getInt("minute", 30)
 
-
         hourPicker = _binding!!.hourPickers
         hourPicker!!.minValue = 0
         hourPicker!!.maxValue = 23
-        hourPicker!!.value =  rightNow.get(Calendar.HOUR_OF_DAY)
+        hourPicker!!.value = rightNow.get(Calendar.HOUR_OF_DAY)
         hourPicker!!.wrapSelectorWheel = true
         // hourPicker!!.setOnValueChangedListener(this)
 
@@ -109,45 +96,44 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment(){
         munitPicker!!.maxValue = 59
         munitPicker!!.value = rightNow.get(Calendar.MINUTE)
         munitPicker!!.wrapSelectorWheel = true
-
     }
-
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding=null
+        _binding = null
     }
 
-private fun formatRcordDescriptionName(description:String):String{
-  return  if ( description.contains("___",true)){
-
-            description.substring(0,
-                description.indexesOf("___", true)[0])  + " "+
-                   shortformateDate(description.substring(description.indexesOf("___", true)[0] +3,
+    private fun formatRcordDescriptionName(description: String): String {
+        return if (description.contains("___", true)) {
+            description.substring(
+                0,
+                description.indexesOf("___", true)[0]
+            ) + " " +
+                shortformateDate(
+                    description.substring(
+                        description.indexesOf("___", true)[0] + 3,
                         description.length
-                    )) + ".mp3"
+                    )
+                ) + ".mp3"
+        } else {
+            description
+        }
     }
-    else {
-        description
-    }
-}
-    private fun viewsVisibility(radioAlarmEmpty: MutableList<RadioAlarmRoom>){
-        if(radioAlarmEmpty.isEmpty()){
+    private fun viewsVisibility(radioAlarmEmpty: MutableList<RadioAlarmRoom>) {
+        if (radioAlarmEmpty.isEmpty()) {
            /* _binding!!.textView.visibility = View.VISIBLE
             _binding!!.textView2.visibility = View.VISIBLE
             _binding!!.hourPickers.visibility = View.VISIBLE
             _binding!!.minutPickers.visibility = View.VISIBLE*/
             _binding!!.buttonStartCancelalarm.text = getString(R.string.Start_alarm)
             _binding!!.infoalarm.visibility = View.GONE
-        }
-        else {
-            _binding!!.infoalarm.text =  getString(R.string.radioAlarmIsSetAT,
-                shortformateDate(androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()).getLong("timeInMilli", 1)),
-                if(radioAlarmEmpty[0].radiouid!="") getString(R.string.RadioStationName) else   getString(R.string.RecordedStationName),
-                radioAlarmEmpty[0].name + if(radioAlarmEmpty[0].radiouid!="")  "" else formatRcordDescriptionName(radioAlarmEmpty[0].homepage))
+        } else {
+            _binding!!.infoalarm.text = getString(
+                R.string.radioAlarmIsSetAT,
+                shortformateDate(androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()).getLong("timeInMilli", 1L)),
+                if (radioAlarmEmpty[0].radiouid != "") getString(R.string.RadioStationName) else getString(R.string.RecordedStationName),
+                radioAlarmEmpty[0].name + if (radioAlarmEmpty[0].radiouid != "") "" else formatRcordDescriptionName(radioAlarmEmpty[0].homepage)
+            )
             _binding!!.infoalarm.visibility = View.VISIBLE
 
             _binding!!.buttonStartCancelalarm.text = getString(R.string.cancel_alarm)
@@ -158,7 +144,6 @@ private fun formatRcordDescriptionName(description:String):String{
         }
     }
 
-
     private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -167,19 +152,17 @@ private fun formatRcordDescriptionName(description:String):String{
         }
     }
 
-
     private fun getAlarmRadioRoom() {
-       // radioAlarmRoomViewModel.deleteAll("")
+        // radioAlarmRoomViewModel.deleteAll("")
         radioAlarmRoomViewModel.getAll().observe(this) { list ->
-//errorToast(requireContext(),list.isEmpty().toString())
+// errorToast(requireContext(),list.isEmpty().toString())
 
             viewsVisibility(list)
             _binding!!.buttonStartCancelalarm.setSafeOnClickListener {
-                MainActivity.fromAlarm=false
-                if(list.isEmpty()){
+                MainActivity.fromAlarm = false
+                if (list.isEmpty()) {
                     minute = munitPicker!!.value
                     hour = hourPicker!!.value
-
 
                     val calendar = Calendar.getInstance()
 
@@ -188,15 +171,13 @@ private fun formatRcordDescriptionName(description:String):String{
                     calendar.set(Calendar.MINUTE, minute/*minuteOfHour*/)
                     calendar.set(Calendar.SECOND, 0)
 
-
-                   // val sdf = SimpleDateFormat("MMM d''yy HH:mm:ss", Locale.getDefault())
+                    // val sdf = SimpleDateFormat("MMM d''yy HH:mm:ss", Locale.getDefault())
                     val sdf = SimpleDateFormat("d MMM yyyy HH:mm:ss", Locale.getDefault())
 
                     // SimpleDateFormat("MMM d''yy", Locale.getDefault())
                     val formattedDate = sdf.format(calendar.time)
                     val date = sdf.parse(formattedDate)
                     timeInMilliSeconds = date!!.time
-
 
                     if (timeInMilliSeconds.toInt() != 0) {
                         val radioroom = RadioAlarmRoom(
@@ -208,7 +189,7 @@ private fun formatRcordDescriptionName(description:String):String{
                             radioVariable.tags,
                             radioVariable.country,
                             radioVariable.state,
-                            //var RadiostateDB: String?,
+                            // var RadiostateDB: String?,
                             radioVariable.language,
                             radioVariable.url_resolved,
                             radioVariable.moreinfo
@@ -219,8 +200,7 @@ private fun formatRcordDescriptionName(description:String):String{
 
                         Utils.setAlarm(requireContext(), timeInMilliSeconds)
                     }
-                }
-                else {
+                } else {
                     // Intent to start the Broadcast Receiver
                     val broadcastInten = Intent(requireContext(), AlarmReceiver::class.java)
                     // Utils.setAlarm(context, timeOfAlarm)
@@ -236,17 +216,11 @@ private fun formatRcordDescriptionName(description:String):String{
                         cancelAlarm(requireContext())
                         diableBootReceiver(requireContext())
                     }
-
-
                 }
 
                 viewsVisibility(list)
                 RadioFunction.interatialadsShow(requireContext())
             }
-
-
-
         }
-
     }
 }

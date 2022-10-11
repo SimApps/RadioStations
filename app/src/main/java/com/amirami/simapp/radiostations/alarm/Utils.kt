@@ -13,15 +13,14 @@ object Utils {
     const val requestalarmId = 11421
     private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
 
-
     fun setAlarm(context: Context, timeOfAlarm: Long) {
-
         // Intent to start the Broadcast Receiver
         val broadcastIntent = Intent(context, AlarmReceiver::class.java)
 
         // Utils.setAlarm(context, timeOfAlarm)
         val pIntent = getBroadcast(
-            context, requestalarmId,
+            context,
+            requestalarmId,
             broadcastIntent,
             immutableFlag or FLAG_UPDATE_CURRENT
         )
@@ -37,7 +36,6 @@ object Utils {
             alarmMgr.setAlarmClock(alarmClockInfo, pIntent)
 
             enableBootReceiver(context)
-
         } else {
             androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
@@ -46,20 +44,16 @@ object Utils {
             alarmMgr.setAlarmClock(alarmClockInfo, pIntent)
 
             enableBootReceiver(context)
-
         }
-
     }
 
-
-
     fun cancelAlarm(context: Context) {
-
         // Intent to start the Broadcast Receiver
         val broadcastIntent = Intent(context, AlarmReceiver::class.java)
 
         val pIntent = getBroadcast(
-            context, requestalarmId,
+            context,
+            requestalarmId,
             broadcastIntent,
             immutableFlag or FLAG_UPDATE_CURRENT
         )
@@ -77,14 +71,8 @@ object Utils {
             )
 
             alarmMgr.cancel(pIntent)
-
-
         }
-
-
     }
-
-
 
     fun enableBootReceiver(context: Context) {
         val receiver = ComponentName(context, BootCompleteReceiver::class.java)

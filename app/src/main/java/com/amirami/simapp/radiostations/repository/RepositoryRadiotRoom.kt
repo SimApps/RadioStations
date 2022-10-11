@@ -5,22 +5,17 @@ import com.amirami.simapp.radiostations.room.RadioDAO
 import com.amirami.simapp.radiostations.room.RadioEntity
 import javax.inject.Inject
 
-class RepositoryRadiotRoom  @Inject constructor(
-    private val radioDAO : RadioDAO
-): RadioRoomBaseRepository {
+class RepositoryRadiotRoom @Inject constructor(
+    private val radioDAO: RadioDAO
+) : RadioRoomBaseRepository {
 
-
-
-    override fun giveRepository() : String {
+    override fun giveRepository(): String {
         return this.toString()
     }
 
-
-
     //region CRUD Operation
 
-
-    override suspend fun upsert(radioEntity : RadioEntity) {
+    override suspend fun upsert(radioEntity: RadioEntity) {
         radioDAO.upsert(radioEntity)
     }
 
@@ -30,7 +25,6 @@ class RepositoryRadiotRoom  @Inject constructor(
         )
     }*/
 
-
     /*override suspend fun delete(customEntity: CustomEntity) {
         println("${customEntity.name}")
         customDao.delete(
@@ -38,19 +32,18 @@ class RepositoryRadiotRoom  @Inject constructor(
         )
     }*/
 
-    override suspend fun delete(radiouid: String?, fav:Boolean) {
-        radioDAO.delete(radiouid,fav)
+    override suspend fun delete(radiouid: String?, fav: Boolean) {
+        radioDAO.delete(radiouid, fav)
     }
-    override suspend fun deletelistened(fav:Boolean) {
+    override suspend fun deletelistened(fav: Boolean) {
         radioDAO.deletelistened(fav)
     }
-
 
     override suspend fun deleteAll() {
         radioDAO.deleteAll()
     }
 
-    override fun getAll(fav:Boolean) : LiveData<List<RadioEntity>> {
+    override fun getAll(fav: Boolean): LiveData<List<RadioEntity>> {
         return radioDAO.getAll(fav)
     }
     //endregion
