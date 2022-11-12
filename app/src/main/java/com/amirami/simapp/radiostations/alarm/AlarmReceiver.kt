@@ -8,6 +8,8 @@ import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.media3.common.util.UnstableApi
+import androidx.preference.PreferenceManager
 import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.MainActivity.Companion.fromAlarm
@@ -19,7 +21,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 import com.amirami.simapp.radiostations.utils.Constatnts.EXTRA_MESSAGE
 import com.amirami.simapp.radiostations.utils.Constatnts.EXTRA_MESSAGE_VALUE
 
-class AlarmReceiver : BroadcastReceiver() {
+@UnstableApi class AlarmReceiver : BroadcastReceiver() {
 
     private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
 
@@ -77,7 +79,7 @@ class AlarmReceiver : BroadcastReceiver() {
              else PlaySystemAlarm(context)
      */
 
-        androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
             .putString("radioURL", "Empty").apply()
 

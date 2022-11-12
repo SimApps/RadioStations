@@ -16,9 +16,6 @@ import com.amirami.simapp.radiostations.model.RecordInfo
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
-
-
-
 class RecordedFilesAdapter(private val listener: OnItemClickListener) :
     ListAdapter<MutableList<RecordInfo>, RecordedFilesAdapter.RecViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
@@ -31,25 +28,19 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
         notifyDataSetChanged()
     }
 
-
-
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecViewHolder {
         val binding = RadioTiketMainBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RecViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RecViewHolder, position: Int) {
-
         productShopingRoom = items[position]
-
 
         holder.bind(productShopingRoom)
     }
 
     override fun getItemCount(): Int {
-        return items.size     //fidCardDBList.size
+        return items.size // fidCardDBList.size
     }
 
     inner class RecViewHolder(private val binding: RadioTiketMainBinding) :
@@ -64,59 +55,53 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
                 }
 
                 ExpandImageView.setSafeOnClickListener {
-                    listener.onRecMoreItemClick(items[bindingAdapterPosition],bindingAdapterPosition)
-
+                    listener.onRecMoreItemClick(items[bindingAdapterPosition], bindingAdapterPosition)
                 }
             }
         }
 
         fun bind(recordInfo: RecordInfo) {
-
             binding.apply {
                 RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
                 RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
 
-             //   val scale: Float = root.context.resources.displayMetrics.density
-             //   val pixels = (32 * scale + 0.5f).toInt()
-            //    val layoutParams = TableRow.LayoutParams(pixels, pixels)
+                //   val scale: Float = root.context.resources.displayMetrics.density
+                //   val pixels = (32 * scale + 0.5f).toInt()
+                //    val layoutParams = TableRow.LayoutParams(pixels, pixels)
 
-
-            //    ExpandImageView.layoutParams = layoutParams
+                //    ExpandImageView.layoutParams = layoutParams
 
                 ExpandImageView.setImageResource(R.drawable.delete)
-               //  RadioFunction.loadImageInt(R.drawable.delete, imagedefaulterrorurl, ExpandImageView)
+                //  RadioFunction.loadImageInt(R.drawable.delete, imagedefaulterrorurl, ExpandImageView)
 
-                if (recordInfo.name.contains("_ _",true) && recordInfo.name.contains("___",true)){
-                    if(mainTxVw.text.isNotEmpty()){
-
+                if (recordInfo.name.contains("_ _", true) && recordInfo.name.contains("___", true)) {
+                    if (mainTxVw.text.isNotEmpty()) {
                         mainTxVw.text = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
-
                     }
-                    if(descriptionTxVw.text.isNotEmpty()){
-                        descriptionTxVw.text =  recordInfo.name.substring(recordInfo.name.indexesOf("_ _", true)[0] + 3,
-                            recordInfo.name.indexesOf("___", true)[0])  + " "+
-                                RadioFunction.shortformateDate(recordInfo.name.substring(recordInfo.name.indexesOf("___", true)[0] +3,
-                                        recordInfo.name.length-4
-                                    )) + ".mp3"
+                    if (descriptionTxVw.text.isNotEmpty()) {
+                        descriptionTxVw.text = recordInfo.name.substring(
+                            recordInfo.name.indexesOf("_ _", true)[0] + 3,
+                            recordInfo.name.indexesOf("___", true)[0]
+                        ) + " " +
+                            RadioFunction.shortformateDate(
+                                recordInfo.name.substring(
+                                    recordInfo.name.indexesOf("___", true)[0] + 3,
+                                    recordInfo.name.length - 4
+                                )
+                            ) + ".mp3"
                             /*RadioFunction.removeWord(recordInfo.name
                             .substring(recordInfo.name.indexesOf("_ _", true)[0] + 3,
                                 recordInfo.name.length),  ".mp3")*/
 
-                        //RadioFunction.shortformateDate()//s.name.substring(s.name.indexesOf("_ _", true)[0] + 2, s.name.length)
-
-
+                        // RadioFunction.shortformateDate()//s.name.substring(s.name.indexesOf("_ _", true)[0] + 2, s.name.length)
                     }
-                }
-                else {
+                } else {
                     mainTxVw.text = recordInfo.name
-                    descriptionTxVw.text =""
+                    descriptionTxVw.text = ""
                 }
-
-
 
                 //  faviconImageView.setImageResource(R.drawable.recordings)
-                RadioFunction.loadImageInt( R.drawable.rec_on, imagedefaulterrorurl, ImageView)
-
+                RadioFunction.loadImageInt(R.drawable.rec_on, imagedefaulterrorurl, ImageView)
             }
         }
     }
@@ -127,9 +112,6 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
         fun onRecMoreItemClick(recordInfo: RecordInfo, position: Int)
     }
 
-
-
-
     class DiffCallback : DiffUtil.ItemCallback<MutableList<RecordInfo>>() {
         override fun areItemsTheSame(oldItem: MutableList<RecordInfo>, newItem: MutableList<RecordInfo>) =
             oldItem[0].name == newItem[0].name
@@ -137,9 +119,6 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
         override fun areContentsTheSame(oldItem: MutableList<RecordInfo>, newItem: MutableList<RecordInfo>) =
             oldItem == newItem
     }
-
-
-
 
     override fun getSectionName(position: Int): String {
         var strTextview = items[position].name

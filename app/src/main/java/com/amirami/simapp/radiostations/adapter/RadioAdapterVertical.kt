@@ -15,21 +15,19 @@ import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.*
 
-//class RadioAdapterVertical (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
+// class RadioAdapterVertical (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
+class RadioAdapterVertical(private val listener: OnItemClickListener) :
+    ListAdapter<RadioVariables, RadioAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
-    class RadioAdapterVertical(private val listener: OnItemClickListener) :
-        ListAdapter<RadioVariables, RadioAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
-
-
-        private val items = ArrayList<RadioVariables>()
+    private val items = ArrayList<RadioVariables>()
     fun setItems(items: MutableList<RadioVariables>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
     }
     inner class MyViewHolder(val binding: RadioTiketMainBinding) :
-        RecyclerView.ViewHolder(binding.root){
+        RecyclerView.ViewHolder(binding.root) {
 
         init {
 
@@ -37,39 +35,32 @@ import java.util.*
                 layoutABorrar.setSafeOnClickListener {
                     if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
                         listener.onItemClick(items[bindingAdapterPosition])
-
                     }
                 }
 
                 ExpandImageView.setSafeOnClickListener {
                     if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
                         listener.onMoreItemClick(items[bindingAdapterPosition])
-
                     }
                 }
-
-
             }
         }
-
-
-
 
         fun bind(currentTvShow: RadioVariables) {
             binding.apply {
                 RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
                 RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
 
-                    RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
-                    RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
+                RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
+                RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
 
-
-                mainTxVw.text=currentTvShow.name
-                descriptionTxVw.text= root.context.getString(
+                mainTxVw.text = currentTvShow.name
+                descriptionTxVw.text = root.context.getString(
                     R.string.stationinfo,
-                  if (currentTvShow.bitrate!="")currentTvShow.bitrate +if (currentTvShow.language!="" || currentTvShow.language != "")" kbps, " else " kbps " else ""  ,
-                    if(currentTvShow.country!="")currentTvShow.country +if (currentTvShow.language!="")", " else "" else "",
-                    if(currentTvShow.language!="")currentTvShow.language  else "")
+                    if (currentTvShow.bitrate != "")currentTvShow.bitrate + if (currentTvShow.language != "" || currentTvShow.language != "")" kbps, " else " kbps " else "",
+                    if (currentTvShow.country != "")currentTvShow.country + if (currentTvShow.language != "")", " else "" else "",
+                    if (currentTvShow.language != "")currentTvShow.language else ""
+                )
 
                     /*    fun stationInfo():String{
                  return if (currentTvShow.bitrate!=""&&currentTvShow.country!= "" && currentTvShow.language!= "")
@@ -89,23 +80,13 @@ import java.util.*
                    else ""
                }*/
 
-
-
-
-
-
-
-                    RadioFunction.loadImageString(
-                        root.context,
-                        currentTvShow.favicon ,
-                        MainActivity.imagedefaulterrorurl,
-                        ImageView,
-                        Constatnts.CORNER_RADIUS_8F
-                    )
-
-
-
-
+                RadioFunction.loadImageString(
+                    root.context,
+                    currentTvShow.favicon,
+                    MainActivity.imagedefaulterrorurl,
+                    ImageView,
+                    Constatnts.CORNER_RADIUS_8F
+                )
             }
         }
     }
@@ -129,26 +110,25 @@ import java.util.*
         }
     */
 
-
     class DiffCallback : DiffUtil.ItemCallback<RadioVariables>() {
         override fun areItemsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
             oldItem.stationuuid == newItem.stationuuid
 
-        override fun areContentsTheSame(oldItem: RadioVariables, newItem:RadioVariables) =
+        override fun areContentsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
             oldItem == newItem
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(
             RadioTiketMainBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
+                LayoutInflater.from(parent.context),
+                parent,
+                false
             )
         )
     }
 
-
-
-    override fun getItemCount() = items.size//differ.currentList.size
+    override fun getItemCount() = items.size // differ.currentList.size
 
     interface OnItemClickListener {
         fun onItemClick(radio: RadioVariables)
@@ -156,14 +136,13 @@ import java.util.*
     }
 
     override fun onBindViewHolder(holder: RadioAdapterVertical.MyViewHolder, position: Int) {
-        val currentTvShow = items[position]//radiodiffer[position]
+        val currentTvShow = items[position] // radiodiffer[position]
         holder.bind(currentTvShow)
     }
-
 
     override fun getSectionName(position: Int): String {
         var strTextview = items[position].name
         strTextview = strTextview.substring(0, 1)
-        return strTextview//String.format("%d", position + 1)
+        return strTextview // String.format("%d", position + 1)
     }
 }

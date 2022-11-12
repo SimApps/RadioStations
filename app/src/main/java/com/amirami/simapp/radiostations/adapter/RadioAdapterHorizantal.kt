@@ -10,16 +10,14 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
-import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import java.util.*
 
+// class RadioAdapterHorizantal (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterHorizantal.MyViewHolder>() {
 
-//class RadioAdapterHorizantal (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterHorizantal.MyViewHolder>() {
-
-    class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
-        ListAdapter<RadioVariables, RadioAdapterHorizantal.MyViewHolder>(DiffCallback()) {
+class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
+    ListAdapter<RadioVariables, RadioAdapterHorizantal.MyViewHolder>(DiffCallback()) {
 
     private val items = ArrayList<RadioVariables>()
     fun setItems(items: MutableList<RadioVariables>) {
@@ -28,82 +26,60 @@ import java.util.*
         notifyDataSetChanged()
     }
     inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) :
-        RecyclerView.ViewHolder(binding.root){
-
-
+        RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.apply {
-
-
 
                 cardViewMainRadio.setSafeOnClickListener {
 
                     if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
                         listener.onItemClick(items[bindingAdapterPosition])
-
-
                     }
                 }
-
-
-
             }
         }
 
-
-
-
-
-
-
-        fun bind(currentTvShow:  RadioVariables) {
+        fun bind(currentTvShow: RadioVariables) {
             binding.apply {
                 RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
                 RadioFunction.secondarytextviewColor(descriptionTxV, MainActivity.darkTheme)
 
                 //  holder.CountriesTxV.text = GlobalCountriesJson[position]
-                descriptionTxV.text = currentTvShow.stationcount //globalStationcountsJson[position]
-
+                descriptionTxV.text = currentTvShow.stationcount // globalStationcountsJson[position]
 
                 mainTxV.text = RadioFunction.countryCodeToName(currentTvShow.name)
-                    if(currentTvShow.stationuuid=="" &&  currentTvShow.name!= RadioFunction.countryCodeToName(currentTvShow.name)) {
-                        if (RadioFunction.isNumber(currentTvShow.name/*   globalCountriesJson[position]*/)) {
-                            mainTxV.text = currentTvShow.name //globalCountriesJson[position]
+                if (currentTvShow.stationuuid == "" && currentTvShow.name != RadioFunction.countryCodeToName(currentTvShow.name)) {
+                    if (RadioFunction.isNumber(currentTvShow.name/*   globalCountriesJson[position]*/)) {
+                        mainTxV.text = currentTvShow.name // globalCountriesJson[position]
 
-                            RadioFunction.loadImageString( root.context,"https://i.ibb.co/B31L5GW/error.jpg",
-                                MainActivity.imagedefaulterrorurl,
-                                imageViewRv,
-                                CORNER_RADIUS_8F
-                            )
+                        RadioFunction.loadImageString(
+                            root.context,
+                            "https://i.ibb.co/B31L5GW/error.jpg",
+                            MainActivity.imagedefaulterrorurl,
+                            imageViewRv,
+                            CORNER_RADIUS_8F
+                        )
+                    } else {
+                        RadioFunction.loadImageString(
+                            root.context,
+                            COUNTRY_FLAGS_BASE_URL + currentTvShow.name.lowercase(Locale.ROOT),
 
-                        }
-                        else  {
-                            RadioFunction.loadImageString(
-                                root.context,
-                                COUNTRY_FLAGS_BASE_URL + currentTvShow.name.lowercase(Locale.ROOT),
+                            MainActivity.imagedefaulterrorurl,
 
-                                MainActivity.imagedefaulterrorurl,
-
-                                imageViewRv,
-                                CORNER_RADIUS_8F
-                            )
-
-                        }
-
+                            imageViewRv,
+                            CORNER_RADIUS_8F
+                        )
                     }
-                    else if(currentTvShow.stationuuid!=""){
-                          RadioFunction.loadImageString(
-                              root.context,
-                              currentTvShow.favicon,
-                              MainActivity.imagedefaulterrorurl,//R.drawable.ic_radio_svg,
-                              imageViewRv,
-                              CORNER_RADIUS_8F
-                          )
-                      }
-
-
-
+                } else if (currentTvShow.stationuuid != "") {
+                    RadioFunction.loadImageString(
+                        root.context,
+                        currentTvShow.favicon,
+                        MainActivity.imagedefaulterrorurl, // R.drawable.ic_radio_svg,
+                        imageViewRv,
+                        CORNER_RADIUS_8F
+                    )
+                }
 
                 /*     cardViewMainRadio.setOnClickListener {
                          try {
@@ -126,11 +102,9 @@ import java.util.*
                          }
                      }*/
                 //    setAnimation(holder.itemView)
-
-
             }
         }
-        }
+    }
 
 /*
     private val diffCallback = object : DiffUtil.ItemCallback<RadioVariables>() {
@@ -152,35 +126,32 @@ import java.util.*
             differ.submitList(value)
         }*/
 
+    class DiffCallback : DiffUtil.ItemCallback<RadioVariables>() {
+        override fun areItemsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
+            oldItem.stationuuid == newItem.stationuuid
 
-        class DiffCallback : DiffUtil.ItemCallback<RadioVariables>() {
-            override fun areItemsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
-                oldItem.stationuuid == newItem.stationuuid
-
-            override fun areContentsTheSame(oldItem: RadioVariables, newItem:RadioVariables) =
-                oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
+            oldItem == newItem
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(
             RadioHorizontalrecyclervTiketBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
+                LayoutInflater.from(parent.context),
+                parent,
+                false
             )
         )
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val currentTvShow = items[position]//differ.currentList[position]
+        val currentTvShow = items[position] // differ.currentList[position]
         holder.bind(currentTvShow)
-
-
-
     }
 
-    override fun getItemCount() = items.size//differ.currentList.size
+    override fun getItemCount() = items.size // differ.currentList.size
 
     interface OnItemClickListener {
-        fun onItemClick(radio:  RadioVariables)
+        fun onItemClick(radio: RadioVariables)
     }
-
 }

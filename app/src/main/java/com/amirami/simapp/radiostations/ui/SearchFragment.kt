@@ -33,7 +33,6 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private lateinit var radioAdapterHorizantal: RadioAdapterVertical
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
@@ -41,38 +40,31 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorTransitionConstraint(binding.containerseach, 0,it)
+                    RadioFunction.gradiancolorTransitionConstraint(binding.containerseach, 0, it)
                 }
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putSearchQuery.collectLatest { query->
+                infoViewModel.putSearchQuery.collectLatest { query ->
                     //   DynamicToast.makeError(requireContext(), query , 3).show()
 
                     binding.itemErrorMessage.btnRetry.setOnClickListener {
-                        if (query!="") {
+                        if (query != "") {
                             retrofitRadioViewModel.changeBseUrl()
                             infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
                             retrofitRadioViewModel.getRadiosByName(query)
-                        }
-                        else {
-                            binding.itemErrorMessage.root.visibility= View.INVISIBLE
+                        } else {
+                            binding.itemErrorMessage.root.visibility = View.INVISIBLE
                         }
                     }
-
                 }
-
             }
         }
 
-
-
         setUpRv()
-
     }
-
 
     private fun setUpRv() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -80,33 +72,29 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                 retrofitRadioViewModel.responseRadioSreach.collectLatest { response ->
                     when (response.status) {
                         Status.SUCCESS -> {
-                            if(response.data!=null){
+                            if (response.data != null) {
                                 hideProgressBar()
-                                binding.itemErrorMessage.root.visibility= View.INVISIBLE
-                                //radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
+                                binding.itemErrorMessage.root.visibility = View.INVISIBLE
+                                // radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
                                 setupRadioLisRV()
                                 // DynamicToast.makeError(requireContext(), "query" , 3).show()
                                 radioAdapterHorizantal.setItems(response.data as MutableList<RadioVariables>)
-                            }
-                            else showErrorConnection(response.message!!)
-
+                            } else showErrorConnection(response.message!!)
                         }
                         Status.ERROR -> {
                             hideProgressBar()
                             showErrorConnection(response.message!!)
                         }
                         Status.LOADING -> {
-
                             displayProgressBar()
                         }
                     }
                 }
-
             }
         }
     }
-    private fun showErrorConnection(msg:String){
-        binding.itemErrorMessage.root.visibility= View.VISIBLE
+    private fun showErrorConnection(msg: String) {
+        binding.itemErrorMessage.root.visibility = View.VISIBLE
         binding.itemErrorMessage.tvErrorMessage.text = msg
     }
 
@@ -129,7 +117,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
             setHasFixedSize(true)
         }
     }
-    //exoplayer begin
+    // exoplayer begin
     /* public override fun onStart() {
          super.onStart()
          if(MainActivity.firstInitPlayer){
@@ -141,11 +129,6 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
      }
  */
 
-
-
-
-
-
     /*
     public override fun onStop() {
         Glide.with(this).clear(view)
@@ -155,12 +138,12 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
          }*/
     }
 */
-    //exoplayer end*/
+    // exoplayer end*/
 
     // receive data form fragments
     //  override fun iAmMSG(msg: String) {
-    //tv_activity.text = msg
-    //}
+    // tv_activity.text = msg
+    // }
 
     private fun closeKeyboard() {
         val view = requireActivity().currentFocus
@@ -171,25 +154,21 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
     }
 
     override fun onResume() {
-
         super.onResume()
 
+        closeKeyboard()
 
-            closeKeyboard()
-
-          //  GlobalQuery =""
+        //  GlobalQuery =""
     }
-
 
     override fun onItemClick(radio: RadioVariables) {
         try {
             MainActivity.imageLinkForNotification = radio.favicon
-            Exoplayer.initializePlayer(requireContext(),false, Uri.parse(radio.url_resolved))
+            Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.url_resolved))
             Exoplayer.startPlayer()
             infoViewModel.putRadiopalyerInfo(radio)
-           // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
+            // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
             //   startServices(context)
-
         } catch (e: IOException) {
             // Catch the exception
             e.printStackTrace()
@@ -200,13 +179,11 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
         } catch (e: IllegalStateException) {
             e.printStackTrace()
         }
-
     }
 
     override fun onMoreItemClick(radio: RadioVariables) {
         infoViewModel.putRadioInfo(radio)
         this@SearchFragment.findNavController().navigate(R.id.action_searchFragment_to_moreBottomSheetFragment) //     NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_searchFragment_to_moreBottomSheetFragment)
-
     }
 
 /*

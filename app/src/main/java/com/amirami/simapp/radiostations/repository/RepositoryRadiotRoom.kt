@@ -32,8 +32,8 @@ class RepositoryRadiotRoom @Inject constructor(
         )
     }*/
 
-    override suspend fun delete(radiouid: String?, fav: Boolean) {
-        radioDAO.delete(radiouid, fav)
+    override suspend fun delete(radiouId: String?, fav: Boolean) {
+        radioDAO.delete(radiouId, fav)
     }
     override suspend fun deletelistened(fav: Boolean) {
         radioDAO.deletelistened(fav)

@@ -15,10 +15,13 @@ class ControlActionsListener : BroadcastReceiver() {
         fun handlePlayPause() {
             if (Exoplayer.playWhenReady && Exoplayer.getIsPlaying) Exoplayer.pausePlayer()
             else {
-                if(Exoplayer.player ==null){
-                    if(Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(context, true,
-                        Uri.parse(""))
-                    else Exoplayer.initializePlayer(context, false,Uri.parse(""))
+                if (Exoplayer.player == null) {
+                    if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(
+                        context,
+                        true,
+                        Uri.parse("")
+                    )
+                    else Exoplayer.initializePlayer(context, false, Uri.parse(""))
                 }
                 Exoplayer.startPlayer()
             }
@@ -28,12 +31,11 @@ class ControlActionsListener : BroadcastReceiver() {
             handlePlayPause()
             Intent(this, NotificationChannelService::class.java).apply {
                 this.action = action
-                    try {
-                        if (isOreoPlus()) startForegroundService(this)
-                        else startService(this)
-                    } catch (ignored: Exception) { }
-
-                }
+                try {
+                    if (isOreoPlus()) startForegroundService(this)
+                    else startService(this)
+                } catch (ignored: Exception) { }
+            }
         }
 
         fun Context.stopallIntent(action: String) {
@@ -41,10 +43,9 @@ class ControlActionsListener : BroadcastReceiver() {
             Intent(this, NotificationChannelService::class.java).apply {
                 this.action = action
                 try {
-                    if(!is_downloading)  stopService(this)
+                    if (!is_downloading) stopService(this)
                 } catch (ignored: Exception) { }
             }
-
         }
 
         fun Context.stopIntent(action: String) {
@@ -52,16 +53,11 @@ class ControlActionsListener : BroadcastReceiver() {
             Intent(this, NotificationChannelService::class.java).apply {
                 this.action = action
             }
-
         }
         when (val action = intent.action) {
-            PLAYPAUSE  -> context.playpauseIntent(action)
+            PLAYPAUSE -> context.playpauseIntent(action)
             STOP -> context.stopIntent(action)
             STOPALL -> context.stopallIntent(action)
         }
-
-
     }
-
-
 }

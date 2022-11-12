@@ -37,7 +37,6 @@ object DataInterval {
             return DataTimeInterval(start, end)
         }
 
-
     val last7days: DataTimeInterval
         get() {
             val calendar = Calendar.getInstance()

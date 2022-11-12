@@ -7,6 +7,8 @@ import android.content.IntentSender
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -41,7 +43,8 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 @AndroidEntryPoint
-class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
+class FavoriteRadioFragment :
+    Fragment(R.layout.fragment_favorite),
     RadioFavoriteAdapterVertical.OnItemClickListener {
     //  private var currentNativeAdFavori:  NativeAd? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
@@ -51,26 +54,38 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
     private lateinit var binding: FragmentFavoriteBinding
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterVertical
 
-       lateinit   var appUpdateManager: AppUpdateManager
-       private val REQUEST_APP_UPDATE = 560
-       private var installStateUpdatedListener: InstallStateUpdatedListener? = null
+    lateinit var appUpdateManager: AppUpdateManager
+    private val REQUEST_APP_UPDATE = 560
+    private var installStateUpdatedListener: InstallStateUpdatedListener? = null
+
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+
+        if (result.resultCode == REQUEST_APP_UPDATE) {
+            if (result.resultCode == RESULT_CANCELED) {
+                errorToast(requireContext(), "Update canceled!")
+                //  checkUpdate()
+            } else if (result.resultCode != RESULT_IN_APP_UPDATE_FAILED) {
+                errorToast(requireContext(), result.resultCode.toString())
+                checkUpdate()
+            } else if (result.resultCode != RESULT_OK) {
+                errorToast(requireContext(), result.resultCode.toString())
+                checkUpdate()
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFavoriteBinding.bind(view)
 
-          appUpdateManager = AppUpdateManagerFactory.create(requireContext())
-
+        appUpdateManager = AppUpdateManagerFactory.create(requireContext())
 
         setTheme()
         infoViewModel.putTitleText(getString(R.string.Favoris))
         setupRadioLisRV()
         getFavRadioRoom()
 
-
-
-
         //  setContentView(R.layout.activity_favorite_main_activity)
-
 
         binding.floatingActionAddStream.setSafeOnClickListener {
             val action = FavoriteRadioFragmentDirections.actionFavoriteRadioFragmentToAddDialogueBottomSheetFragment(false)
@@ -82,14 +97,11 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorTransitionConstraint(binding.containerfav, 0,it)
-
+                    RadioFunction.gradiancolorTransitionConstraint(binding.containerfav, 0, it)
                 }
             }
         }
-
     }
-
 
     private fun setupRadioLisRV() {
         radioFavoriteAdapterVertical = RadioFavoriteAdapterVertical(this)
@@ -112,19 +124,12 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
                 populateRecyclerView(radioRoom)
                 binding.whenemptyfavImage.visibility = View.GONE
                 binding.rv.visibility = View.VISIBLE
-
-
             } else {
                 binding.whenemptyfavImage.visibility = View.VISIBLE
                 binding.rv.visibility = View.INVISIBLE
             }
-
-
         }
-
     }
-
-
 
     private fun populateRecyclerView(radioRoom: MutableList<RadioRoom>) {
         if (radioRoom.isNotEmpty()) {
@@ -138,7 +143,7 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
     override fun onItemClick(radioRoom: RadioRoom) {
         try {
             MainActivity.imageLinkForNotification = radioRoom.favicon
-            initializePlayer(requireContext(),false, Uri.parse(radioRoom.streamurl))
+            initializePlayer(requireContext(), false, Uri.parse(radioRoom.streamurl))
             startPlayer()
             val radioVariables = RadioVariables()
             radioVariables.apply {
@@ -156,9 +161,7 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
 
             infoViewModel.putRadiopalyerInfo(radioVariables)
 
-
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
-
         } catch (e: IOException) {
             // Catch the exception
             e.printStackTrace()
@@ -188,11 +191,8 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
         this@FavoriteRadioFragment.findNavController().navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment) //      NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment)
     }
 
-
-
-
-    private fun checkUpdate(){
-       // appUpdateManager = AppUpdateManagerFactory.create(requireContext())
+    private fun checkUpdate() {
+        // appUpdateManager = AppUpdateManagerFactory.create(requireContext())
 
         /*
 // Returns an intent object that you use to check for an update.
@@ -231,67 +231,65 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
 */
 
         installStateUpdatedListener = InstallStateUpdatedListener { state ->
-                when {
-                    state.installStatus() == InstallStatus.DOWNLOADED -> {
-                        appUpdateManager.completeUpdate()
-                    }
-                    state.installStatus() == InstallStatus.INSTALLED -> {
-                        // if (appUpdateManager != null) {
-                        appUpdateManager.unregisterListener(installStateUpdatedListener!!)
-                        // }
-                    }
-                    else -> {
-                      //  Log.i(TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
-                    }
+            when {
+                state.installStatus() == InstallStatus.DOWNLOADED -> {
+                    appUpdateManager.completeUpdate()
+                }
+                state.installStatus() == InstallStatus.INSTALLED -> {
+                    // if (appUpdateManager != null) {
+                    appUpdateManager.unregisterListener(installStateUpdatedListener!!)
+                    // }
+                }
+                else -> {
+                    //  Log.i(TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
                 }
             }
+        }
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo: AppUpdateInfo ->
             //    Log.d("TAG", "here")
-                // Checks that the platform will allow the specified type of update.
-                if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
-                    || (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)) {
-                    // Request the update.
-                    try {
+            // Checks that the platform will allow the specified type of update.
+            if ((
+                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+                ) ||
+                (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)
+            ) {
+                // Request the update.
+                try {
                     //    Log.d("TAG", "here")
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            AppUpdateType.IMMEDIATE,
-                            requireActivity(),
-                            REQUEST_APP_UPDATE
-                        )
-                    } catch (e: IntentSender.SendIntentException) {
-                        e.printStackTrace()
-                    }
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE,
+                        requireActivity(),
+                        REQUEST_APP_UPDATE
+                    )
+
+                    startForResult.launch(Intent(requireContext(), FavoriteRadioFragment::class.java))
+                } catch (e: IntentSender.SendIntentException) {
+                    e.printStackTrace()
                 }
             }
+        }
 
         appUpdateManager.registerListener(installStateUpdatedListener!!)
-
     }
 
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+  /*  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_APP_UPDATE) {
             if (resultCode == RESULT_CANCELED) {
                 errorToast(requireContext(), "Update canceled!")
-              //  checkUpdate()
-            }
-            else if(resultCode != RESULT_IN_APP_UPDATE_FAILED){
+                //  checkUpdate()
+            } else if (resultCode != RESULT_IN_APP_UPDATE_FAILED) {
                 errorToast(requireContext(), resultCode.toString())
                 checkUpdate()
-            }
-            else if (resultCode != RESULT_OK){
+            } else if (resultCode != RESULT_OK) {
                 errorToast(requireContext(), resultCode.toString())
                 checkUpdate()
             }
         }
     }
-
-
-
+*/
     override fun onStop() {
         super.onStop()
         appUpdateManager.unregisterListener(installStateUpdatedListener!!)
@@ -310,5 +308,4 @@ class FavoriteRadioFragment : Fragment(R.layout.fragment_favorite),
                     appUpdateManager.completeUpdate()                }
             }*/
     }
-
 }

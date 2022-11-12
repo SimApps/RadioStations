@@ -1,6 +1,5 @@
 package com.amirami.simapp.radiostations.di
 
-
 import com.amirami.simapp.radiostations.MainActivity.Companion.BASE_URL
 import com.amirami.simapp.radiostations.api.ApiService
 import dagger.Module
@@ -26,5 +25,4 @@ object RetrofitModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
-
 }

@@ -1,6 +1,5 @@
 package com.amirami.simapp.radiostations
 
-
 import alirezat775.lib.downloader.Downloader
 import alirezat775.lib.downloader.core.OnDownloadListener
 import android.Manifest
@@ -50,7 +49,6 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
-import com.amirami.simapp.radiostations.alarm.BootCompleteReceiver
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.utils.Constatnts.RECORDS_FILE_NAME
@@ -60,18 +58,15 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
-import com.google.firebase.auth.FirebaseAuth
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import java.io.File
 import java.lang.reflect.Field
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 object RadioFunction {
-    fun getCurrentDate():Long{
-
-        return System.currentTimeMillis() //DateFormat.getDateTimeInstance().format(currentDate) // formated
+    fun getCurrentDate(): Long {
+        return System.currentTimeMillis() // DateFormat.getDateTimeInstance().format(currentDate) // formated
     }
     fun shortformateDate(Date: Long): String {
         // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
@@ -107,8 +102,8 @@ object RadioFunction {
                     intent.putExtra(
                         Intent.EXTRA_TEXT,
                         "I am listening to $radioName recorded with ${context.resources.getString(R.string.app_name)} application.\n" +
-                                "Information about redorded file : $icyandState \n" +
-                                "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
+                            "Information about redorded file : $icyandState \n" +
+                            "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
                     )
                     intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : $radioName")
                     context.startActivity(
@@ -118,7 +113,7 @@ object RadioFunction {
                         )
                     )
                 } catch (e: Exception) {
-                    //e.toString();
+                    // e.toString();
                 }
             } else {
                 try {
@@ -128,12 +123,12 @@ object RadioFunction {
                     intent.putExtra(
                         Intent.EXTRA_TEXT,
                         "I am listening to $radioName on ${context.resources.getString(R.string.app_name)}  application.\n" +
-                                "Radio Homepage : $radioHomepage \n" +
-                                "Radio Stream URL : $radioStreamURL \n" +
-                                "Radio Country : $radioCountry  \n" +
-                                "Radio Language : $radioLanguage \n" +
-                                "Radio Bitrate : $radioBitrate \n \n" +
-                                "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
+                            "Radio Homepage : $radioHomepage \n" +
+                            "Radio Stream URL : $radioStreamURL \n" +
+                            "Radio Country : $radioCountry  \n" +
+                            "Radio Language : $radioLanguage \n" +
+                            "Radio Bitrate : $radioBitrate \n \n" +
+                            "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
                     )
                     intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : $radioName")
                     context.startActivity(
@@ -142,9 +137,8 @@ object RadioFunction {
                             "Share Radio Information Via"
                         )
                     )
-
                 } catch (e: Exception) {
-                    //e.toString();
+                    // e.toString();
                 }
             }
         } else DynamicToast.makeError(
@@ -152,10 +146,7 @@ object RadioFunction {
             context.resources.getString(R.string.Select_radio_toshare),
             9
         ).show()
-
-
     }
-
 
   /*  fun startServices(context: Context) {
         try {
@@ -175,25 +166,20 @@ object RadioFunction {
         }
     }*/
 
-
-     fun startServices(context: Context) {
-       if (player != null) {
+    fun startServices(context: Context) {
+        if (player != null) {
             val serviceIntent = Intent(context, NotificationChannelService::class.java)
-           // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
+            // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
 
             if (isOreoPlus()) context.startForegroundService(serviceIntent)
-             else context.startService(serviceIntent)
-
+            else context.startService(serviceIntent)
         }
-
     }
-    fun stopService(context: Context, stopplayer:Boolean) {
-        if(stopplayer) Exoplayer.releasePlayer(context)
+    fun stopService(context: Context, stopplayer: Boolean) {
+        if (stopplayer) Exoplayer.releasePlayer(context)
         val serviceIntent = Intent(context, NotificationChannelService::class.java)
         context.stopService(serviceIntent)
-
     }
-
 
     fun unwrap(context: Context): Activity {
         var scontext = context
@@ -202,7 +188,6 @@ object RadioFunction {
         }
         return scontext as Activity
     }
-
 
     fun countryCodeToName(GlobalCountriesJsons: String?): String {
         return when (GlobalCountriesJsons!!.uppercase()) {
@@ -458,25 +443,18 @@ object RadioFunction {
             "XK" -> "Kosovo"
             else -> GlobalCountriesJsons
         }
-
-
     }
 
     fun isNumber(s: String?): Boolean =
         if (s.isNullOrEmpty()) false else s.all { Character.isDigit(it) }
 
-
     fun getDownloader(context: Context) {
-
-
         var recordFileName =
             GlobalRadioName + "_ _" + " " + icyandState + "___" + System.currentTimeMillis()
         recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
 
-
         //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
         //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
-
 
         downloader = Downloader.Builder(context, GlobalRadiourl.toString())
             .downloadListener(object : OnDownloadListener {
@@ -502,7 +480,6 @@ object RadioFunction {
                             9
                         ).show()
                         startServices(unwrap(context))
-
                     }
                 }
 
@@ -546,7 +523,6 @@ object RadioFunction {
                 override fun onProgressUpdate(percent: Int, downloadedSize: Int, totalSize: Int) {
                     Exoplayer.is_downloading = true
 
-
                     handlers.post {
                         Exoplayer.Observer.changeImageRecord(
                             "Main record image view",
@@ -561,13 +537,11 @@ object RadioFunction {
                         //   size_txt.text = getSize(downloadedSize)
                         //   total_size_txt.text = getSize(totalSize)
                         //  download_progress.progress = percent
-
                     }
                     // Log.d(TAG, "onProgressUpdate: percent --> $percent downloadedSize --> $downloadedSize totalSize --> $totalSize ")
                 }
 
                 override fun onCompleted(file: File?) {
-
                     Exoplayer.is_downloading = false
 
                     handlers.post {
@@ -581,10 +555,12 @@ object RadioFunction {
                         )
 
                         DynamicToast.make(
-                            context, "Recording Saved",
+                            context,
+                            "Recording Saved",
                             getDrawable(context, R.drawable.rec_on),
                             getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium), 9
+                            getColor(context, R.color.violet_medium),
+                            9
                         ).show()
 
                         startServices(unwrap(context))
@@ -593,10 +569,7 @@ object RadioFunction {
                 }
 
                 override fun onFailure(reason: String?) {
-
-
                     handlers.post {
-
                         Exoplayer.is_downloading = false
                         Exoplayer.Observer.changeImageRecord(
                             "Main record image view",
@@ -607,7 +580,6 @@ object RadioFunction {
                             R.drawable.stop_2
                         )
 
-
                         DynamicToast.makeError(context, reason!!, 9).show()
 
                         startServices(unwrap(context))
@@ -616,7 +588,6 @@ object RadioFunction {
                 }
 
                 override fun onCancel() {
-
                     handlers.post {
                         Exoplayer.is_downloading = false
                         Exoplayer.Observer.changeImageRecord(
@@ -629,12 +600,13 @@ object RadioFunction {
                         )
 
                         DynamicToast.make(
-                            context, "Recording Saved",
+                            context,
+                            "Recording Saved",
                             getDrawable(context, R.drawable.rec_on),
                             getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium), 9
+                            getColor(context, R.color.violet_medium),
+                            9
                         ).show()
-
 
                         startServices(unwrap(context))
                     }
@@ -642,19 +614,14 @@ object RadioFunction {
                 }
             }).fileName(recordFileName, "mp3").downloadDirectory(getDownloadDir(context).toString())
             .build()
-
-
     }
 
-
     fun getCutomDownloader(context: Context, nameRecord: String, url: String) {
-
         //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
         // var recordFileName= nameRecord+ "_ _"  + sdfDate.format(Date())
 
         var recordFileName = nameRecord + "_ _" + System.currentTimeMillis()
         recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
-
 
         customdownloader =
             Downloader.Builder(context, url).downloadListener(object : OnDownloadListener {
@@ -710,7 +677,6 @@ object RadioFunction {
                         Exoplayer.Observer.changeText("text view", "Download Completed")
                     }
                     // Log.d(TAG, "onPause")
-
                 }
 
                 override fun onResume() {
@@ -781,7 +747,6 @@ object RadioFunction {
                 }
 
                 override fun onCompleted(file: File?) {
-
                     isDownloadingCustomurl = false
                     // icy="Download Completed"
 
@@ -799,10 +764,12 @@ object RadioFunction {
                             R.drawable.ic_download_button
                         )
                         DynamicToast.make(
-                            context, "Download Complete",
+                            context,
+                            "Download Complete",
                             getDrawable(context, R.drawable.rec_on),
                             getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium), 9
+                            getColor(context, R.color.violet_medium),
+                            9
                         ).show()
                         Exoplayer.Observer.changeText("Main text view", "Download Completed")
                         Exoplayer.Observer.changeText("text view", "Download Completed")
@@ -811,7 +778,6 @@ object RadioFunction {
                 }
 
                 override fun onFailure(reason: String?) {
-
                     isDownloadingCustomurl = false
 
                     handlers.post {
@@ -841,7 +807,6 @@ object RadioFunction {
                 }
 
                 override fun onCancel() {
-
                     isDownloadingCustomurl = false
 
                     handlers.post {
@@ -862,20 +827,19 @@ object RadioFunction {
                         )
 
                         DynamicToast.make(
-                            context, "Download Saved",
+                            context,
+                            "Download Saved",
                             getDrawable(context, R.drawable.rec_on),
                             getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium), 9
+                            getColor(context, R.color.violet_medium),
+                            9
                         ).show()
                     }
                     //  Log.d(TAG, "onCancel")
                 }
             }).fileName(recordFileName, "").downloadDirectory(getDownloadDir(context).toString())
                 .build()
-
-
     }
-
 
     fun removeWord(value: String, wordtoremove: String): String {
         var result = ""
@@ -892,15 +856,12 @@ object RadioFunction {
                     j++
                 }
             } else {
-
                 result += possibleMatch
                 possibleMatch = ""
 
                 if (j == 0) {
-
                     result += value[i]
                 } else {
-
                     j = 0
                     i-- // re-test
                 }
@@ -922,18 +883,18 @@ object RadioFunction {
             byte /= 1024
         }
         return String.format(
-            Locale.getDefault(), "%1$,.1f %2\$s", byte * 1024,
+            Locale.getDefault(),
+            "%1$,.1f %2\$s",
+            byte * 1024,
             str[str.size - 1]
         )
     }
-
 
     fun deleteRecordedItem(index: Int, context: Context) {
         val file = getDownloadDir(context).listFiles()!![index]
 
         try {
             deleteAllFileAndContents(file, context)
-
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -941,7 +902,6 @@ object RadioFunction {
 
     private fun deleteAllFileAndContents(@NonNull file: File, context: Context) {
         if (file.exists()) {
-
             /*
               // if (file.isDirectory) {
                    val contents = file.listFiles()
@@ -953,7 +913,6 @@ object RadioFunction {
              //  }
                */
 
-
             val result = file.delete()
             if (result) errorToast(
                 context,
@@ -963,10 +922,8 @@ object RadioFunction {
                 context,
                 context.getString(R.string.errorDeleteRecord, shortRecordFileName(file))
             )
-
         }
     }
-
 
     fun shortRecordFileName(@NonNull file: File): String {
         return if (file.name.contains("_ _", true)) file.name.substring(
@@ -976,7 +933,6 @@ object RadioFunction {
         else file.name
     }
 
-
     fun String?.indexesOf(substr: String, ignoreCase: Boolean = true): List<Int> {
         return this?.let {
             val regex = if (ignoreCase) Regex(substr, RegexOption.IGNORE_CASE) else Regex(substr)
@@ -984,16 +940,19 @@ object RadioFunction {
         } ?: emptyList()
     }
 
-
     fun allPermissionsGranted(context: Context): Boolean {
-        if ((checkSelfPermission(
-                context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED) &&
-            (checkSelfPermission(
-                context,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED)
+        if ((
+            checkSelfPermission(
+                    context,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) &&
+            (
+                checkSelfPermission(
+                        context,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                )
         ) {
             // Permission is not granted
             return false
@@ -1002,17 +961,15 @@ object RadioFunction {
     }
 
     fun openRecordFolder(context: Context) {
-
         if (getDownloadDir(context).exists()) {
-
             // val intent = Intent(Intent.ACTION_GET_CONTENT)
-            //val intent = Intent(Intent.ACTION_VIEW)
+            // val intent = Intent(Intent.ACTION_VIEW)
             val uri = Uri.parse(getDownloadDir(context).absolutePath)
 
             val intent = Intent(Intent.ACTION_VIEW).apply {
-               // addCategory(Intent.CATEGORY_OPENABLE)
+                // addCategory(Intent.CATEGORY_OPENABLE)
                 setDataAndType(uri, "*/*")
-                //data = uri
+                // data = uri
             }
 
             try {
@@ -1041,15 +998,13 @@ object RadioFunction {
                  // Did not find any activity capable of handling that intent on our system
                  DynamicToast.makeError(context,context.resources.getString(R.string.filemanagernotfound) , 9).show()
              }*/
-
-
         }
     }
 
-     private fun getDownloadDir(context: Context): File {
+    private fun getDownloadDir(context: Context): File {
         val f = File(
-            getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString()
-                    + File.separator + RECORDS_FILE_NAME
+            getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString() +
+                File.separator + RECORDS_FILE_NAME
         )
       /*  val f = File(
             context.getExternalFilesDir(null).toString()
@@ -1065,14 +1020,14 @@ object RadioFunction {
 
     fun getRecordedFiles(context: Context): ArrayList<RecordInfo> {
         val RcordInfo = ArrayList<RecordInfo>()
-        //TARGET FOLDER
+        // TARGET FOLDER
         var s: RecordInfo
         if (getDownloadDir(context).exists()) {
-            //GET ALL FILES IN DOWNLOAD FOLDER
+            // GET ALL FILES IN DOWNLOAD FOLDER
             val files = getDownloadDir(context).listFiles()
             if (files != null) {
                 if (files.isNotEmpty()) {
-                    //LOOP THRU THOSE FILES GETTING NAME AND URI
+                    // LOOP THRU THOSE FILES GETTING NAME AND URI
                     for (i in files.indices) {
                         val file = files[i]
                         s = RecordInfo()
@@ -1087,8 +1042,6 @@ object RadioFunction {
         } else {
             DynamicToast.makeError(context, "not found", 3).show()
         }
-
-
 
         return RcordInfo
     }
@@ -1108,9 +1061,8 @@ object RadioFunction {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     mInterstitialAd = interstitialAd
                 }
-            })
-
-
+            }
+        )
     }
 
     fun interatialadsShow(context: Context) {
@@ -1129,7 +1081,8 @@ object RadioFunction {
                         override fun onAdLoaded(interstitialAd: InterstitialAd) {
                             mInterstitialAd = interstitialAd
                         }
-                    })
+                    }
+                )
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
@@ -1145,20 +1098,16 @@ object RadioFunction {
         } else {
             Log.d("TAG", "The interstitial ad wasn't ready yet.")
         }
-
-
     }
-
 
     fun loadImageString(
         context: Context,
         mainiconSting: String,
         erroricon: Int,
         imageview: ImageView,
-        cornerRadius:Float
+        cornerRadius: Float
     ) {
-
-       if (!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)) {
+        if (!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)) {
             val imageLoader = ImageLoader.Builder(context)
                 .components {
                     add(SvgDecoder.Factory())
@@ -1168,13 +1117,13 @@ object RadioFunction {
                 .build()
 
             imageview.load(mainiconSting, imageLoader) {
-               // if (mainiconSting.contains(COUNTRY_FLAGS_BASE_URL))
-                    transformations(RoundedCornersTransformation(/*16f*/cornerRadius))
-              //  else transformations(RoundedCornersTransformation(8f))
+                // if (mainiconSting.contains(COUNTRY_FLAGS_BASE_URL))
+                transformations(RoundedCornersTransformation(/*16f*/cornerRadius))
+                //  else transformations(RoundedCornersTransformation(8f))
                 error(erroricon)
                 diskCachePolicy(CachePolicy.ENABLED)
                 memoryCachePolicy(CachePolicy.ENABLED)
-                placeholder(erroricon) //image shown when loading image
+                placeholder(erroricon) // image shown when loading image
             }
         }
     }
@@ -1185,19 +1134,15 @@ object RadioFunction {
             error(erroricon)
             diskCachePolicy(CachePolicy.ENABLED)
             memoryCachePolicy(CachePolicy.ENABLED)
-            placeholder(erroricon) //image shown when loading image
+            placeholder(erroricon) // image shown when loading image
         }
     }
-
-
 
     fun switchColor(switch: SwitchCompat, theme: Boolean) {
         if (theme) {
             switch.setTextColor(parseColor("#FFFFFF"))
-
         } else {
             switch.setTextColor(parseColor("#000000"))
-
         }
     }
 
@@ -1206,14 +1151,10 @@ object RadioFunction {
         else textcolor.setTextColor(parseColor("#000000"))
     }
 
-
-
     fun secondarytextviewColor(textcolor: TextView, theme: Boolean) {
         if (theme) textcolor.setTextColor(parseColor("#BABABA"))
         else textcolor.setTextColor(parseColor("#0E0E0E"))
     }
-
-
 
     @SuppressLint("SoonBlockedPrivateApi")
     fun setNumberPickerTextColor(numberPicker: NumberPicker, theme: Boolean) {
@@ -1221,8 +1162,8 @@ object RadioFunction {
             val selectorWheelPaintField: Field = numberPicker.javaClass
                 .getDeclaredField("mSelectorWheelPaint")
             selectorWheelPaintField.isAccessible = true
-            (selectorWheelPaintField.get(numberPicker) as Paint).color = if (theme)
-                parseColor("#BABABA") else parseColor("#000000")
+            (selectorWheelPaintField.get(numberPicker) as Paint).color = if (theme) {
+                parseColor("#BABABA") } else parseColor("#000000")
         } catch (e: NoSuchFieldException) {
             Log.w("setNumberPickerTxtColor", e)
         } catch (e: IllegalAccessException) {
@@ -1234,13 +1175,12 @@ object RadioFunction {
         for (i in 0 until count) {
             val child = numberPicker.getChildAt(i)
             if (child is EditText) child.setTextColor(
-                if (theme)
-                    parseColor("#BABABA") else parseColor("#000000")
+                if (theme) {
+                    parseColor("#BABABA") } else parseColor("#000000")
             )
         }
         numberPicker.invalidate()
     }
-
 
     fun nativeadstexViewColor(
         textcolor1: TextView,
@@ -1256,38 +1196,32 @@ object RadioFunction {
             textcolor3.setTextColor(parseColor("#BABABA"))
             textcolor4.setTextColor(parseColor("#BABABA"))
             textcolor5.setTextColor(parseColor("#BABABA"))
-
         } else {
             textcolor1.setTextColor(parseColor("#000000"))
             textcolor2.setTextColor(parseColor("#000000"))
             textcolor3.setTextColor(parseColor("#000000"))
             textcolor4.setTextColor(parseColor("#000000"))
             textcolor5.setTextColor(parseColor("#000000"))
-
         }
     }
 
     fun buttonColor(buttoncolor: Button, theme: Boolean) {
         if (theme) buttoncolor.setTextColor(parseColor("#FFFFFF"))
         else buttoncolor.setTextColor(parseColor("#000000"))
-
     }
-
-
 
     fun cardViewColor(cardView: CardView, theme: Boolean) {
         if (theme) cardView.setCardBackgroundColor(parseColor("#26CAEEFF"))
         else cardView.setCardBackgroundColor(parseColor("#f8f9fa"))
     }
 
-
     fun textcolorSearchviewTransition(
         container: androidx.appcompat.widget.SearchView,
         theme: Boolean
     ) {
         if (!theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
+            color1 = parseColor("#000000") // -256
+            color2 = parseColor("#000000") // -65536
             color3 = parseColor("#000000")
             color4 = parseColor("#000000")
         } else {
@@ -1297,13 +1231,11 @@ object RadioFunction {
             color4 = parseColor("#FFFFFF")
         }
 
-
-        //val searchView = findViewById(R.id.search) as SearchView
+        // val searchView = findViewById(R.id.search) as SearchView
         val searchEditText = container.findViewById(R.id.search_src_text) as EditText
         searchEditText.setTextColor(color1)
         searchEditText.setHintTextColor(color1)
     }
-
 
     fun gradiancolorNestedScrollViewTransitionseconcolor(
         container: NestedScrollView,
@@ -1311,8 +1243,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#070326")//-256
-            color2 = parseColor("#070326")//-65536
+            color1 = parseColor("#070326") // -256
+            color2 = parseColor("#070326") // -65536
             color3 = parseColor("#070326")
             color4 = parseColor("#070326")
         } else {
@@ -1322,15 +1254,16 @@ object RadioFunction {
             color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
@@ -1344,8 +1277,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
+            color1 = parseColor("#000000") // -256
+            color2 = parseColor("#000000") // -65536
             color3 = parseColor("#000000")
             color4 = parseColor("#000000")
         } else {
@@ -1355,15 +1288,16 @@ object RadioFunction {
             color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
@@ -1371,11 +1305,10 @@ object RadioFunction {
         trans.startTransition(duration)
     }
 
-
     fun gradiancolorTransition(container: RelativeLayout, duration: Int, theme: Boolean) {
         if (theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
+            color1 = parseColor("#000000") // -256
+            color2 = parseColor("#000000") // -65536
             color3 = parseColor("#000000")
             color4 = parseColor("#000000")
         } else {
@@ -1385,15 +1318,16 @@ object RadioFunction {
             color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
@@ -1407,8 +1341,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#070326")//-256
-            color2 = parseColor("#070326")//-65536
+            color1 = parseColor("#070326") // -256
+            color2 = parseColor("#070326") // -65536
             color3 = parseColor("#070326")
             color4 = parseColor("#070326")
         } else {
@@ -1418,15 +1352,16 @@ object RadioFunction {
             color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
@@ -1440,8 +1375,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#070326")//-256
-            color2 = parseColor("#070326")//-65536
+            color1 = parseColor("#070326") // -256
+            color2 = parseColor("#070326") // -65536
             color3 = parseColor("#070326")
             color4 = parseColor("#070326")
         } else {
@@ -1451,15 +1386,16 @@ object RadioFunction {
             color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
@@ -1473,8 +1409,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
+            color1 = parseColor("#000000") // -256
+            color2 = parseColor("#000000") // -65536
             color3 = parseColor("#000000")
             color4 = parseColor("#000000")
         } else {
@@ -1484,15 +1420,16 @@ object RadioFunction {
             color4 = parseColor("#FFFFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
@@ -1500,15 +1437,14 @@ object RadioFunction {
         trans.startTransition(duration)
     }
 
-
     fun gradiancolorLinearlayoutTransitionBottomSheet(
         container: LinearLayout,
         duration: Int,
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#070326")//-256
-            color2 = parseColor("#070326")//-65536
+            color1 = parseColor("#070326") // -256
+            color2 = parseColor("#070326") // -65536
             color3 = parseColor("#070326")
             color4 = parseColor("#070326")
         } else {
@@ -1518,27 +1454,27 @@ object RadioFunction {
             color4 = parseColor("#F0FFFF")
         }
         val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color1, color2)
         )
         gd1.cornerRadius = 0f
 
         val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4)
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(color3, color4)
         )
         gd.cornerRadius = 0f
-
 
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
         container.background = trans
         trans.startTransition(duration)
-
     }
 
     fun gradiancolorLinearlayoutTransition(container: LinearLayout, duration: Int, theme: Boolean) {
         if (theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
+            color1 = parseColor("#000000") // -256
+            color2 = parseColor("#000000") // -65536
             color3 = parseColor("#000000")
             color4 = parseColor("#000000")
         } else {
@@ -1555,12 +1491,10 @@ object RadioFunction {
             GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
-
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
         container.background = trans
         trans.startTransition(duration)
-
     }
 
     fun gradiancolorConstraintLayoutTransitionBottomsheet(
@@ -1569,8 +1503,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#070326")//-256
-            color2 = parseColor("#070326")//-65536
+            color1 = parseColor("#070326") // -256
+            color2 = parseColor("#070326") // -65536
             color3 = parseColor("#070326")
             color4 = parseColor("#070326")
         } else {
@@ -1587,12 +1521,10 @@ object RadioFunction {
             GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
-
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
         container.background = trans
         trans.startTransition(duration)
-
     }
 
     fun gradiancolorConstraintLayoutTransition(
@@ -1601,8 +1533,8 @@ object RadioFunction {
         theme: Boolean
     ) {
         if (theme) {
-            color1 = parseColor("#000000")//-256
-            color2 = parseColor("#000000")//-65536
+            color1 = parseColor("#000000") // -256
+            color2 = parseColor("#000000") // -65536
             color3 = parseColor("#000000")
             color4 = parseColor("#000000")
         } else {
@@ -1619,17 +1551,13 @@ object RadioFunction {
             GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
-
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
         container.background = trans
         trans.startTransition(duration)
-
     }
 
-
     fun gradiancolorNativeAdslayout(container: FrameLayout, duration: Int) {
-
         color1 = parseColor("#00000000")
         color2 = parseColor("#00000000")
         color3 = parseColor("#00000000")
@@ -1642,7 +1570,6 @@ object RadioFunction {
             GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
         gd.cornerRadius = 0f
 
-
         val color = arrayOf(gd, gd1)
         val trans = TransitionDrawable(color)
         container.background = trans
@@ -1650,26 +1577,19 @@ object RadioFunction {
     }
 
     fun parseColor(colorString: String): Int {
-
         return colorString.toColorInt()
     }
 
-
-
-
     fun nativeSmallAds(context: Context, ad_frame: FrameLayout, adView: NativeAdView) {
         fun populateUnifiedNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
-
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.
             currentNativeAd?.destroy()
             currentNativeAd = nativeAd
 
-
             // Set the media view. Media content will be automatically populated in the media view once
             // adView.setNativeAd() is called.
             adView.mediaView = adView.findViewById(R.id.ad_media)
-
 
             // Set other ad assets.
             adView.headlineView = adView.findViewById(R.id.ad_headline)
@@ -1680,7 +1600,6 @@ object RadioFunction {
             adView.starRatingView = adView.findViewById(R.id.ad_stars)
             adView.storeView = adView.findViewById(R.id.ad_store)
             adView.advertiserView = adView.findViewById(R.id.ad_advertiser)
-
 
             if (adView.headlineView != null) {
                 nativeadstexViewColor(
@@ -1698,25 +1617,21 @@ object RadioFunction {
                 // These assets aren't guaranteed to be in every UnifiedNativeAd, so it's important to
                 // check before trying to display them.
                 if (nativeAd.body == null) {
-                    adView.bodyView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.bodyView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.bodyView!!.visibility = View.VISIBLE
                     (adView.bodyView as TextView).text = nativeAd.body
                 }
 
                 if (nativeAd.callToAction == null) {
-                    adView.callToActionView!!.visibility = View.INVISIBLE//INVISIBLE
-
-
+                    adView.callToActionView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.callToActionView!!.visibility = View.VISIBLE
                     (adView.callToActionView as Button).text = nativeAd.callToAction
-
-
                 }
 
                 if (nativeAd.icon == null) {
-                    adView.iconView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.iconView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     (adView.iconView as ImageView).setImageDrawable(
                         nativeAd.icon!!.drawable
@@ -1725,28 +1640,28 @@ object RadioFunction {
                 }
 
                 if (nativeAd.price == null) {
-                    adView.priceView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.priceView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.priceView!!.visibility = View.VISIBLE
                     (adView.priceView as TextView).text = nativeAd.price
                 }
 
                 if (nativeAd.store == null) {
-                    adView.storeView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.storeView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     adView.storeView!!.visibility = View.VISIBLE
                     (adView.storeView as TextView).text = nativeAd.store
                 }
 
                 if (nativeAd.starRating == null) {
-                    adView.starRatingView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.starRatingView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     (adView.starRatingView as RatingBar).rating = nativeAd.starRating!!.toFloat()
                     adView.starRatingView!!.visibility = View.VISIBLE
                 }
 
                 if (nativeAd.advertiser == null) {
-                    adView.advertiserView!!.visibility = View.INVISIBLE//INVISIBLE
+                    adView.advertiserView!!.visibility = View.INVISIBLE // INVISIBLE
                 } else {
                     (adView.advertiserView as TextView).text = nativeAd.advertiser
                     adView.advertiserView!!.visibility = View.VISIBLE
@@ -1757,7 +1672,6 @@ object RadioFunction {
                 adView.storeView!!.visibility = View.GONE
                 adView.advertiserView!!.visibility = View.GONE
             }
-
 
             // This method tells the Google Mobile Ads SDK that you have finished populating your
             // native ad view with this native ad. The SDK will populate the adView's MediaView
@@ -1795,12 +1709,12 @@ object RadioFunction {
               }*/
         }
 
-
         fun refreshAd() {
-            //refresh_button.isEnabled = false
+            // refresh_button.isEnabled = false
 
             val builder = AdLoader.Builder(
-                context, context.resources.getString(
+                context,
+                context.resources.getString(
                     R.string.native_Advanced_adUnitId
                 )/*"ca-app-pub-5900899997553420/8708850645"*/
             )
@@ -1809,12 +1723,9 @@ object RadioFunction {
                 // OnUnifiedNativeAdLoadedListener implementation.
                 //     val adView = layoutInflater.inflate(R.layout.ad_unified, null) as UnifiedNativeAdView
 
-
                 populateUnifiedNativeAdView(unifiedNativeAd, adView)
                 ad_frame.removeAllViews()
                 ad_frame.addView(adView)
-
-
             }
 
             val videoOptions = VideoOptions.Builder()
@@ -1827,19 +1738,14 @@ object RadioFunction {
 
             builder.withNativeAdOptions(adOptions)
 
-
             val adLoader = builder.withAdListener(object : AdListener() {
 
                 override fun onAdLoaded() {
                     // Code to be executed when an ad finishes loading.
-
-
                 }
-
 
                 override fun onAdOpened() {
                     // Code to be executed when the ad is displayed.
-
                 }
 
                 override fun onAdClicked() {
@@ -1848,10 +1754,8 @@ object RadioFunction {
 
                 override fun onAdClosed() {
                     // Code to be executed when the interstitial ad is closed.
-
                 }
             }).build()
-
 
             adLoader.loadAd(AdRequest.Builder().build())
 
@@ -1860,12 +1764,8 @@ object RadioFunction {
         refreshAd()
     }
 
-
-
-
     fun homepageChrome(context: Context, homepageJson: String) {
         if (homepageJson != "") {
-
             if (!homepageJson.startsWith("http://") && !homepageJson.startsWith("https://")) {
                 val browserIntent = Intent()
                     .setAction(Intent.ACTION_VIEW)
@@ -1883,7 +1783,6 @@ object RadioFunction {
                 browserIntent.data = Uri.parse(homepageJson)
                 unwrap(context).startActivity(browserIntent)
             }
-
 
             /*
                      val url: String = homepageJson
@@ -1903,17 +1802,13 @@ object RadioFunction {
     }
 
     fun copytext(context: Context, textToCopy: String) {
-
-
         val myClipboard =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val myClip: ClipData = ClipData.newPlainText("note_copy", textToCopy)
         myClipboard.setPrimaryClip(myClip)
         DynamicToast.makeSuccess(context, context.resources.getString(R.string.StreamInfoCopied), 3)
             .show()
-
     }
-
 
     class SafeClickListener(
 
@@ -1930,7 +1825,6 @@ object RadioFunction {
         }
     }
 
-
     fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
         val safeClickListener = SafeClickListener {
             onSafeClick(it)
@@ -1940,11 +1834,10 @@ object RadioFunction {
 
     fun icyandStateWhenPlayRecordFiles(icyandStates: String, downloadRecInfo: String): String {
         if (is_playing_recorded_file) icyandState = downloadRecInfo
-            else icyandState = icyandStates
+        else icyandState = icyandStates
         //  MainActivity.icyandState
         return if (is_playing_recorded_file) downloadRecInfo else icyandStates
     }
-
 
     fun getuserid(): String {
         return if (userRecord.uid != null) userRecord.uid!!
@@ -1966,10 +1859,4 @@ object RadioFunction {
     fun dynamicToast(context: Context, message: String) {
         DynamicToast.make(context, message, 9).show()
     }
-
-
 }
-
-
-
-

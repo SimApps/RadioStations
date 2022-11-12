@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.*
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -33,7 +34,7 @@ import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordF
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
-object Exoplayer {
+@UnstableApi object Exoplayer {
     const val notifi_CHANNEL_ID = "SimAPPcganelIDradioApp"
 
     const val packagename = "com.amirami.simapp.radiostations"
@@ -281,7 +282,7 @@ object Exoplayer {
             getIsPlaying = isPlaying
             if (playWhenReady && isPlaying) {
                 if (is_playing_recorded_file) totalTime = player?.duration!!
-                else if (GlobalstateString == "UNKNOWN_STATE" && !is_playing_recorded_file) {
+                else if (GlobalstateString == "UNKNOWN_STATE") {
                     Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
                     Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
                     Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
@@ -291,7 +292,7 @@ object Exoplayer {
                 GlobalstateString = "Player.STATE_READY"
                 changeImagePlayPause("Main image view", R.drawable.pause_2)
                 changeImagePlayPause("image view", R.drawable.pause_2)
-            } else if (playWhenReady && !isPlaying && GlobalstateString != "Player.STATE_BUFFERING") {
+            } else if (playWhenReady && GlobalstateString != "Player.STATE_BUFFERING") {
                 playPauseIcon = R.drawable.play_2
                 GlobalstateString = "Player.STATE_PAUSED"
                 changeImagePlayPause("Main image view", R.drawable.play_2)

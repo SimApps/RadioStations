@@ -9,11 +9,17 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
-    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+        android:maxSdkVersion="32" />
+    <!-- <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />-->
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -28,7 +34,8 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
-    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+    <!--   <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />-->
 
     <uses-feature
         android:name="android.hardware.faketouch"
@@ -53,10 +60,10 @@
         tools:targetApi="m">
 
 
-        <!--   android:clearTaskOnLaunch="true"
-          android:finishOnTaskLaunch="true"-->
+                <!--   android:clearTaskOnLaunch="true"
+                  android:finishOnTaskLaunch="true"-->
 
-        <!--   android:configChanges="keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"-->
+        <!--    android:configChanges="keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"-->
 
 
 

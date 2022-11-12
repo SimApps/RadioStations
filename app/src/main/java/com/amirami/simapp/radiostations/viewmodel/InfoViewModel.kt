@@ -5,7 +5,7 @@ import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.os.Build
-import androidx.lifecycle.*
+import androidx.lifecycle.* // ktlint-disable no-wildcard-imports
 import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction

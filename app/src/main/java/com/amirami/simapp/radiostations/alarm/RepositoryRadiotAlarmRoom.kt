@@ -30,8 +30,8 @@ class RepositoryRadiotAlarmRoom @Inject constructor(
         )
     }*/
 
-    override suspend fun delete(idradio: String?) {
-        radioDAO.delete(idradio)
+    override suspend fun delete(idRadio: String?) {
+        radioDAO.delete(idRadio)
     }
 
     override suspend fun deleteAll() {

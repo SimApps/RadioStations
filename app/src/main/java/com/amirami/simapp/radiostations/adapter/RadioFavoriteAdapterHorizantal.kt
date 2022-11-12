@@ -16,13 +16,9 @@ import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
-
-
-
 class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) :
     ListAdapter<MutableList<RadioRoom>, RadioFavoriteAdapterHorizantal.FavViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
-    //class RadioFavoriteAdapter (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioFavoriteAdapter.FavViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
-
+    // class RadioFavoriteAdapter (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioFavoriteAdapter.FavViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private val items = ArrayList<RadioRoom>()
     private lateinit var ProductShopingRoom: RadioRoom
@@ -33,25 +29,18 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
         notifyDataSetChanged()
     }
 
-
-
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {
         val binding = RadioHorizontalrecyclervTiketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return FavViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
-
-        ProductShopingRoom = items[position]//radiodiffer[position]
-
+        ProductShopingRoom = items[position] // radiodiffer[position]
 
         holder.bind(ProductShopingRoom)
     }
 
-    override fun getItemCount(): Int =items.size// differ.currentList.size     //fidCardDBList.size
-
+    override fun getItemCount(): Int = items.size // differ.currentList.size     //fidCardDBList.size
 
     inner class FavViewHolder(private val binding: RadioHorizontalrecyclervTiketBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -67,7 +56,6 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
         }
 
         fun bind(radioRoom: RadioRoom) {
-
             binding.apply {
               /*  CountriesTxV.setTextColor(RadioFunction.parseColor("#FF546d79"))
                 NbrradioStationTxV.setTextColor(RadioFunction.parseColor("#FF546d79"))
@@ -75,20 +63,23 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
                 RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
                 RadioFunction.secondarytextviewColor(descriptionTxV, MainActivity.darkTheme)
 
-                mainTxV.text=radioRoom.name
-                descriptionTxV.text=root.context.getString(
+                mainTxV.text = radioRoom.name
+                descriptionTxV.text = root.context.getString(
                     R.string.stationinfo,
-                    if (radioRoom.bitrate!="")radioRoom.bitrate +if (radioRoom.language!="" || radioRoom.language != "")" kbps, " else if(radioRoom.language!="") " kbps, " else " kbps " else ""  ,
-                    if(radioRoom.country!="")radioRoom.country +if (radioRoom.language!="")", " else "" else "",
-                    if(radioRoom.language!="")radioRoom.language  else "")
-
-                //root.context.getString(R.string.stationinfo,radioRoom.bitrate,radioRoom.country,radioRoom.language)
-                descriptionTxV.visibility = View.GONE
-                RadioFunction.loadImageString( root.context,radioRoom.favicon,
-                    MainActivity.imagedefaulterrorurl,imageViewRv,
-                    Constatnts.CORNER_RADIUS_8F
+                    if (radioRoom.bitrate != "")radioRoom.bitrate + if (radioRoom.language != "" || radioRoom.language != "")" kbps, " else if (radioRoom.language != "") " kbps, " else " kbps " else "",
+                    if (radioRoom.country != "")radioRoom.country + if (radioRoom.language != "")", " else "" else "",
+                    if (radioRoom.language != "")radioRoom.language else ""
                 )
 
+                // root.context.getString(R.string.stationinfo,radioRoom.bitrate,radioRoom.country,radioRoom.language)
+                descriptionTxV.visibility = View.GONE
+                RadioFunction.loadImageString(
+                    root.context,
+                    radioRoom.favicon,
+                    MainActivity.imagedefaulterrorurl,
+                    imageViewRv,
+                    Constatnts.CORNER_RADIUS_8F
+                )
             }
         }
     }
@@ -98,9 +89,6 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
         fun onItemFavClick(radioRoom: RadioRoom)
         fun onMoreItemFavClick(radio: RadioRoom)
     }
-
-
-
 
     class DiffCallback : DiffUtil.ItemCallback<MutableList<RadioRoom>>() {
         override fun areItemsTheSame(oldItem: MutableList<RadioRoom>, newItem: MutableList<RadioRoom>) =
@@ -129,7 +117,6 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
        }
 
     */
-
 
     override fun getSectionName(position: Int): String {
         var strTextview = items[position].name

@@ -454,7 +454,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             } catch (e: IllegalStateException) {
                 e.printStackTrace()
             }
-        } else if (radio.stationuuid != "") {
+        } else {
             try {
                 MainActivity.imageLinkForNotification = radio.favicon
                 Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.url_resolved))

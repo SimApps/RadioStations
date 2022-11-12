@@ -33,7 +33,7 @@ import java.io.IOException
 class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapterVertical.OnItemClickListener {
     private var _binding: BottomsheetChooseDefDialogueBinding? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val preferencesViewModel : PreferencesViewModel by activityViewModels()
+    private val preferencesViewModel: PreferencesViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private lateinit var radioAdapterVertical: RadioListAdapterVertical
     override fun onCreateView(
@@ -51,11 +51,11 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         super.onViewCreated(view, savedInstanceState)
 
         collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorTransitionBottomSheet(binding.defcountryRelativelay,4,it)
-            RadioFunction.secondarytextviewColor(binding.choosedefTitle,it)
-            RadioFunction.buttonColor(binding.btnDark,it)
-            RadioFunction.buttonColor(binding.btnLight,it)
-            RadioFunction.buttonColor(binding.btnSysThme,it)
+            RadioFunction.gradiancolorTransitionBottomSheet(binding.defcountryRelativelay, 4, it)
+            RadioFunction.secondarytextviewColor(binding.choosedefTitle, it)
+            RadioFunction.buttonColor(binding.btnDark, it)
+            RadioFunction.buttonColor(binding.btnLight, it)
+            RadioFunction.buttonColor(binding.btnSysThme, it)
         }
 
         setupRadioLisRV()
@@ -64,9 +64,9 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
             retrofitRadioViewModel.changeBseUrl()
             infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
             when (argsFrom.msg) {
-                "defcountry" ->  retrofitRadioViewModel.getListCountrieRadios()//retrofitRadioViewModel.getListRadios(getString(R.string.Countries))
+                "defcountry" -> retrofitRadioViewModel.getListCountrieRadios() // retrofitRadioViewModel.getListRadios(getString(R.string.Countries))
                 "defserver" -> retrofitRadioViewModel.getListservers()
-                else -> binding.itemErrorMessage.root.visibility= View.INVISIBLE
+                else -> binding.itemErrorMessage.root.visibility = View.INVISIBLE
             }
         }
 
@@ -76,149 +76,128 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                 binding.toggleButtonGroup.visibility = View.GONE
                 binding.spinKitCountryFav.visibility = View.VISIBLE
                 binding.listViewCountries.visibility = View.VISIBLE
-                binding.choosedefTitle.text=getString(R.string.choose_countrie)
-               // retrofitRadioViewModel.getListCountrieRadios()
-
-
+                binding.choosedefTitle.text = getString(R.string.choose_countrie)
+                // retrofitRadioViewModel.getListCountrieRadios()
             }
             "defserver" -> {
                 setUpRv()
                 binding.toggleButtonGroup.visibility = View.GONE
                 binding.spinKitCountryFav.visibility = View.VISIBLE
                 binding.listViewCountries.visibility = View.VISIBLE
-                binding.choosedefTitle.text=getString(R.string.choose_server)
+                binding.choosedefTitle.text = getString(R.string.choose_server)
                 retrofitRadioViewModel.getListservers()
-
-
             }
             "deftheme" -> {
-                binding.itemErrorMessage.root.visibility= View.INVISIBLE
-                binding.choosedefTitle.text=getString(R.string.choose_theme)
+                binding.itemErrorMessage.root.visibility = View.INVISIBLE
+                binding.choosedefTitle.text = getString(R.string.choose_theme)
                 binding.toggleButtonGroup.visibility = View.VISIBLE
                 binding.spinKitCountryFav.visibility = View.GONE
                 binding.listViewCountries.visibility = View.GONE
 
-
-                if(systemTheme) binding.toggleButtonGroup.check(R.id.btnSysThme)
-                else if(!systemTheme)   {
-                    if(darkTheme) binding.toggleButtonGroup.check(R.id.btnDark)
-                    else if(!darkTheme) binding.toggleButtonGroup.check(R.id.btnLight)
+                if (systemTheme) binding.toggleButtonGroup.check(R.id.btnSysThme)
+                else {
+                    if (darkTheme) binding.toggleButtonGroup.check(R.id.btnDark)
+                    else binding.toggleButtonGroup.check(R.id.btnLight)
                 }
 
                 binding.toggleButtonGroup.addOnButtonCheckedListener { toggleButtonGroup, checkedId, isChecked ->
 
                     if (isChecked) {
                         when (checkedId) {
-                            R.id.btnDark ->{
-                                darkTheme =true
-                                systemTheme =false
+                            R.id.btnDark -> {
+                                darkTheme = true
+                                systemTheme = false
                                 //  DynamicToast.makeError(requireContext(), "ssss", 9).show()
                                 dismiss()
                             }
-                            R.id.btnLight ->{
-                                darkTheme =false
-                                systemTheme =false
+                            R.id.btnLight -> {
+                                darkTheme = false
+                                systemTheme = false
                                 //   DynamicToast.makeError(requireContext(), "ffff", 9).show()
                                 dismiss()
                             }
-                            R.id.btnSysThme ->{
-                                systemTheme =true
+                            R.id.btnSysThme -> {
+                                systemTheme = true
                                 val isNightTheme = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                                 when (isNightTheme) {
-                                    Configuration.UI_MODE_NIGHT_YES -> darkTheme =true
-                                    Configuration.UI_MODE_NIGHT_NO -> darkTheme =false
+                                    Configuration.UI_MODE_NIGHT_YES -> darkTheme = true
+                                    Configuration.UI_MODE_NIGHT_NO -> darkTheme = false
                                 }
                                 //     DynamicToast.makeError(requireContext(), "rrrr", 9).show()
                                 dismiss()
-
                             }
                         }
-                    }
-                    else {
+                    } else {
                         if (toggleButtonGroup.checkedButtonId == View.NO_ID) {
-                            if(systemTheme) toggleButtonGroup.check(R.id.btnSysThme)
-                            else if(!systemTheme)   {
-                                if(darkTheme) toggleButtonGroup.check(R.id.btnDark)
-                                else if(!darkTheme) toggleButtonGroup.check(R.id.btnLight)
+                            if (systemTheme) toggleButtonGroup.check(R.id.btnSysThme)
+                            else {
+                                if (darkTheme) toggleButtonGroup.check(R.id.btnDark)
+                                else toggleButtonGroup.check(R.id.btnLight)
                             }
-
                         }
                     }
                     preferencesViewModel.onDarkThemeChanged(darkTheme)
                     preferencesViewModel.onSystemThemeChanged(systemTheme)
-                    infoViewModel.putPutDefThemeInfo(darkTheme,systemTheme)
-
+                    infoViewModel.putPutDefThemeInfo(darkTheme, systemTheme)
 
                     infoViewModel.putThemes(darkTheme)
                 }
             }
         }
-
     }
 
     override fun onItemClick(radio: RadioVariables) {
+        if (radio.ip != "") {
+            try {
+                //    if(globalserversJson[position]!=""){
+                preferencesViewModel.onChoosenServerChanged("http://" + radio.ip)
 
-       if(radio.ip!=""){
-           try {
-           //    if(globalserversJson[position]!=""){
-                   preferencesViewModel.onChoosenServerChanged("http://"+radio.ip)
+                MainActivity.BASE_URL = "http://" + radio.ip
+                infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
 
-
-                   MainActivity.BASE_URL ="http://"+radio.ip
-                   infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
-
-
-                   dismiss()
-              // }
-             //  else DynamicToast.makeError(requireContext(), "Requested Server is Offline! Try another server ", 3).show()
-
-           }
-           catch (e: IOException) {
-               // Catch the exception
-               e.printStackTrace()
-           } catch (e: IllegalArgumentException) {
-               e.printStackTrace()
-           } catch (e: SecurityException) {
-               e.printStackTrace()
-           } catch (e: IllegalStateException) {
-               e.printStackTrace()
-           }
-       }
-        else {
-           try {
-
-               preferencesViewModel.onDefaultCountryChanged(radio.name)
-               MainActivity.defaultCountry=radio.name
-               infoViewModel.putDefCountryInfo(RadioFunction.countryCodeToName(radio.name))
-               // fav_country_txv.text = getString(R.string.defaultCountry,  RadioFunction.countryCodeToName(globalCountriesJson[position]))
-               dismiss()
-           } catch (e: IOException) {
-               // Catch the exception
-               e.printStackTrace()
-           } catch (e: IllegalArgumentException) {
-               e.printStackTrace()
-           } catch (e: SecurityException) {
-               e.printStackTrace()
-           } catch (e: IllegalStateException) {
-               e.printStackTrace()
-           }
-       }
-
-
+                dismiss()
+                // }
+                //  else DynamicToast.makeError(requireContext(), "Requested Server is Offline! Try another server ", 3).show()
+            } catch (e: IOException) {
+                // Catch the exception
+                e.printStackTrace()
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            } catch (e: IllegalStateException) {
+                e.printStackTrace()
+            }
+        } else {
+            try {
+                preferencesViewModel.onDefaultCountryChanged(radio.name)
+                MainActivity.defaultCountry = radio.name
+                infoViewModel.putDefCountryInfo(RadioFunction.countryCodeToName(radio.name))
+                // fav_country_txv.text = getString(R.string.defaultCountry,  RadioFunction.countryCodeToName(globalCountriesJson[position]))
+                dismiss()
+            } catch (e: IOException) {
+                // Catch the exception
+                e.printStackTrace()
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            } catch (e: IllegalStateException) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun setUpListCountryRv() {
         collectLatestLifecycleFlow(retrofitRadioViewModel.responseListCountrieRadio) { response ->
             when (response.status) {
                 Status.SUCCESS -> {
-                    if(response.data!=null){
+                    if (response.data != null) {
                         hideProgressBar()
-                        binding.itemErrorMessage.root.visibility= View.INVISIBLE
+                        binding.itemErrorMessage.root.visibility = View.INVISIBLE
                         // radioAdapterVertical.radioListdffer = response.data as List<RadioVariables>
                         radioAdapterVertical.setItems(response.data as MutableList<RadioVariables>)
-                    }
-                    else showErrorConnection(response.message!!)
-
+                    } else showErrorConnection(response.message!!)
                 }
                 Status.ERROR -> {
                     retrofitRadioViewModel.changeBseUrl()
@@ -230,23 +209,18 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                     displayProgressBar()
                 }
             }
-
         }
-
     }
     private fun setUpRv() {
         collectLatestLifecycleFlow(retrofitRadioViewModel.responseRadioList) { response ->
             when (response.status) {
                 Status.SUCCESS -> {
-                    if(response.data!=null){
+                    if (response.data != null) {
                         hideProgressBar()
-                        binding.itemErrorMessage.root.visibility= View.INVISIBLE
+                        binding.itemErrorMessage.root.visibility = View.INVISIBLE
                         // radioAdapterVertical.radioListdffer = response.data as List<RadioVariables>
                         radioAdapterVertical.setItems(response.data as MutableList<RadioVariables>)
-                    }
-                    else showErrorConnection(response.message!!)
-
-
+                    } else showErrorConnection(response.message!!)
                 }
                 Status.ERROR -> {
                     hideProgressBar()
@@ -256,13 +230,10 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                     displayProgressBar()
                 }
             }
-
         }
-
-
     }
-    fun showErrorConnection(msg:String){
-        binding.itemErrorMessage.root.visibility= View.VISIBLE
+    fun showErrorConnection(msg: String) {
+        binding.itemErrorMessage.root.visibility = View.VISIBLE
         binding.itemErrorMessage.tvErrorMessage.text = msg
     }
     private fun displayProgressBar() {
@@ -287,7 +258,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding=null
+        _binding = null
     }
     private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {

@@ -2,11 +2,9 @@ package com.amirami.simapp.radiostations.ui
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResult
@@ -45,15 +43,11 @@ import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
 class SettingFragment : Fragment(R.layout.fragment_setting) {
@@ -105,7 +99,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
             binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
 
-            succesToast(requireContext(), user?.displayName +" "+ resources.getString(R.string.connectionsuccess))
+            succesToast(requireContext(), user?.displayName + " " + resources.getString(R.string.connectionsuccess))
             // ...
             getRadioUidListFromFirestoreAndITSaveInRoom(true)
 
@@ -115,7 +109,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
             userTxtVwVisibiity(false)
-           
+
             errorToast(requireContext(), resources.getString(R.string.Échec_connexion))
         }
     }
@@ -426,9 +420,9 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         // Choose authentication providers
 
         val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.EmailBuilder().build()
             // AuthUI.IdpConfig.PhoneBuilder().build(),
-          //   AuthUI.IdpConfig.GoogleBuilder().build()
+            //   AuthUI.IdpConfig.GoogleBuilder().build()
             // AuthUI.IdpConfig.FacebookBuilder().build(),
             // AuthUI.IdpConfig.TwitterBuilder().build()
         )
@@ -451,8 +445,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
-          //  .setAuthMethodPickerLayout(customLayout)
-              .setLogo(R.drawable.ic_radio_svg) // Set logo drawable
+            //  .setAuthMethodPickerLayout(customLayout)
+            .setLogo(R.drawable.ic_radio_svg) // Set logo drawable
             .setTheme(R.style.FirebaseUI) // Set theme
             .build()
 

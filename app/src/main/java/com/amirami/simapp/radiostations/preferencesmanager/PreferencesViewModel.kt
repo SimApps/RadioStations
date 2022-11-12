@@ -1,19 +1,16 @@
 package com.amirami.simapp.radiostations.preferencesmanager
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PreferencesViewModel  @Inject constructor(
+class PreferencesViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
     val preferencesFlow = preferencesManager.preferencesFlow
-
 
 /*
 used to sort database see prference manager class and code inflow
@@ -24,7 +21,6 @@ used to sort database see prference manager class and code inflow
         preferencesManager.updateSortOrder(sortOrder)
     }
     */
-
 
     fun onFirstOpenChanged(value: Boolean) = viewModelScope.launch {
         preferencesManager.updateFirstOpen(value)
@@ -42,7 +38,6 @@ used to sort database see prference manager class and code inflow
         preferencesManager.updateChoosenServer(value)
     }
 
-
     fun onDarkThemeChanged(value: Boolean) = viewModelScope.launch {
         preferencesManager.updateDarkTheme(value)
     }
@@ -54,8 +49,6 @@ used to sort database see prference manager class and code inflow
     fun onSaveDataChanged(value: Boolean) = viewModelScope.launch {
         preferencesManager.updateSaveData(value)
     }
-
-
 
     fun onSystemThemeChanged(value: Boolean) = viewModelScope.launch {
         preferencesManager.updatesystemTheme(value)

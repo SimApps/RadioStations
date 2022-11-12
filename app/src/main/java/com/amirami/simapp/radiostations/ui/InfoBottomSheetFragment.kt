@@ -79,22 +79,18 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                 // Display a message on alert dialog
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val packageName = requireContext().packageName
-                    val pm: PowerManager =
-                        requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
+                    val pm: PowerManager = requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
                     if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                        binding.messageTxtVw.text =
-                            resources.getString(R.string.batterieoptimisationmessages)
+                        binding.messageTxtVw.text = resources.getString(R.string.batterieoptimisationmessages)
                     } else {
-                        binding.messageTxtVw.text =
-                            resources.getString(R.string.batterieoptimisationmessageson)
+                        binding.messageTxtVw.text = resources.getString(R.string.batterieoptimisationmessageson)
                         go = resources.getString(R.string.Exit)
                         binding.btnOui.visibility = View.GONE
                         binding.yesnoDivider.visibility = View.GONE
                         binding.verticalDividerDialogue.visibility = View.GONE
                     }
                 } else {
-                    binding.messageTxtVw.text =
-                        resources.getString(R.string.nobatterieoptimisationmessageso)
+                    binding.messageTxtVw.text = resources.getString(R.string.nobatterieoptimisationmessageso)
                 }
 
                 binding.btnOui.text = go

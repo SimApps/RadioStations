@@ -6,38 +6,41 @@ import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.room.RadioEntity
 
 object ConvertRadioClass {
-    private fun toListModel(prodNamesEntity: List<RadioEntity>) : MutableList<RadioRoom> {
-        val itemList : MutableList<RadioRoom> = mutableListOf<RadioRoom>()
+    private fun toListModel(prodNamesEntity: List<RadioEntity>): MutableList<RadioRoom> {
+        val itemList: MutableList<RadioRoom> = mutableListOf<RadioRoom>()
         prodNamesEntity.map {
             itemList.add(
-                RadioRoom(it.radiouid?:"",
-                        it.name?:"",
-                        it.bitrate?:"",
-                    it.homepage?:"",
-                    it.imageurl?:"",
-                it.tags?:"",
-                it.country?:"",
-                it.state?:"",
-                it.language?:"",
-                it.streamurl?:"",
+                RadioRoom(
+                    it.radiouid ?: "",
+                    it.name ?: "",
+                    it.bitrate ?: "",
+                    it.homepage ?: "",
+                    it.imageurl ?: "",
+                    it.tags ?: "",
+                    it.country ?: "",
+                    it.state ?: "",
+                    it.language ?: "",
+                    it.streamurl ?: "",
                     it.fav!!
-                ))
+                )
+            )
         }
         return itemList
     }
 
-    fun toLiveDataListModel(localList : LiveData<List<RadioEntity>>) : LiveData<MutableList<RadioRoom>> {
+    fun toLiveDataListModel(localList: LiveData<List<RadioEntity>>): LiveData<MutableList<RadioRoom>> {
         return Transformations.map<
-                List<RadioEntity>, //localList Data Type
-                MutableList<RadioRoom> //toListModel List Data Type
-                >(
-            localList) { listEntity ->
+            List<RadioEntity>, // localList Data Type
+            MutableList<RadioRoom> // toListModel List Data Type
+            >(
+            localList
+        ) { listEntity ->
             toListModel(listEntity)
         }
     }
 
-    fun toEntity(radioRoomModel: RadioRoom) : RadioEntity {
-        return when(radioRoomModel.radiouid) {
+    fun toEntity(radioRoomModel: RadioRoom): RadioEntity {
+        return when (radioRoomModel.radiouid) {
             else -> {
                 RadioEntity(
                     radioRoomModel.radiouid,
@@ -48,7 +51,7 @@ object ConvertRadioClass {
                     radioRoomModel.tags,
                     radioRoomModel.country,
                     radioRoomModel.state,
-                    //var RadiostateDB: String?,
+                    // var RadiostateDB: String?,
                     radioRoomModel.language,
                     radioRoomModel.streamurl,
                     radioRoomModel.fav

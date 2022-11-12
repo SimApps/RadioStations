@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var hourPicker: NumberPicker? = null

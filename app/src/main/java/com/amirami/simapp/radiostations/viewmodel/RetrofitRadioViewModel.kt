@@ -3,24 +3,22 @@ package com.amirami.simapp.radiostations.viewmodel
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.ConnectivityManager.*
 import android.net.NetworkCapabilities.*
 import android.os.Build
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
 import com.amirami.simapp.radiostations.model.Resource
+import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.repository.RetrofitRadioRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-import android.net.ConnectivityManager.*
-
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.amirami.simapp.radiostations.model.Status
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.io.IOException
+import javax.inject.Inject
 
 @HiltViewModel
 class RetrofitRadioViewModel
@@ -30,18 +28,14 @@ constructor(
     app: Application
 ) : AndroidViewModel(app) {
 
-
     private val _statsresponse = MutableStateFlow(Resource(Status.SUCCESS, null, ""))
     val statsresponse = _statsresponse.asStateFlow()
-
 
     private val _responseListRadio = MutableStateFlow<Resource<*>>(Resource(Status.SUCCESS, null, ""))
     val responseRadioList = _responseListRadio.asStateFlow()
 
-
     private val _responseListCountrieRadio = MutableStateFlow<Resource<*>>(Resource(Status.SUCCESS, null, ""))
     val responseListCountrieRadio = _responseListCountrieRadio.asStateFlow()
-
 
     private val _responseRadio = MutableStateFlow<Resource<*>>(Resource(Status.SUCCESS, null, ""))
     val responseRadio = _responseRadio.asStateFlow()
@@ -58,7 +52,6 @@ constructor(
     private val _responseLocalRadio = MutableStateFlow(Resource(Status.SUCCESS, null, ""))
     val responseLocalRadio = _responseLocalRadio.asStateFlow()
 
-
     init {
         /*viewModelScope.launch {
 
@@ -69,7 +62,6 @@ constructor(
            }*/
         getListCountrieRadios()
     }
-
 
     fun getListservers() = viewModelScope.launch {
         getListserver()
@@ -85,7 +77,6 @@ constructor(
                     else _responseListRadio.value = Resource.error(response.code().toString(), response.body())
                 }
             } else _responseListRadio.value = Resource.error("No internet connection", null)
-
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> _responseListRadio.value = Resource.error("Network Failure", null)
@@ -99,7 +90,6 @@ constructor(
         getStat()
     }
 
-
     suspend fun getStat() = viewModelScope.launch {
         _statsresponse.value = Resource.loading(null)
         //   _statsresponse.postValue(Resource.loading(null))
@@ -108,17 +98,17 @@ constructor(
             if (hasInternetConnection()) {
                 repository.getStatistics().let { response ->
                     if (response.isSuccessful) _statsresponse.value =
-                        Resource.success(response.body()) as Resource<Nothing> //.postValue(Resource.success(response.body()))
+                        Resource.success(response.body()) as Resource<Nothing> // .postValue(Resource.success(response.body()))
                     else _statsresponse.value =
                         Resource.error(
-                            response.code().toString(),
-                            response.body()
-                        ) as Resource<Nothing>//.postValue(Resource.error(response.code().toString(),response.body()))
+                        response.code().toString(),
+                        response.body()
+                    ) as Resource<Nothing> // .postValue(Resource.error(response.code().toString(),response.body()))
                 }
             } else _statsresponse.value = Resource.error(
                 "No internet connection",
                 null
-            )//.postValue(Resource.error("No internet connection",null))
+            ) // .postValue(Resource.error("No internet connection",null))
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> _responseListRadio.value = Resource.error("Network Failure", null)
@@ -132,27 +122,24 @@ constructor(
     }
 
     suspend fun getlocalRadio(countriecode: String) = viewModelScope.launch {
-
-        _responseLocalRadio.value = Resource.loading(null) //.postValue(Resource.loading(null))
+        _responseLocalRadio.value = Resource.loading(null) // .postValue(Resource.loading(null))
         //  delay(1500)
         try {
             if (hasInternetConnection()) {
                 repository.getRadiosLocals(countriecode).let { response ->
 
                     if (response.isSuccessful) _responseLocalRadio.value =
-                        Resource.success(response.body()) as Resource<Nothing>//.postValue(Resource.success(response.body()))
+                        Resource.success(response.body()) as Resource<Nothing> // .postValue(Resource.success(response.body()))
                     else _responseLocalRadio.value =
                         Resource.error(
-                            response.code().toString(),
-                            response.body()
-                        ) as Resource<Nothing>//.postValue(Resource.error(response.code().toString(),response.body()))
+                        response.code().toString(),
+                        response.body()
+                    ) as Resource<Nothing> // .postValue(Resource.error(response.code().toString(),response.body()))
                 }
-
             } else _responseLocalRadio.value = Resource.error(
                 "No internet connection",
                 null
-            )//.postValue(Resource.error("No internet connection",null))
-
+            ) // .postValue(Resource.error("No internet connection",null))
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> _responseListRadio.value = Resource.error("Network Failure", null)
@@ -175,10 +162,9 @@ constructor(
                     if (response.isSuccessful) _responseLastClicked.value = Resource.success(response.body())
                     else _responseLastClicked.value = Resource.error(response.code().toString(), response.body())
                 }
-            }
-            else
+            } else {
                 _responseLastClicked.value = Resource.error("No internet connection", null)
-
+            }
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> _responseListRadio.value = Resource.error("Network Failure", null)
@@ -196,59 +182,51 @@ constructor(
     }
 
     suspend fun getRadioByUId(UId: String) = viewModelScope.launch {
-        //_responseRadioSreach.emit(Resource.loading(null))
+        // _responseRadioSreach.emit(Resource.loading(null))
         _responseRadioUID.value = Resource.loading(null)
         //    delay(1500)
         try {
             if (hasInternetConnection()) {
                 repository.getRadiobyuid(UId).let { response ->
-                    if (response.isSuccessful) _responseRadioUID.value = Resource.success(response.body())//_responseRadioSreach.emit(Resource.success(response.body()))
-                    else _responseRadioUID.value = Resource.error(response.code().toString(), response.body())// _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
+                    if (response.isSuccessful) _responseRadioUID.value = Resource.success(response.body()) // _responseRadioSreach.emit(Resource.success(response.body()))
+                    else _responseRadioUID.value = Resource.error(response.code().toString(), response.body()) // _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
                 }
-            }
-            else _responseRadioUID.value =Resource.error("No internet connection", null)//_responseRadioSreach.emit(Resource.error("No internet connection", null))
-
+            } else _responseRadioUID.value = Resource.error("No internet connection", null) // _responseRadioSreach.emit(Resource.error("No internet connection", null))
         } catch (t: Throwable) {
             when (t) {
-                is IOException -> _responseRadioUID.value = Resource.error("Network Failure", null)//_responseRadioSreach.emit(Resource.error("Network Failure", null))
+                is IOException -> _responseRadioUID.value = Resource.error("Network Failure", null) // _responseRadioSreach.emit(Resource.error("Network Failure", null))
 
-                else -> _responseRadioUID.value = Resource.error("Conversion Error", null)//_responseRadioSreach.emit(Resource.error("Conversion Error", null))
+                else -> _responseRadioUID.value = Resource.error("Conversion Error", null) // _responseRadioSreach.emit(Resource.error("Conversion Error", null))
             }
         }
     }
 
-
-
     suspend fun getRadiosByname(name: String) = viewModelScope.launch {
-        //_responseRadioSreach.emit(Resource.loading(null))
+        // _responseRadioSreach.emit(Resource.loading(null))
         _responseRadioSreach.value = Resource.loading(null)
         //    delay(1500)
         try {
             if (hasInternetConnection()) {
                 repository.getRadioByname(name).let { response ->
-                    if (response.isSuccessful) _responseRadioSreach.value = Resource.success(response.body())//_responseRadioSreach.emit(Resource.success(response.body()))
+                    if (response.isSuccessful) _responseRadioSreach.value = Resource.success(response.body()) // _responseRadioSreach.emit(Resource.success(response.body()))
 
-                    else _responseRadioSreach.value = Resource.error(response.code().toString(), response.body())// _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
+                    else _responseRadioSreach.value = Resource.error(response.code().toString(), response.body()) // _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
                 }
-            } else _responseRadioSreach.value =Resource.error("No internet connection", null)//_responseRadioSreach.emit(Resource.error("No internet connection", null))
-
+            } else _responseRadioSreach.value = Resource.error("No internet connection", null) // _responseRadioSreach.emit(Resource.error("No internet connection", null))
         } catch (t: Throwable) {
             when (t) {
-                is IOException -> _responseRadioSreach.value = Resource.error("Network Failure", null)//_responseRadioSreach.emit(Resource.error("Network Failure", null))
+                is IOException -> _responseRadioSreach.value = Resource.error("Network Failure", null) // _responseRadioSreach.emit(Resource.error("Network Failure", null))
 
-                else -> _responseRadioSreach.value = Resource.error("Conversion Error", null)//_responseRadioSreach.emit(Resource.error("Conversion Error", null))
+                else -> _responseRadioSreach.value = Resource.error("Conversion Error", null) // _responseRadioSreach.emit(Resource.error("Conversion Error", null))
             }
         }
     }
-
 
     fun getRadios(msg: String, secondmsg: String) = viewModelScope.launch {
         getRadio(msg, secondmsg)
     }
 
-
     suspend fun getRadio(msg: String, secondmsg: String) = viewModelScope.launch {
-
         _responseRadio.value = Resource.loading(null)
         //  delay(1500)
         try {
@@ -312,21 +290,15 @@ constructor(
                         if (response.isSuccessful) _responseRadio.value = Resource.success(response.body())
 
                         else _responseRadio.value = Resource.error(response.code().toString(), response.body())
-
-
                     }
                 }
-            }
-            else _responseRadio.value = Resource.error("No internet connection", null)
-
+            } else _responseRadio.value = Resource.error("No internet connection", null)
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> _responseRadio.value = Resource.error("Network Failure", null)
                 else -> _responseRadio.value = Resource.error("Conversion Error", null)
             }
         }
-
-
     }
 
     fun getListRadios(msg: String) = viewModelScope.launch {
@@ -348,9 +320,7 @@ constructor(
                     else _responseListCountrieRadio.value =
                         Resource.error(response.code().toString(), response.body())
                 }
-            }
-            else _responseListCountrieRadio.value = Resource.error("No internet connection", null)
-
+            } else _responseListCountrieRadio.value = Resource.error("No internet connection", null)
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> {
@@ -381,9 +351,7 @@ constructor(
                         else _responseListRadio.value = Resource.error(response.code().toString(), response.body())
                     }
                 }
-            }
-            else _responseListRadio.value = Resource.error("No internet connection", null)
-
+            } else _responseListRadio.value = Resource.error("No internet connection", null)
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> _responseListRadio.value = Resource.error("Network Failure", null)
@@ -392,14 +360,12 @@ constructor(
         }
     }
 
-
     fun changeBseUrl() {
         if (MainActivity.repeat_tryconnect_server < MainActivity.server_arraylist.size - 1) {
             MainActivity.repeat_tryconnect_server += 1
             MainActivity.server_arraylist[MainActivity.repeat_tryconnect_server]
             MainActivity.BASE_URL =
                 MainActivity.server_arraylist[MainActivity.repeat_tryconnect_server]
-
         } else MainActivity.repeat_tryconnect_server = -1
     }
 
@@ -417,8 +383,7 @@ constructor(
                 capabilities.hasTransport(TRANSPORT_ETHERNET) -> true
                 else -> false
             }
-        }
-        else {
+        } else {
             connectivityManager.activeNetworkInfo?.run {
                 return when (type) {
                     TYPE_WIFI -> true

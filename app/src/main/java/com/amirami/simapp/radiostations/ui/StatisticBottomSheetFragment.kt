@@ -11,13 +11,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.hilt.android.AndroidEntryPoint
 import com.amirami.simapp.radiostations.databinding.StatisticsDialogueBinding
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.JsonObject
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -47,38 +47,33 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
             infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
 
             retrofitRadioViewModel.getStatis()
-          //      retrofitRadioViewModel.getStatis()
+            //      retrofitRadioViewModel.getStatis()
         }
 
         collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorConstraintBottomSheet(binding.linearL, 0,it)
-            RadioFunction.maintextviewColor(binding.StationNbrTxV,it)
-            RadioFunction.maintextviewColor(binding.stationsBrokentxV,it)
-            RadioFunction.maintextviewColor(binding.tagsTxV,it)
-            RadioFunction.maintextviewColor(binding.languagesTxV,it)
-            RadioFunction.maintextviewColor(binding.countriesTxV,it)
+            RadioFunction.gradiancolorConstraintBottomSheet(binding.linearL, 0, it)
+            RadioFunction.maintextviewColor(binding.StationNbrTxV, it)
+            RadioFunction.maintextviewColor(binding.stationsBrokentxV, it)
+            RadioFunction.maintextviewColor(binding.tagsTxV, it)
+            RadioFunction.maintextviewColor(binding.languagesTxV, it)
+            RadioFunction.maintextviewColor(binding.countriesTxV, it)
         }
 
-
-
-        collectLatestLifecycleFlow(retrofitRadioViewModel.statsresponse) {response ->
+        collectLatestLifecycleFlow(retrofitRadioViewModel.statsresponse) { response ->
             when (response.status) {
                 Status.SUCCESS -> {
-                    if(response.data!=null){
-                        binding.itemErrorMessage.root.visibility= View.INVISIBLE
-                        binding.StationNbrTxV.text=getString(R.string.statNbrStation,(response.data as JsonObject).get("stations").toString())
-                        binding.stationsBrokentxV.text=getString(R.string.statNbrStationBroken, (response.data as JsonObject).get("stations_broken").toString())
-                        binding.tagsTxV.text=getString(R.string.statNbrTags, (response.data as JsonObject).get("tags").toString())
-                        binding.languagesTxV.text=getString(R.string.statNbrLanguage,(response.data as JsonObject).get("languages").toString())
-                        binding.countriesTxV.text=getString(R.string.statNbrCountries,(response.data as JsonObject).get("countries").toString())
+                    if (response.data != null) {
+                        binding.itemErrorMessage.root.visibility = View.INVISIBLE
+                        binding.StationNbrTxV.text = getString(R.string.statNbrStation, (response.data as JsonObject).get("stations").toString())
+                        binding.stationsBrokentxV.text = getString(R.string.statNbrStationBroken, (response.data as JsonObject).get("stations_broken").toString())
+                        binding.tagsTxV.text = getString(R.string.statNbrTags, (response.data as JsonObject).get("tags").toString())
+                        binding.languagesTxV.text = getString(R.string.statNbrLanguage, (response.data as JsonObject).get("languages").toString())
+                        binding.countriesTxV.text = getString(R.string.statNbrCountries, (response.data as JsonObject).get("countries").toString())
 
                         hideProgressBar()
-                    }
-                    else showErrorConnection(response.message!!)
-
+                    } else showErrorConnection(response.message!!)
                 }
                 Status.ERROR -> {
-
                     hideProgressBar()
                     showErrorConnection(response.message!!)
                 }
@@ -86,10 +81,7 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
                     displayProgressBar()
                 }
             }
-
         }
-
-
 
       /*  lifecycleScope.launchWhenCreated {
             retrofitRadioViewModel.stateFlowTrigger.flowWithLifecycle(requireActivity().lifecycle, Lifecycle.State.STARTED)
@@ -98,18 +90,15 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
 
                 }
         }*/
-
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding=null
+        _binding = null
     }
 
-
-    private fun showErrorConnection(msg:String){
-        binding.itemErrorMessage.root.visibility= View.VISIBLE
+    private fun showErrorConnection(msg: String) {
+        binding.itemErrorMessage.root.visibility = View.VISIBLE
         binding.itemErrorMessage.tvErrorMessage.text = msg
     }
     private fun displayProgressBar() {

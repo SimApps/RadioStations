@@ -9,44 +9,35 @@ import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
 import java.util.*
 
+class TagsAdapterHorizantal(private val item: ArrayList<String>, private val images: ArrayList<Int>, private val listener: OnItemClickListener) : RecyclerView.Adapter<TagsAdapterHorizantal.MyViewHolder>() {
 
-
-
-class TagsAdapterHorizantal (private val item: ArrayList<String>, private val images:ArrayList<Int>,private val listener: OnItemClickListener): RecyclerView.Adapter<TagsAdapterHorizantal.MyViewHolder>() {
-
-
-    inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) : RecyclerView.ViewHolder(binding.root){
+    inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.apply {
                 cardViewMainRadio.setSafeOnClickListener {
-                    if (bindingAdapterPosition != RecyclerView.NO_POSITION) listener.onItemTagsClick(item[bindingAdapterPosition],images[bindingAdapterPosition])
+                    if (bindingAdapterPosition != RecyclerView.NO_POSITION) listener.onItemTagsClick(item[bindingAdapterPosition], images[bindingAdapterPosition])
                 }
-
             }
         }
 
-        fun bind(position:Int) {
+        fun bind(position: Int) {
             binding.apply {
-
                 RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
                 //   RadioFunction.secondarytextviewColor(NbrradioStationTxV)
                 mainTxV.text = item[position].replaceFirstChar { it.uppercase() }
 
-               // countryFlagImageView.setImageResource(images[position])
+                // countryFlagImageView.setImageResource(images[position])
                 RadioFunction.loadImageInt(images[position], MainActivity.imagedefaulterrorurl, imageViewRv)
-
-
-
-
             }
         }
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(
             RadioHorizontalrecyclervTiketBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
+                LayoutInflater.from(parent.context),
+                parent,
+                false
             )
         )
     }
@@ -58,7 +49,6 @@ class TagsAdapterHorizantal (private val item: ArrayList<String>, private val im
     override fun getItemCount() = item.size
 
     interface OnItemClickListener {
-        fun onItemTagsClick(item : String, image : Int)
+        fun onItemTagsClick(item: String, image: Int)
     }
-
 }

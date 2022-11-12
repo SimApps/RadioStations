@@ -8,8 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.media3.common.util.UnstableApi
+import androidx.preference.PreferenceManager
 
-object Utils {
+@UnstableApi object Utils {
     const val requestalarmId = 11421
     private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
 
@@ -28,7 +30,7 @@ object Utils {
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         if (System.currentTimeMillis() < timeOfAlarm) {
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putLong("timeInMilli", timeOfAlarm).apply()
 
@@ -37,7 +39,7 @@ object Utils {
 
             enableBootReceiver(context)
         } else {
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putLong("timeInMilli", timeOfAlarm + 86400000L).apply()
             val alarmClockInfo = AlarmClockInfo(timeOfAlarm + 86400000L/* add one day*/, pIntent)
@@ -59,7 +61,7 @@ object Utils {
         )
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (pIntent != null) {
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString("radioURL", "Empty").apply()
 

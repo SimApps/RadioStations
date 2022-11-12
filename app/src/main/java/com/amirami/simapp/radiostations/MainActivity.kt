@@ -1,15 +1,18 @@
 package com.amirami.simapp.radiostations
 
 import alirezat775.lib.downloader.Downloader
+import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.*
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -44,6 +47,7 @@ import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
+import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.viewmodel.*
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -86,6 +90,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     private val radioRoom: MutableList<RadioRoom> = mutableListOf()
 
     var recordDrawable = R.drawable.pop
+
+    private lateinit var managePermissions: ManagePermissions
+    private val PermissionsRequestCode = 12322
 
     // Determine the screen width (less decorations) to use for the ad width.
     // If the ad hasn't been laid out, default to the full screen width.
@@ -467,9 +474,31 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                 if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
                     if (!isDownloadingCustomurl) {
-                        if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
-                        else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                       val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            listOf(
+                                Manifest.permission.READ_MEDIA_AUDIO,
+                                Manifest.permission.READ_MEDIA_IMAGES,
+                                Manifest.permission.READ_MEDIA_VIDEO,
+                                WRITE_EXTERNAL_STORAGE,
+                                //Manifest.permission.READ_EXTERNAL_STORAGE
+                            )
+                        } else {
+                            listOf(
+                                WRITE_EXTERNAL_STORAGE,
+                                READ_EXTERNAL_STORAGE
+                            )
+                        }
 
+                        // Initialize a new instance of ManagePermissions class
+                        managePermissions = ManagePermissions(this@MainActivity, list, PermissionsRequestCode)
+Log.d("ffdsq", managePermissions.isPermissionsGranted().toString())
+                        if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
+                            managePermissions.checkPermissions()
+                        } else RadioFunction.getDownloader(this@MainActivity)
+
+                     /*   if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
+                        else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+*/
                         downloader?.download()
 
                         if (Exoplayer.is_downloading) {

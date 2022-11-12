@@ -11,13 +11,12 @@ class BootCompleteReceiver : BroadcastReceiver() {
             intent?.action == "android.intent.action.BOOT_COMPLETED" ||
             intent?.action == "android.intent.action.QUICKBOOT_POWERON"
         ) {
-            if(androidx.preference.PreferenceManager.getDefaultSharedPreferences(context!!).getLong("timeInMilli", 1L)!=1L){
+            if (androidx.preference.PreferenceManager.getDefaultSharedPreferences(context!!).getLong("timeInMilli", 1L) != 1L) {
                 Utils.setAlarm(
                     context,
                     androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).getLong("timeInMilli", 1L)
                 )
             }
-
         }
         /*
         if (intent?.action == "android.intent.action.BOOT_COMPLETED"
