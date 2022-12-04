@@ -5,6 +5,7 @@ import alirezat775.lib.downloader.core.OnDownloadListener
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ServiceStartNotAllowedException
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Paint
@@ -171,7 +172,16 @@ object RadioFunction {
             val serviceIntent = Intent(context, NotificationChannelService::class.java)
             // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
 
-            if (isOreoPlus()) context.startForegroundService(serviceIntent)
+            if (isOreoPlus()){
+                try {
+                    context.startForegroundService(serviceIntent)
+                }
+                catch (e: ServiceStartNotAllowedException) {
+                    // This happens on Android 12+ if you try to start a service from the background
+                    // without a qualifying event.  Why was it not allowed?  What the heck do we do now?
+                    Log.e("serviceStartNotAllowedException ", e.message.toString())
+                }
+            }
             else context.startService(serviceIntent)
         }
     }

@@ -29,10 +29,10 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.amirami.simapp.radiostations.RadioFunction.allPermissionsGranted
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
@@ -474,13 +474,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                 if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
                     if (!isDownloadingCustomurl) {
-                       val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             listOf(
                                 Manifest.permission.READ_MEDIA_AUDIO,
                                 Manifest.permission.READ_MEDIA_IMAGES,
                                 Manifest.permission.READ_MEDIA_VIDEO,
-                                WRITE_EXTERNAL_STORAGE,
-                                //Manifest.permission.READ_EXTERNAL_STORAGE
+                                WRITE_EXTERNAL_STORAGE
+                                // Manifest.permission.READ_EXTERNAL_STORAGE
                             )
                         } else {
                             listOf(
@@ -491,7 +491,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                         // Initialize a new instance of ManagePermissions class
                         managePermissions = ManagePermissions(this@MainActivity, list, PermissionsRequestCode)
-Log.d("ffdsq", managePermissions.isPermissionsGranted().toString())
+                        Log.d("ffdsq", managePermissions.isPermissionsGranted().toString())
                         if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
                             managePermissions.checkPermissions()
                         } else RadioFunction.getDownloader(this@MainActivity)

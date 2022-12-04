@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.*
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -34,7 +33,7 @@ import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordF
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
-@UnstableApi object Exoplayer {
+ object Exoplayer {
     const val notifi_CHANNEL_ID = "SimAPPcganelIDradioApp"
 
     const val packagename = "com.amirami.simapp.radiostations"
@@ -56,7 +55,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
     fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
-    fun initializePlayer(ctx: Context, isRecfile: Boolean, streamUrl: Uri) {
+    fun  initializePlayer(ctx: Context, isRecfile: Boolean, streamUrl: Uri) {
         if (streamUrl != Uri.parse("")) GlobalRadiourl = streamUrl
         is_playing_recorded_file = isRecfile
 
@@ -402,11 +401,14 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
     fun playSystemAlarm(context: Context) {
         // errorToast(context,defaultAlarmsoundUri.toString())
 
-        val defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
+        var defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
             context,
             RingtoneManager.TYPE_ALARM
         )
-
+if(defaultRingtoneUri== null) defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
+    context,
+    RingtoneManager.TYPE_RINGTONE
+)
         initializePlayer(context, true, defaultRingtoneUri)
         startPlayer()
 

@@ -11,7 +11,6 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaStyleNotificationHelper
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -32,7 +31,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.imageLinkForNotif
 import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterrorurl
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 
-@UnstableApi class NotificationChannelService : Service() {
+class NotificationChannelService : Service() {
     val notifID = 93696
     val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
 
@@ -76,7 +75,7 @@ import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordF
         return resultPendingIntent!!
     }
 
-    lateinit var notification: NotificationCompat.Builder
+    lateinit var notification: Notification
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) return START_STICKY_COMPATIBILITY
@@ -156,8 +155,8 @@ import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordF
                                     .setShowActionsInCompactView(0, 1, 2)
                                 // .setShowActionsInCompactView(1,2)
                             )
-
-                        startForeground(notifID, notification.build())
+                            .build()
+                        startForeground(notifID, notification)
 // delay foreground state updating a bit, so the notification can be swiped away properly after initial display
                         Handler(Looper.getMainLooper()).postDelayed({
                             if (player != null) {
@@ -208,9 +207,9 @@ import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordF
                                 MediaStyleNotificationHelper.MediaStyle(mMediaSession)
                                     .setShowActionsInCompactView(0, 1, 2)
                                 // .setShowActionsInCompactView(1,2)
-                            )
+                            ).build()
 
-                        startForeground(notifID, notification.build())
+                        startForeground(notifID, notification)
 
 // delay foreground state updating a bit, so the notification can be swiped away properly after initial display
                         Handler(Looper.getMainLooper()).postDelayed({
