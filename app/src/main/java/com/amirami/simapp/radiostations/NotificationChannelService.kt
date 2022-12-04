@@ -247,11 +247,6 @@ class NotificationChannelService : Service() {
         // after onUnbind() has already been called
     }
 
-    /* override fun onTaskRemoved(rootIntent: Intent?) {
-         super.onTaskRemoved(rootIntent)
-         stopSelf()
-         stopForeground(true)
-     }*/
 
     override fun onDestroy() {
         super.onDestroy()
@@ -260,38 +255,4 @@ class NotificationChannelService : Service() {
         stopSelf()
         stopForeground(true)
     }
-
-    /*
-        override fun onLowMemory() {
-            Toast.makeText(application, "onDestroy", Toast.LENGTH_SHORT).show()
-            super.onLowMemory()
-        }
-
-    */
-
-/*
-    private fun setupFakeNotification() {
-      val  notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val name = resources.getString(R.string.app_name)
-        val importance = NotificationManager.IMPORTANCE_LOW
-        NotificationChannel(notifi_CHANNEL_ID, name, importance).apply {
-            enableLights(false)
-            enableVibration(false)
-            notificationManager.createNotificationChannel(this)
-        }
-        val  notification = NotificationCompat.Builder(applicationContext, notifi_CHANNEL_ID)
-            .setContentTitle("")
-            .setContentText("")
-            .setSmallIcon(R.drawable.radioerror)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_MIN) // max
-            .setChannelId(notifi_CHANNEL_ID)
-            .setOnlyAlertOnce(true)
-            .setCategory(Notification.CATEGORY_SERVICE)
-
-        startForeground(1, notification.build())
-
-        // notificationManager.notify( 1, notification.build() )
-    }
-*/
 }

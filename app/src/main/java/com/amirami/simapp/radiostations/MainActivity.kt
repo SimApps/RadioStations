@@ -474,27 +474,22 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
                 if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
                     if (!isDownloadingCustomurl) {
-                        val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            listOf(
-                                Manifest.permission.READ_MEDIA_AUDIO,
-                                Manifest.permission.READ_MEDIA_IMAGES,
-                                Manifest.permission.READ_MEDIA_VIDEO,
-                                WRITE_EXTERNAL_STORAGE
-                                // Manifest.permission.READ_EXTERNAL_STORAGE
-                            )
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            RadioFunction.getDownloader(this@MainActivity)
                         } else {
-                            listOf(
+                            val list =  listOf(
                                 WRITE_EXTERNAL_STORAGE,
                                 READ_EXTERNAL_STORAGE
                             )
+                            // Initialize a new instance of ManagePermissions class
+                            managePermissions = ManagePermissions(this@MainActivity, list, PermissionsRequestCode)
+                            Log.d("ffdsq", managePermissions.isPermissionsGranted().toString())
+                            if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
+                                managePermissions.checkPermissions()
+                            } else
+                                RadioFunction.getDownloader(this@MainActivity)
                         }
 
-                        // Initialize a new instance of ManagePermissions class
-                        managePermissions = ManagePermissions(this@MainActivity, list, PermissionsRequestCode)
-                        Log.d("ffdsq", managePermissions.isPermissionsGranted().toString())
-                        if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
-                            managePermissions.checkPermissions()
-                        } else RadioFunction.getDownloader(this@MainActivity)
 
                      /*   if (allPermissionsGranted(this@MainActivity)) RadioFunction.getDownloader(this@MainActivity)
                         else requestMultiplePermissions.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))

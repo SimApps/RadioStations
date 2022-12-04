@@ -282,7 +282,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
     }
 
     private fun setUpRecord() {
-        val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+       /* val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             listOf<String>(
                 Manifest.permission.READ_MEDIA_AUDIO,
                 Manifest.permission.READ_MEDIA_IMAGES,
@@ -295,14 +295,9 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
-        }
+        }*/
 
-        // Initialize a new instance of ManagePermissions class
-        managePermissions = ManagePermissions(requireActivity(), list, PermissionsRequestCode)
-
-        if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
-            managePermissions.checkPermissions()
-        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             //  if (RadioFunction.allPermissionsGranted(requireContext())) {
             Log.d("kksjq", "1")
             if (getRecordedFiles(requireContext()).size == 0) {
@@ -314,18 +309,56 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                 binding.whenemptyrecordImage.visibility = View.GONE
                 binding.listViewCountriesLiradio.visibility = View.VISIBLE
             }
-           /* } else {
-                Log.d("kksjq", "2")
-                requestMultiplePermissions.launch(
-                    arrayOf(
-                        Manifest.permission.READ_MEDIA_AUDIO,
-                        Manifest.permission.READ_MEDIA_IMAGES,
-                        Manifest.permission.READ_MEDIA_VIDEO,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                )
-            }  */
+            /* } else {
+                 Log.d("kksjq", "2")
+                 requestMultiplePermissions.launch(
+                     arrayOf(
+                         Manifest.permission.READ_MEDIA_AUDIO,
+                         Manifest.permission.READ_MEDIA_IMAGES,
+                         Manifest.permission.READ_MEDIA_VIDEO,
+                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                         Manifest.permission.READ_EXTERNAL_STORAGE
+                     )
+                 )
+             }  */
+        } else {
+            val list=   listOf<String>(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+
+            // Initialize a new instance of ManagePermissions class
+            managePermissions = ManagePermissions(requireActivity(), list, PermissionsRequestCode)
+
+            if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
+                managePermissions.checkPermissions()
+            } else {
+                //  if (RadioFunction.allPermissionsGranted(requireContext())) {
+                Log.d("kksjq", "1")
+                if (getRecordedFiles(requireContext()).size == 0) {
+                    binding.listViewCountriesLiradio.visibility = View.GONE
+                    binding.whenemptyrecordImage.visibility = View.VISIBLE
+                } else {
+                    setupRecordedFilesRV()
+                    recordedFilesAdapter.setItems(getRecordedFiles(requireContext()))
+                    binding.whenemptyrecordImage.visibility = View.GONE
+                    binding.listViewCountriesLiradio.visibility = View.VISIBLE
+                }
+                /* } else {
+                     Log.d("kksjq", "2")
+                     requestMultiplePermissions.launch(
+                         arrayOf(
+                             Manifest.permission.READ_MEDIA_AUDIO,
+                             Manifest.permission.READ_MEDIA_IMAGES,
+                             Manifest.permission.READ_MEDIA_VIDEO,
+                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                             Manifest.permission.READ_EXTERNAL_STORAGE
+                         )
+                     )
+                 }  */
+            }
         }
+
+
     }
 }
