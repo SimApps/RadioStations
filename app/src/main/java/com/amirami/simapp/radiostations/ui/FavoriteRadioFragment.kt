@@ -16,8 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.amirami.simapp.radiostations.Exoplayer.initializePlayer
-import com.amirami.simapp.radiostations.Exoplayer.startPlayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
@@ -29,6 +27,7 @@ import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -49,7 +48,7 @@ class FavoriteRadioFragment :
     //  private var currentNativeAdFavori:  NativeAd? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
-    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
 
     private val radioRoom: MutableList<RadioEntity> = mutableListOf()
     private lateinit var binding: FragmentFavoriteBinding
@@ -143,9 +142,10 @@ class FavoriteRadioFragment :
 
     override fun onItemClick(radioRoom: RadioEntity) {
         try {
-            MainActivity.imageLinkForNotification = radioRoom.favicon
-            initializePlayer(requireContext(), false, Uri.parse(radioRoom.streamurl))
-            startPlayer()
+
+            simpleMediaViewModel.loadData(radioRoom)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
             val radioVariables = RadioEntity()
             radioVariables.apply {
                 name = radioRoom.name

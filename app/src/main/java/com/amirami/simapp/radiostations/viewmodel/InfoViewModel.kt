@@ -9,7 +9,6 @@ import androidx.lifecycle.* // ktlint-disable no-wildcard-imports
 import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
-import com.amirami.simapp.radiostations.RadioFunction.stopService
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.datamonitor.DataUsageManager
@@ -156,7 +155,7 @@ class InfoViewModel @Inject constructor(
             MainActivity.downloader?.cancelDownload()
             Exoplayer.is_downloading = false // without this line player continue paly and rec stop
         }
-        stopService(getApplication<RadioApplication>(), true)
+       // stopService(getApplication<RadioApplication>(), true)
         //   Exoplayer.releasePlayer(getApplication<RadioApplication>())
     }
 

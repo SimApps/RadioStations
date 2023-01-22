@@ -50,6 +50,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
 import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiostations.viewmodel.*
+import com.asmtunis.player_service.service.SimpleMediaService
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.nativead.NativeAd
@@ -69,13 +70,13 @@ import java.io.IOException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemClickListener {
-
+    private var isServiceRunning = false
     var populateFavRv = true // temoprary mesure
 
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterHorizantal
     private var isExpanded = false
 
-    var stationuuid: String = ""
+     var stationuuid: String = ""
 
     private lateinit var adViewSmallActivityplayer: NativeAdView
 
@@ -174,8 +175,34 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         setDataConsumption()
         dataConsuptionTimer()
         putTimer()
+        collectLatestLifecycleFlow(simpleMediaViewModel.icyStreamInfoState) { info ->
+            binding.radioplayer.radioInfotxV.text = info
+        }
 
-        subsucribers()
+
+            collectLatestLifecycleFlow(simpleMediaViewModel.isPlaying) { isPlayin ->
+
+
+                if (isPlayin) {
+              if(!isServiceRunning) startService()
+
+                    binding.radioplayer.pauseplayButton.setImageResource(R.drawable.pause_2)
+                    binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
+                } /*else if (Exoplayer.player == null) {
+                         if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity, true, Uri.parse(""))
+                         else Exoplayer.initializePlayer(this@MainActivity, false, Uri.parse(""))
+                         Exoplayer.startPlayer()
+
+                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
+
+                         if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
+                         else vedeoisNotOnviews()
+                     } */else  {
+
+                    binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
+                    binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
+                }
+            }
         setPlayerBottomSheet()
         getLastPlayedRadioRoom()
         getFavRadioRoom()
@@ -254,7 +281,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private fun vedeoisOnviews() {
         binding.radioplayer.apply {
-            videoView.player = Exoplayer.player
+           // videoView.player = Exoplayer.player
             RadioImVFragBig.visibility = View.GONE
             videoView.visibility = View.VISIBLE
             videoView.defaultArtwork = ContextCompat.getDrawable(this@MainActivity, recordDrawable)
@@ -269,11 +296,10 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private fun setPlayer(radioVar: RadioEntity) {
         stationuuid = radioVar.stationuuid
-        imageLinkForNotification = radioVar.favicon
-        GlobalRadioName = radioVar.name
+         GlobalRadioName = radioVar.name
 
         if (!Exoplayer.is_playing_recorded_file) {
-            if (Exoplayer.player != null) {
+           // if (Exoplayer.player != null) {
                 val radioroom = RadioEntity(
                     stationuuid =  radioVar.stationuuid,
                     name = radioVar.name,
@@ -290,7 +316,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 )
                 radioRoomViewModel.upsertRadio(radioroom, "Radio added")
                 radioRoomViewModel.deletelistened(false, "Radio listened deleted")
-            }
+            //}
             if (video_on) vedeoisOnviews()
             else vedeoisNotOnviews()
 
@@ -371,16 +397,18 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         }
 
         binding.radioplayer.stopButtonMain.setSafeOnClickListener {
+            simpleMediaViewModel.onUIEvent(UIEvent.Stop)
             if (isDownloadingCustomurl) {
                 customdownloader?.cancelDownload()
                 binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
             } else {
-                if (Exoplayer.player != null) {
+               // if (Exoplayer.player != null) {
                     if (!Exoplayer.is_downloading) {
                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                         binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
 
-                        RadioFunction.stopService(this@MainActivity, true)
+                        simpleMediaViewModel.onUIEvent(UIEvent.Stop)
+                    //    RadioFunction.stopService(this@MainActivity, true)
                     } else {
                         downloader?.cancelDownload()
                         binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
@@ -400,20 +428,21 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
                             CORNER_RADIUS_8F
                         )
                     }
-                }
+               // }
             }
         }
         binding.radioplayer.stopButton.setSafeOnClickListener {
+            simpleMediaViewModel.onUIEvent(UIEvent.Stop)
             if (isDownloadingCustomurl) {
                 customdownloader?.cancelDownload()
                 binding.radioplayer.recordOffONButton.setImageResource(R.drawable.rec_2)
             } else {
-                if (Exoplayer.player != null) {
+               // if (Exoplayer.player != null) {
                     if (!Exoplayer.is_downloading) {
                         binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
                         binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
 
-                        RadioFunction.stopService(this@MainActivity, true)
+                       // RadioFunction.stopService(this@MainActivity, true)
                     } else {
                         downloader?.cancelDownload()
                         binding.radioplayer.stopButton.setImageResource(R.drawable.stop_2)
@@ -432,52 +461,19 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
                             CORNER_RADIUS_8F
                         )
                     }
-                }
+                //}
             }
         }
 
         binding.radioplayer.pauseplayButtonMain.setSafeOnClickListener {
-         //   simpleMediaViewModel.loadData(radio)
+            //   simpleMediaViewModel.loadData(radio)
             simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
-
-            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
-                Exoplayer.startPlayer()
-                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-            } else if (Exoplayer.player == null) {
-                if (Exoplayer.is_playing_recorded_file) {
-                    Exoplayer.initializePlayer(this@MainActivity, true, Uri.parse(""))
-                } else Exoplayer.initializePlayer(this@MainActivity, false, Uri.parse(""))
-
-                Exoplayer.startPlayer()
-
-                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-
-                if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
-                else vedeoisNotOnviews()
-            } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
-                Exoplayer.pausePlayer()
-                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
-                binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-            }
         }
         binding.radioplayer.pauseplayButton.setSafeOnClickListener {
-            if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
-                Exoplayer.startPlayer()
-                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
-            } else if (Exoplayer.player == null) {
-                if (Exoplayer.is_playing_recorded_file) Exoplayer.initializePlayer(this@MainActivity, true, Uri.parse(""))
-                else Exoplayer.initializePlayer(this@MainActivity, false, Uri.parse(""))
-                Exoplayer.startPlayer()
+            //   simpleMediaViewModel.loadData(radio)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
-                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
 
-                if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
-                else vedeoisNotOnviews()
-            } else if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY") {
-                Exoplayer.pausePlayer()
-                binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
-                binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-            }
         }
 
         binding.radioplayer.RadioNameImVFrag.isSelected = true
@@ -493,7 +489,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
 
                 if (Exoplayer.is_playing_recorded_file) errorToast(this@MainActivity, getString(R.string.cantRecordArecordedStream))
 
-                if (Exoplayer.player != null && GlobalstateString == "Player.STATE_READY" && !video_on && !Exoplayer.is_playing_recorded_file) {
+                if (/*Exoplayer.player != null && */ !video_on && !Exoplayer.is_playing_recorded_file) {
                     if (!isDownloadingCustomurl) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             RadioFunction.getDownloader(this@MainActivity)
@@ -650,8 +646,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
 
         var video_on = false
 
-        var imageLinkForNotification = ""
-        var GlobalstateString = ""
+
 
         var defaultCountry = ""
 
@@ -669,7 +664,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
     public override fun onResume() {
         super.onResume()
 
-        if (Exoplayer.player != null) {
+       /* if (Exoplayer.player != null) {
             if (video_on) binding.radioplayer.videoView.onResume()
 
             if (video_on || Exoplayer.is_playing_recorded_file) vedeoisOnviews()
@@ -677,9 +672,8 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         } else {
             binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.play_2)
             binding.radioplayer.pauseplayButton.setImageResource(R.drawable.play_2)
-        }
+        }*/
 
-        // startServices(this@MainActivity)
     }
 
     /*  override fun onStop() {
@@ -695,11 +689,23 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
     override fun onDestroy() {
         super.onDestroy()
         turnScreenOffAndKeyguardOn()
-    }
 
+        stopService(Intent(this, SimpleMediaService::class.java))
+        isServiceRunning = false
+    }
+    private fun startService() {
+
+        if (!isServiceRunning) {
+            val intent = Intent(this, SimpleMediaService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
+            isServiceRunning = true
+        }
+    }
     override fun onPause() {
         super.onPause()
-        if (Exoplayer.player != null && video_on) binding.radioplayer.videoView.onPause()
+     //   if (Exoplayer.player != null && video_on) binding.radioplayer.videoView.onPause()
     }
 
     private val requestMultiplePermissions =
@@ -717,31 +723,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
             }
         }
 
-    private fun subsucribers() {
-        Exoplayer.Observer.subscribe("text view", binding.radioplayer.radioInfotxV)
 
-        Exoplayer.Observer.subscribeImagePlayPause(
-            "Main image view",
-            binding.radioplayer.pauseplayButtonMain
-        )
-        Exoplayer.Observer.subscribeImagePlayPause(
-            "image view",
-            binding.radioplayer.pauseplayButton
-        )
-
-        Exoplayer.Observer.subscribeImageRecord(
-            "Main record image view",
-            binding.radioplayer.recordOffONButton
-        )
-
-        //  ExoPlayer.Observer.subscribeImageFave("Main fav image view", binding.radioplayer.likeImageViewPlayermain)
-        //    ExoPlayer.Observer.subscribeImageFave("fav image view", binding.radioplayer.likeImageView)
-
-        Exoplayer.Observer.subscribeImageRecord(
-            "Main stop image view",
-            binding.radioplayer.stopButton
-        )
-    }
 
     private fun setTheme() {
         lifecycleScope.launch {
@@ -814,10 +796,14 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
                     moreinfo =    list[0].moreinfo
                 )
 
-                if (list[0].radiouid == "") Exoplayer.initializePlayer(this, true, Uri.parse(list[0].streamurl))
-                else Exoplayer.initializePlayer(this, false, Uri.parse(list[0].streamurl))
+              //  if (list[0].radiouid == "") Exoplayer.initializePlayer(this, true, Uri.parse(list[0].streamurl))
+               // else Exoplayer.initializePlayer(this, false, Uri.parse(list[0].streamurl))
 
-                Exoplayer.startPlayer()
+               // Exoplayer.startPlayer()
+
+                 simpleMediaViewModel.loadData(radioVar)
+                simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
                 setPlayer(radioVar)
 
                 radioAlarmRoomViewModel.deleteAll("")
@@ -855,7 +841,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
     private fun getLastPlayedRadioRoom() {
         radioRoomViewModel.getAll(false).observe(this) { list ->
 
-            if (Exoplayer.player == null) {
+            //if (Exoplayer.player == null) {
                 if (list.isNotEmpty()) {
                     val radioVariables = RadioEntity()
                     radioVariables.apply {
@@ -896,7 +882,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
                     icyandStateWhenPlayRecordFiles(getString(R.string.playernullinfo), "")
                     // icyandState = getString(R.string.playernullinfo)
                 }
-            }
+           // }
         }
     }
 
@@ -1189,9 +1175,12 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
     override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
             populateFavRv = false
-            imageLinkForNotification = radioRoom.favicon
-            Exoplayer.initializePlayer(this, false, Uri.parse(radioRoom.streamurl))
-            Exoplayer.startPlayer()
+
+
+
+            simpleMediaViewModel.loadData(radioRoom)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
 
             val radioVariables = RadioEntity()
             radioVariables.apply {
@@ -1338,4 +1327,6 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
             }
         }
     }
+
+
 }

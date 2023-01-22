@@ -31,6 +31,7 @@ import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -63,7 +64,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
-    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
 
 
     private lateinit var radioAdapterLastPlayedRadioHorizantal: RadioFavoriteAdapterHorizantal
@@ -479,9 +480,9 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
         } else {
             try {
-                MainActivity.imageLinkForNotification = radio.favicon
-                Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.streamurl))
-                Exoplayer.startPlayer()
+
+                simpleMediaViewModel.loadData(radio)
+                simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
                 infoViewModel.putRadiopalyerInfo(radio)
                 //    jsonLocalRadioCall = api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
@@ -532,9 +533,11 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
-            MainActivity.imageLinkForNotification = radioRoom.favicon
-            Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radioRoom.streamurl))
-            Exoplayer.startPlayer()
+
+
+            simpleMediaViewModel.loadData(radioRoom)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
             val radioVariables = RadioEntity()
             radioVariables.apply {
                 name = radioRoom.name

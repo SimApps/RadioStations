@@ -104,38 +104,6 @@
 
 
 
-        <service
-            android:name=".NotificationChannelService"
-            android:exported="false"
-            android:stopWithTask="true">
-            <intent-filter>
-                <action android:name="com.amirami.simapp.radiostations.action.PAUSE" />
-                <action android:name="com.amirami.simapp.radiostations.action.PLAYPAUSE" />
-                <action android:name="com.amirami.simapp.radiostations.action.REC" />
-                <action android:name="com.amirami.simapp.radiostations.action.STOP" />
-                <action android:name="com.amirami.simapp.radiostations.action.STOPALL" />
-            </intent-filter>
-        </service>
-
-        <receiver android:name=".ControlActionsListener" />
-
-        <receiver
-            android:name=".NotificationDismissedReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.amirami.simapp.radiostations.action.NOTIFICATION_DISMISSED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".NotificationDownloadDismissedReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.amirami.simapp.radiostations.action.NOTIFICATION_DOWNLOAD_DISMISSED" />
-            </intent-filter>
-        </receiver>
 
 
 

@@ -1,5 +1,6 @@
 package com.amirami.simapp.radiostations.viewmodel
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,13 @@ import androidx.lifecycle.viewModelScope
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
+import com.amirami.simapp.radiostations.Exoplayer
+import com.amirami.simapp.radiostations.MainActivity
+import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Resource
 import com.amirami.simapp.radiostations.model.Status
@@ -52,6 +60,9 @@ class SimpleMediaViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
     val uiState = _uiState.asStateFlow()
 
+    private val _icyStreamInfoState = MutableStateFlow<String>("")
+    val icyStreamInfoState = _icyStreamInfoState.asStateFlow()
+
     init {
         viewModelScope.launch {
 
@@ -68,7 +79,17 @@ class SimpleMediaViewModel @Inject constructor(
                     }
                 }
             }
+
+
         }
+        viewModelScope.launch {
+            simpleMediaServiceHandler.icyState.collect { icyStreamInfo ->
+
+            _icyStreamInfoState.value =      icyStreamInfo
+
+            }
+        }
+
     }
 
     override fun onCleared() {
@@ -91,9 +112,12 @@ class SimpleMediaViewModel @Inject constructor(
                 )
             }
 
-            UIEvent.Stop ->  simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Stop)
+            UIEvent.Stop ->  viewModelScope.launch {
+                simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Stop)
+            }
         }
     }
+
 
     fun formatDuration(duration: Long): String {
         val minutes: Long = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
@@ -102,20 +126,23 @@ class SimpleMediaViewModel @Inject constructor(
         return String.format("%02d:%02d", minutes, seconds)
     }
 
+
+
     private fun calculateProgressValues(currentProgress: Long) {
         _progress.value = if (currentProgress > 0) (currentProgress.toFloat() / _duration.value) else 0f
         _progressString.value = formatDuration(currentProgress)
     }
 
      fun loadData(radio : RadioEntity) {
+
         val mediaItem = MediaItem.Builder()
             .setUri(radio.streamurl)
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
                     .setArtworkUri(Uri.parse(radio.favicon))
-                    .setAlbumTitle("SoundHelix")
-                    .setDisplayTitle("Song 1")
+                    .setAlbumTitle(radio.name)
+                    .setDisplayTitle(_icyStreamInfoState.value)
                     .build()
             ).build()
 
@@ -136,6 +163,7 @@ class SimpleMediaViewModel @Inject constructor(
 
         simpleMediaServiceHandler.addMediaItem(mediaItem)
         //simpleMediaServiceHandler.addMediaItemList(mediaItemList)
+
     }
 
 }

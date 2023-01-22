@@ -40,6 +40,7 @@ class SimpleMediaModule {
         ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
+            .setWakeMode(C.WAKE_MODE_NETWORK)
             .setTrackSelector(DefaultTrackSelector(context))
             .build()
 

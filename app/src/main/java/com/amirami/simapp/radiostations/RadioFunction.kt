@@ -34,7 +34,6 @@ import coil.request.CachePolicy
 import coil.transform.RoundedCornersTransformation
 import com.amirami.simapp.radiostations.Exoplayer.isOreoPlus
 import com.amirami.simapp.radiostations.Exoplayer.is_playing_recorded_file
-import com.amirami.simapp.radiostations.Exoplayer.player
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
 import com.amirami.simapp.radiostations.MainActivity.Companion.color1
@@ -167,29 +166,6 @@ object RadioFunction {
         }
     }*/
 
-    fun startServices(context: Context) {
-        if (player != null) {
-            val serviceIntent = Intent(context, NotificationChannelService::class.java)
-            // serviceIntent.putExtra("input_radio_name", GlobalRadioName)
-
-            if (isOreoPlus()){
-                try {
-                    context.startForegroundService(serviceIntent)
-                }
-                catch (e: ServiceStartNotAllowedException) {
-                    // This happens on Android 12+ if you try to start a service from the background
-                    // without a qualifying event.  Why was it not allowed?  What the heck do we do now?
-                    Log.e("serviceStartNotAllowedException ", e.message.toString())
-                }
-            }
-            else context.startService(serviceIntent)
-        }
-    }
-    fun stopService(context: Context, stopplayer: Boolean) {
-        if (stopplayer) Exoplayer.releasePlayer(context)
-        val serviceIntent = Intent(context, NotificationChannelService::class.java)
-        context.stopService(serviceIntent)
-    }
 
     fun unwrap(context: Context): Activity {
         var scontext = context
@@ -489,7 +465,7 @@ object RadioFunction {
                             getColor(context, R.color.violet_medium),
                             9
                         ).show()
-                        startServices(unwrap(context))
+                    //    startServices(unwrap(context))
                     }
                 }
 
@@ -507,7 +483,7 @@ object RadioFunction {
                             R.drawable.stop_2
                         )
 
-                        startServices(unwrap(context))
+                      //  startServices(unwrap(context))
                     }
                 }
 
@@ -525,7 +501,7 @@ object RadioFunction {
                             R.drawable.rec_on
                         )
 
-                        startServices(unwrap(context))
+                    //    startServices(unwrap(context))
                     }
                     //  Log.d(TAG, "onResume")
                 }
@@ -573,7 +549,7 @@ object RadioFunction {
                             9
                         ).show()
 
-                        startServices(unwrap(context))
+                       // startServices(unwrap(context))
                     }
                     // Log.d(TAG, "onCompleted: file --> $file")
                 }
@@ -592,7 +568,7 @@ object RadioFunction {
 
                         DynamicToast.makeError(context, reason!!, 9).show()
 
-                        startServices(unwrap(context))
+                     //   startServices(unwrap(context))
                     }
                     //  Log.d(TAG, "onFailure: reason --> $reason")
                 }
@@ -618,7 +594,7 @@ object RadioFunction {
                             9
                         ).show()
 
-                        startServices(unwrap(context))
+                     //   startServices(unwrap(context))
                     }
                     //  Log.d(TAG, "onCancel")
                 }

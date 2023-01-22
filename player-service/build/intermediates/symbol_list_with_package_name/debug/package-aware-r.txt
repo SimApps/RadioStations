@@ -2737,6 +2737,7 @@ drawable exo_styled_controls_speed
 drawable exo_styled_controls_subtitle_off
 drawable exo_styled_controls_subtitle_on
 drawable exo_styled_controls_vr
+drawable ic_100tb
 drawable ic_clock_black_24dp
 drawable ic_keyboard_black_24dp
 drawable ic_launcher_background
@@ -2933,6 +2934,7 @@ id circle_center
 id clear_text
 id clockwise
 id closest
+id coil_request_manager
 id compress
 id confirm_button
 id constraint
@@ -3051,7 +3053,6 @@ id frost
 id fullscreen_header
 id ghost_view
 id ghost_view_holder
-id glide_custom_view_target_tag
 id gone
 id group_divider
 id guideline

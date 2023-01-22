@@ -23,13 +23,10 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
-import com.amirami.simapp.radiostations.Exoplayer.Observer.Companion.changeImagePlayPause
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalstateString
 import com.amirami.simapp.radiostations.MainActivity.Companion.downloader
 import com.amirami.simapp.radiostations.MainActivity.Companion.fromAlarm
 import com.amirami.simapp.radiostations.MainActivity.Companion.video_on
-import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
@@ -45,7 +42,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
     var totalTime: Long = 0
     var is_playing_recorded_file = false
     var is_downloading = false
-    var player: ExoPlayer? = null
+     private  var player: ExoPlayer? = null
     lateinit var mMediaSession: MediaSession
     var getIsPlaying = false
     private var playbackPosition: Long = 0
@@ -86,7 +83,6 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
         player!!.setMediaSource(mediaSource, true)
         player!!.apply {
             playWhenReady = Exoplayer.playWhenReady
-            addListener(playbackStateListener(ctx))
             repeatMode = Player.REPEAT_MODE_OFF
             prepare()
         }
@@ -96,38 +92,11 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
     class Observer private constructor() {
         private val map: HashMap<String, TextView> = HashMap()
-        private val mapnotify: HashMap<String, String> = HashMap()
         private val mapimage: HashMap<String, ImageView> = HashMap()
 
         companion object {
             private val instance = Observer()
-            fun subscribe(viewKey: String, view: TextView) {
-                val observer = instance
-                observer.map[viewKey] = view
-            }
 
-            fun subscribeImagePlayPause(viewKey: String, image: ImageView) {
-                val observer = instance
-                observer.mapimage[viewKey] = image
-            }
-
-            fun subscribeImageRecord(viewKey: String, image: ImageView) {
-                val observer = instance
-                observer.mapimage[viewKey] = image
-            }
-
-            fun subscribenotificztion(viewKey: String, texet: String) {
-                val observer = instance
-                observer.mapnotify[viewKey] = texet
-            }
-
-            fun changesubscribenotificztion(viewKey: String, text: String) {
-                val observer = instance
-                if (observer.map.containsKey(viewKey)) {
-                    val textView = observer.map[viewKey]
-                    textView!!.text = text
-                }
-            }
 
             fun changeText(viewKey: String, text: String) {
                 val observer = instance
@@ -135,23 +104,8 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
                     val textView = observer.map[viewKey]
                     textView!!.text = text
                 }
-                /*  else
-                  {
-                      // throw exception
-                  }*/
             }
 
-            fun changeImagePlayPause(viewKey: String, image: Int) {
-                val observer = instance
-                if (observer.mapimage.containsKey(viewKey)) {
-                    val imageView = observer.mapimage[viewKey]
-                    imageView!!.setImageResource(image)
-                }
-                /*  else
-                  {
-                      // throw exception
-                  }*/
-            }
 
             fun changeImageRecord(viewKey: String, image: Int) {
                 val observer = instance
@@ -159,10 +113,6 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
                     val imageView = observer.mapimage[viewKey]
                     imageView!!.setImageResource(image)
                 }
-                /*  else
-                  {
-                      // throw exception
-                  }*/
             }
         }
     }
@@ -175,7 +125,6 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
                 currentWindow = player!!.currentMediaItemIndex
                 player!!.playWhenReady = player!!.playWhenReady
                 player!!.playbackState
-                player!!.removeListener(playbackStateListener(context))
                 mMediaSession.release()
                 player?.stop()
                 player!!.release()
@@ -273,130 +222,6 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
         }
     }
 
-    private fun playbackStateListener(ctx: Context) = object : Player.Listener {
-        var icybackup = ""
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-
-            getIsPlaying = isPlaying
-            if (playWhenReady && isPlaying) {
-                if (is_playing_recorded_file) totalTime = player?.duration!!
-                else if (GlobalstateString == "UNKNOWN_STATE") {
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
-                }
-
-                playPauseIcon = R.drawable.pause_2
-                GlobalstateString = "Player.STATE_READY"
-                changeImagePlayPause("Main image view", R.drawable.pause_2)
-                changeImagePlayPause("image view", R.drawable.pause_2)
-            } else if (playWhenReady && GlobalstateString != "Player.STATE_BUFFERING") {
-                playPauseIcon = R.drawable.play_2
-                GlobalstateString = "Player.STATE_PAUSED"
-                changeImagePlayPause("Main image view", R.drawable.play_2)
-                changeImagePlayPause("image view", R.drawable.play_2)
-            }
-
-            RadioFunction.startServices(ctx)
-        }
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            when (playbackState) {
-                Player.STATE_IDLE // The player does not have any media to play.
-                -> {
-                    playPauseIcon = R.drawable.play_2
-                    GlobalstateString = "Player.STATE_IDLE"
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
-                    changeImagePlayPause("Main image view", R.drawable.play_2)
-                    changeImagePlayPause("image view", R.drawable.play_2)
-                }
-                Player.STATE_BUFFERING // The player needs to load media before playing.
-                -> {
-                    GlobalstateString = "Player.STATE_BUFFERING"
-                    playPauseIcon = R.drawable.pause_2
-                    // icyandState = "BUFFERING"
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("BUFFERING", ""))
-                    changeImagePlayPause("Main image view", R.drawable.pause_2)
-                    changeImagePlayPause("image view", R.drawable.pause_2)
-                }
-            /*  Player.STATE_READY // The player is able to immediately play from its current position.
-            -> {
-                  GlobalstateString = "Player.STATE_READY"
-                 bufferingProgressBar.visibility = View.INVISIBLE
-                  bufferingProgressBarbig.visibility = View.INVISIBLE
-                 nowPlayingProgressBar.visibility = View.INVISIBLE
-
-                  play.visibility = View.VISIBLE
-                  pause.visibility = View.GONE
-             }*/
-                Player.STATE_ENDED // The player has finished playing the media.
-                -> {
-                    GlobalstateString = "Player.STATE_ENDED"
-                    playPauseIcon = R.drawable.play_2
-                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-
-                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", ""))
-                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", ""))
-                    changeImagePlayPause("Main image view", R.drawable.play_2)
-                    changeImagePlayPause("image view", R.drawable.play_2)
-                }
-                else -> {
-                    GlobalstateString = "UNKNOWN_STATE"
-                /* playPauseIcon = R.drawable.play_2
-                 icyandState = "OoOps! Try another station! "
-                 icybackup = ""
-
-                 Observer.changeText("Main text view", icyandState)
-                 Observer.changeText("text view", icyandState)
-
-                 changeImagePlayPause("Main image view", R.drawable.play_2)
-                 changeImagePlayPause("image view", R.drawable.play_2)*/
-                }
-            }
-            //    RadioFunction.startServices(ctx)
-        }
-
-        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-            super.onMediaMetadataChanged(mediaMetadata)
-            // icyandState = mediaMetadata.title.toString() //+ mediaMetadata.genre.toString()
-            // icybackup = mediaMetadata.title.toString()
-            icybackup = mediaMetadata.title.toString()
-            RadioFunction.startServices(ctx)
-            //  errorToast(ctx,"3")
-            Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
-            Observer.changeText("text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
-            Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(mediaMetadata.title.toString(), ""))
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-            super.onPlayerError(error)
-
-            releasePlayer(ctx)
-            if (fromAlarm) playSystemAlarm(ctx)
-            RadioFunction.startServices(ctx)
-
-            GlobalstateString = "onPlayerError"
-
-            //   icyandState = "OoOps! Try another station! "
-            //  icybackup = ""
-            Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
-
-            Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
-            Observer.changeText("text view", icyandStateWhenPlayRecordFiles("OoOps! Try another station! ", ""))
-            changeImagePlayPause("Main image view", R.drawable.play_2)
-            changeImagePlayPause("image view", R.drawable.play_2)
-            playPauseIcon = R.drawable.play_2
-        }
-
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) = Unit
-        override fun onRepeatModeChanged(repeatMode: Int) = Unit
-        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = Unit
-    }
 
     fun playSystemAlarm(context: Context) {
         // errorToast(context,defaultAlarmsoundUri.toString())

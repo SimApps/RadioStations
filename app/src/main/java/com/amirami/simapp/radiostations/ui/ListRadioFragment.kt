@@ -35,6 +35,7 @@ import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -45,7 +46,7 @@ import java.io.IOException
 class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapterVertical.OnItemClickListener, RecordedFilesAdapter.OnItemClickListener {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
-    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
 
     private lateinit var radioAdapterHorizantal: RadioListAdapterVertical
     private lateinit var recordedFilesAdapter: RecordedFilesAdapter
@@ -96,7 +97,6 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
             setUpRv()
             binding.floatingActionAddDownload.visibility = View.INVISIBLE
         } else if (argsFrom.msg == resources.getString(R.string.Recordings)) {
-            Exoplayer.Observer.subscribeImageRecord("floatingActionAddDownload", binding.floatingActionAddDownload)
 
             binding.floatingActionAddDownload.visibility = View.VISIBLE
 
@@ -242,12 +242,12 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
     }
 
     override fun onRecItemClick(recordInfo: RecordInfo) {
-        Exoplayer.initializePlayer(
+      /*  Exoplayer.initializePlayer(
             requireContext(),
             true,
             recordInfo.uri!!
             /* if(recordInfo.uri!=null) recordInfo.uri!! else Uri.parse("")*/
-        )
+        )*/
 
         val radioVariables = RadioEntity()
         radioVariables.streamurl = recordInfo.uri.toString()
@@ -271,7 +271,11 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
         }
 
         // DynamicToast.makeSuccess(requireContext(), "refresh frag PLAYER", 9).show()
-        Exoplayer.startPlayer()
+        simpleMediaViewModel.loadData(radioVariables)
+        simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
+
+       // Exoplayer.startPlayer()
         Exoplayer.Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", radioVariables.homepage))
         Exoplayer.Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", radioVariables.homepage))
         // Exoplayer.Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("",radioVariables.homepage))

@@ -22,6 +22,7 @@ import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -34,7 +35,7 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
 
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
-    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
 
     private lateinit var radioAdapterHorizantal: RadioAdapterVertical
     val argsFrom: RadiosFragmentArgs by navArgs()
@@ -133,9 +134,9 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
     }
     override fun onItemClick(radio: RadioEntity) {
         try {
-            MainActivity.imageLinkForNotification = radio.favicon
-            Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.streamurl))
-            Exoplayer.startPlayer()
+            simpleMediaViewModel.loadData(radio)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
             infoViewModel.putRadiopalyerInfo(radio)
             // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
 

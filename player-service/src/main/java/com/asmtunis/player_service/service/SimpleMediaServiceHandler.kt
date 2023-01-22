@@ -1,7 +1,12 @@
 package com.asmtunis.player_service.service
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.*
@@ -15,6 +20,10 @@ class SimpleMediaServiceHandler @Inject constructor(
 
     private val _simpleMediaState = MutableStateFlow<SimpleMediaState>(SimpleMediaState.Initial)
     val simpleMediaState = _simpleMediaState.asStateFlow()
+
+
+    private val _icyState = MutableStateFlow<String>("")
+    val icyState = _icyState.asStateFlow()
 
     private var job: Job? = null
 
@@ -47,18 +56,42 @@ class SimpleMediaServiceHandler @Inject constructor(
                     startProgressUpdate()
                 }
             }
-            PlayerEvent.Stop -> stopProgressUpdate()
+            PlayerEvent.Stop -> {
+
+                stopProgressUpdate()
+                releasePlayer()
+            }
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
         }
     }
 
     @SuppressLint("SwitchIntDef")
     override fun onPlaybackStateChanged(playbackState: Int) {
+
+
         when (playbackState) {
-            ExoPlayer.STATE_BUFFERING -> _simpleMediaState.value =
-                SimpleMediaState.Buffering(player.currentPosition)
-            ExoPlayer.STATE_READY -> _simpleMediaState.value =
-                SimpleMediaState.Ready(player.duration)
+            ExoPlayer.STATE_IDLE // The player does not have any media to play.
+            -> {
+
+            }
+            ExoPlayer.STATE_BUFFERING // The player needs to load media before playing.
+            -> {
+                _simpleMediaState.value =
+                    SimpleMediaState.Buffering(player.currentPosition)
+
+            }
+            ExoPlayer.STATE_READY // The player is able to immediately play from its current position.
+            -> {
+
+             }
+            ExoPlayer.STATE_ENDED // The player has finished playing the media.
+            -> {
+
+            }
+            else -> {
+              //  MainActivity.GlobalstateString = "UNKNOWN_STATE"
+
+            }
         }
     }
 
@@ -74,6 +107,32 @@ class SimpleMediaServiceHandler @Inject constructor(
         }
     }
 
+
+
+
+
+
+
+
+    override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+        super.onMediaMetadataChanged(mediaMetadata)
+        if(mediaMetadata.title.toString()== "null")
+            _icyState.value = "Buffering"
+            else _icyState.value = mediaMetadata.title.toString()
+
+
+    }
+
+    override fun onPlayerError(error: PlaybackException) {
+        super.onPlayerError(error)
+
+        releasePlayer()
+
+    }
+
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) = Unit
+    override fun onRepeatModeChanged(repeatMode: Int) = Unit
+    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = Unit
     private suspend fun startProgressUpdate() = job.run {
         while (true) {
             delay(500)
@@ -81,9 +140,20 @@ class SimpleMediaServiceHandler @Inject constructor(
         }
     }
 
+
+
     private fun stopProgressUpdate() {
         job?.cancel()
         _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = false)
+
+
+    }
+
+    private fun releasePlayer(){
+        player.playWhenReady = player.playWhenReady
+        player.playbackState
+        player.stop()
+        player.release()
     }
 }
 

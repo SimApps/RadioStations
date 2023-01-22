@@ -14,6 +14,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.time
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.CountdownTimerPopupBinding
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,7 @@ class SetTimerBottomSheetFragment :
     NumberPicker.OnValueChangeListener {
 
     private val infoViewModel: InfoViewModel by activityViewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
 
     private var _binding: CountdownTimerPopupBinding? = null
 
@@ -188,29 +190,33 @@ class SetTimerBottomSheetFragment :
         }
 
         binding.buttonStartPause.setSafeOnClickListener {
-            if (MainActivity.GlobalstateString != "Player.STATE_READY") {
-                DynamicToast.makeError(requireContext(), getString(R.string.Radio_is_off), 3).show()
-            } else {
-                val input = spinnerTimerArray[binding.numberPickers.value]!!
-                /* val millisInput = if (binding.timerUnitTxvw.text == getString(R.string.Minute)) Long.parseLong(input) * 60000
-                else input.toLong() * 1024 * 1024*/
+            collectLatestLifecycleFlow(simpleMediaViewModel.isPlaying) {
+                if (!it) {
+                    DynamicToast.makeError(requireContext(), getString(R.string.Radio_is_off), 3).show()
+                } else {
+                    val input = spinnerTimerArray[binding.numberPickers.value]!!
+                    /* val millisInput = if (binding.timerUnitTxvw.text == getString(R.string.Minute)) Long.parseLong(input) * 60000
+                    else input.toLong() * 1024 * 1024*/
 
-                if (binding.timerUnitTxvw.text == getString(R.string.Minute) && binding.buttonStartPause.text != getString(R.string.Reset)) {
-                    infoViewModel.puttimer(input.toInt() * 60)
-                } else if (binding.switchTmerData.text == getString(R.string.Data) && binding.buttonStartPause.text != getString(R.string.Reset)) {
-                    infoViewModel.putDataConsumptiontimer(input.toLong() * 1024 * 1024)
-                } else if (binding.buttonStartPause.text == getString(R.string.Reset)) {
-                    infoViewModel.stoptimer(false)
-                    infoViewModel.stopdatatimer(false)
+                    if (binding.timerUnitTxvw.text == getString(R.string.Minute) && binding.buttonStartPause.text != getString(R.string.Reset)) {
+                        infoViewModel.puttimer(input.toInt() * 60)
+                    } else if (binding.switchTmerData.text == getString(R.string.Data) && binding.buttonStartPause.text != getString(R.string.Reset)) {
+                        infoViewModel.putDataConsumptiontimer(input.toLong() * 1024 * 1024)
+                    } else if (binding.buttonStartPause.text == getString(R.string.Reset)) {
+                        infoViewModel.stoptimer(false)
+                        infoViewModel.stopdatatimer(false)
+                    }
+                    /*  else if(binding.buttonStartPause.text == getString(R.string.Reset) && binding.timerUnitTxvw.text == getString(R.string.Minute))
+                         infoViewModel.stoptimer()
+
+                      else if ( binding.switchTmerData.text == getString(R.string.Data) && binding.buttonStartPause.text == getString(R.string.Reset)){
+                          //   DynamicToast.makeError(requireContext(), "it.toString()", 3).show()
+                          infoViewModel.stopdatatimer()
+                      }*/
                 }
-              /*  else if(binding.buttonStartPause.text == getString(R.string.Reset) && binding.timerUnitTxvw.text == getString(R.string.Minute))
-                   infoViewModel.stoptimer()
 
-                else if ( binding.switchTmerData.text == getString(R.string.Data) && binding.buttonStartPause.text == getString(R.string.Reset)){
-                    //   DynamicToast.makeError(requireContext(), "it.toString()", 3).show()
-                    infoViewModel.stopdatatimer()
-                }*/
             }
+
         }
     }
 
