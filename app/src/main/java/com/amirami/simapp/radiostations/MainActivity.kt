@@ -1,7 +1,6 @@
 package com.amirami.simapp.radiostations
 
 import alirezat775.lib.downloader.Downloader
-import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
@@ -17,6 +16,8 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -26,10 +27,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.util.UnstableApi
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,13 +42,14 @@ import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.alarm.RadioAlarmRoomViewModel
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
-import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
 import com.amirami.simapp.radiostations.utils.ManagePermissions
+import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiostations.viewmodel.*
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -59,6 +61,7 @@ import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -80,12 +83,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     private lateinit var adViewAdaptiveBanner: AdView
 
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by viewModels()
+    private val networkViewModel: NetworkViewModel by viewModels()
 
     private val infoViewModel: InfoViewModel by viewModels()
-    private val preferencesViewModel: PreferencesViewModel by viewModels()
     private val radioRoomViewModel: RadioRoomViewModel by viewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by viewModels()
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by viewModels()
+    private val dataViewModel: DataViewModel by viewModels()
 
     private val radioRoom: MutableList<RadioRoom> = mutableListOf()
 
@@ -133,6 +137,22 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
+
+    private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (isExpanded) bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            else {
+                val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
+
+
+
+               if(navController.graph.startDestinationId == navController.currentDestination?.id)
+                   finish()
+                else navController.navigateUp()
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -141,6 +161,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         binding = ActivityContentMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         firebaseappCheck()
 
@@ -315,10 +337,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         )
                         navController.navigate(R.id.infoBottomSheetFragment, bundle)
                     }
+dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
 
-                    preferencesViewModel.onFirstTimeopenRecordFolderChanged(
-                        firstTimeopenRecordfolder
-                    )
                 }
                 RadioFunction.openRecordFolder(this@MainActivity)
             }
@@ -341,10 +361,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                         )
                         navController.navigate(R.id.infoBottomSheetFragment, bundle)
                     }
+                    dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
 
-                    preferencesViewModel.onFirstTimeopenRecordFolderChanged(
-                        firstTimeopenRecordfolder
-                    )
                 }
                 RadioFunction.openRecordFolder(this@MainActivity)
             }
@@ -881,10 +899,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
     }
 
-    override fun onBackPressed() {
-        if (isExpanded) bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        else super.onBackPressed()
-    }
+
+
 
     private fun bottomsheetopenclose() {
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -929,22 +945,27 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     when (newState) {
                         BottomSheetBehavior.STATE_COLLAPSED -> {
                             if (::adViewSmallActivityplayer.isInitialized) adViewSmallActivityplayer.destroy()
-                            binding.radioplayer.RadioImVFrag.visibility = View.VISIBLE
-                            binding.radioplayer.stopButton.visibility = View.VISIBLE
-                            binding.radioplayer.pauseplayButton.visibility = View.VISIBLE
-                            binding.radioplayer.likeImageView.visibility = View.VISIBLE
-                            // binding.radioplayer.datainfotxvw.visibility = View.VISIBLE
+                            binding.radioplayer.apply {
+                                RadioImVFrag.visibility = View.VISIBLE
+                                stopButton.visibility = View.VISIBLE
+                                pauseplayButton.visibility = View.VISIBLE
+                                likeImageView.visibility = View.VISIBLE
+                                // binding.radioplayer.datainfotxvw.visibility = View.VISIBLE
+                            }
+
                             isExpanded = false
                         }
                         BottomSheetBehavior.STATE_EXPANDED -> {
                             //    setupRadioLisRV()
                             // getRadioRoomplayer()
+                            binding.radioplayer.apply {
+                                RadioImVFrag.visibility = View.INVISIBLE
+                                stopButton.visibility = View.INVISIBLE
+                                pauseplayButton.visibility = View.INVISIBLE
+                                likeImageView.visibility = View.INVISIBLE
+                                //  binding.radioplayer.datainfotxvw.visibility = View.GONE
+                            }
 
-                            binding.radioplayer.RadioImVFrag.visibility = View.INVISIBLE
-                            binding.radioplayer.stopButton.visibility = View.INVISIBLE
-                            binding.radioplayer.pauseplayButton.visibility = View.INVISIBLE
-                            binding.radioplayer.likeImageView.visibility = View.INVISIBLE
-                            //  binding.radioplayer.datainfotxvw.visibility = View.GONE
                             isExpanded = true
                             //    DynamicToast.makeSuccess(this@MainActivity,"STATE_EXPANDED", 3).show()
                             loadNativeAdPlayer()
@@ -986,17 +1007,33 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
     private fun setTitleText() {
-        lifecycleScope.launchWhenStarted {
-            infoViewModel.putTitleText.collectLatest { title ->
-                binding.searchView.ActionBarTitle.text = title
+        collectLatestLifecycleFlow(networkViewModel.isConnected) { isConnected ->
+            if(isConnected){
+                binding.searchView.opencloseSearchButton.visibility = View.VISIBLE
 
-                if (title != getString(R.string.Search)) {
-                    // if (binding.searchView.searchOpenView.isAttachedToWindow) {
-                    closeSearch()
-                    //  }
+                lifecycleScope.launchWhenStarted {
+                    infoViewModel.putTitleText.collectLatest { title ->
+                        binding.searchView.ActionBarTitle.text = title
+
+                        if (title != getString(R.string.Search)) {
+                            // if (binding.searchView.searchOpenView.isAttachedToWindow) {
+                            closeSearch()
+                            //  }
+                        }
+                    }
+                }
+            }
+
+
+            else  {
+                binding.searchView.apply {
+                    ActionBarTitle.text = "Not Connected !"
+                    opencloseSearchButton.visibility = View.INVISIBLE
                 }
             }
         }
+
+
     }
 
     private fun closeSearch() {
@@ -1122,14 +1159,13 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
     private fun getPref() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                darkTheme = preferencesViewModel.preferencesFlow.first().dark_theme
-                systemTheme = preferencesViewModel.preferencesFlow.first().system_theme
 
-                infoViewModel.putThemes(preferencesViewModel.preferencesFlow.first().dark_theme)
-            }
-        }
+
+        darkTheme =  dataViewModel.getDarkTheme()
+        systemTheme = dataViewModel.getSystemTheme()
+
+        infoViewModel.putThemes(darkTheme)
+
     }
 
     private fun populateRecyclerView(radioRoom: MutableList<RadioRoom>) {
@@ -1291,6 +1327,14 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                     or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
             )
+        }
+    }
+
+    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+        this.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                flow.collectLatest(collect)
+            }
         }
     }
 }

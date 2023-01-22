@@ -3,8 +3,15 @@ package com.amirami.simapp.radiostations.alarm
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class TimeChangedReceiver : BroadcastReceiver() {
+@AndroidEntryPoint
+class TimeChangedReceiver @Inject constructor(
+
+    var dataViewModel: DataViewModel
+): BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == "android.intent.action.TIME_SET") {
@@ -12,9 +19,11 @@ class TimeChangedReceiver : BroadcastReceiver() {
             //   val sharedPref = context?.getSharedPreferences("MyPref",Context.MODE_PRIVATE) ?: return
             //   val timeInMilli = sharedPref.getLong("timeInMilli", 1)
 
-            val timeInMilli = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context!!).getLong("timeInMilli", 1L)
+            val timeInMilli = dataViewModel.getTimeInMillis().toLong().toLong()
 
-            Utils.setAlarm(context, timeInMilli)
+            if (context != null) {
+                Utils.setAlarm(context, timeInMilli)
+            }
 
             // Toast.makeText(context,"TimeChangedReceiver  $timeInMilli " , Toast.LENGTH_SHORT).show()
         }

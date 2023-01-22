@@ -935,7 +935,7 @@ object RadioFunction {
         }
     }
 
-    fun shortRecordFileName(@NonNull file: File): String {
+    fun shortRecordFileName(file: File): String {
         return if (file.name.contains("_ _", true)) file.name.substring(
             0,
             file.name.indexesOf("_ _", true)[0]

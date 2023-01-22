@@ -56,13 +56,14 @@ dependencies {
 
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'com.google.android.material:material:1.7.0'
+    implementation "androidx.activity:activity-ktx:1.6.0-rc01"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     //reetrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -125,7 +126,7 @@ dependencies {
 
 
     //ads to remove in pro
-    implementation 'com.google.android.gms:play-services-ads:21.3.0'
+    implementation 'com.google.android.gms:play-services-ads:21.4.0'
 
 
     // When using the BoM, you don't specify versions in Firebase library dependencies
@@ -148,22 +149,22 @@ dependencies {
 
 
     // this line below because a wierd warning about viewbinding
-    compileOnly 'com.android.databinding:viewbinding:7.3.1'
+    compileOnly 'com.android.databinding:viewbinding:7.4.0'
 
 // Navigation Component dependencies
     implementation "androidx.navigation:navigation-fragment-ktx:2.6.0-alpha04"
     implementation "androidx.navigation:navigation-ui-ktx:2.6.0-alpha04"
 
     // ViewModel
-    implementation "androidx.fragment:fragment-ktx:1.5.4"
+    implementation "androidx.fragment:fragment-ktx:1.5.5"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 
 
     //dager hilt
-    implementation 'com.google.dagger:hilt-android:2.44'
-    kapt 'com.google.dagger:hilt-compiler:2.44'
+    implementation 'com.google.dagger:hilt-android:2.44.2'
+    kapt 'com.google.dagger:hilt-compiler:2.44.2'
 
     kapt "androidx.hilt:hilt-compiler:1.0.0"
     
@@ -179,10 +180,10 @@ dependencies {
 
 
     // - - Room Persistence Library
-    implementation "androidx.room:room-runtime:2.4.3"
-    kapt "androidx.room:room-compiler:2.4.3"
+    implementation "androidx.room:room-runtime:2.5.0"
+    kapt "androidx.room:room-compiler:2.5.0"
     // optional - Kotlin Extensions and Coroutines support for Room
-    implementation "androidx.room:room-ktx:2.4.3"
+    implementation "androidx.room:room-ktx:2.5.0"
 
 
    // def lottieVersion = "5.0.3"
@@ -190,7 +191,7 @@ dependencies {
 
 
     //ONLY FOR ALARMS MAYBE FIND HOW TO REMOVE IT??? REPLACE IT ...
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+//    implementation 'androidx.preference:preference-ktx:1.2.0'
 
 
 }

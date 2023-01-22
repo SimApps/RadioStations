@@ -24,9 +24,12 @@ import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
 import com.amirami.simapp.radiostations.alarm.Utils.cancelAlarm
 import com.amirami.simapp.radiostations.alarm.Utils.diableBootReceiver
 import com.amirami.simapp.radiostations.alarm.Utils.enableBootReceiver
+import com.amirami.simapp.radiostations.alarm.Utils.immutableFlag
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.BottomsheetAddalarmBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
+import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +40,7 @@ import java.util.*
 
 @UnstableApi @AndroidEntryPoint
 class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private var hourPicker: NumberPicker? = null
     private var munitPicker: NumberPicker? = null
@@ -49,7 +53,6 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomsheetAddalarmBinding? = null
 
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by activityViewModels()
-    private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
 
     private lateinit var radioVariable: RadioVariables
     override fun onCreateView(
@@ -129,9 +132,10 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
             _binding!!.buttonStartCancelalarm.text = getString(R.string.Start_alarm)
             _binding!!.infoalarm.visibility = View.GONE
         } else {
+
             _binding!!.infoalarm.text = getString(
                 R.string.radioAlarmIsSetAT,
-                shortformateDate(androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()).getLong("timeInMilli", 1L)),
+                shortformateDate(dataViewModel.getTimeInMillis().toLong()),
                 if (radioAlarmEmpty[0].radiouid != "") getString(R.string.RadioStationName) else getString(R.string.RecordedStationName),
                 radioAlarmEmpty[0].name + if (radioAlarmEmpty[0].radiouid != "") "" else formatRcordDescriptionName(radioAlarmEmpty[0].homepage)
             )
@@ -215,6 +219,8 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
                     if (pInten != null) {
                         radioAlarmRoomViewModel.deleteAll("")
                         cancelAlarm(requireContext())
+                        dataViewModel.saveRadioUrl("Empty")
+
                         diableBootReceiver(requireContext())
                     }
                 }

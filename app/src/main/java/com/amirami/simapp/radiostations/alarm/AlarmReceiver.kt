@@ -6,24 +6,29 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.media.RingtoneManager
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.util.UnstableApi
-import androidx.preference.PreferenceManager
 import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.MainActivity.Companion.fromAlarm
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.alarm.Utils.diableBootReceiver
+import com.amirami.simapp.radiostations.alarm.Utils.immutableFlag
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_CHANNEL_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 import com.amirami.simapp.radiostations.utils.Constatnts.EXTRA_MESSAGE
 import com.amirami.simapp.radiostations.utils.Constatnts.EXTRA_MESSAGE_VALUE
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-@UnstableApi class AlarmReceiver : BroadcastReceiver() {
+@AndroidEntryPoint
+@UnstableApi class AlarmReceiver @Inject constructor(
 
-    private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
+    var dataViewModel: DataViewModel
+) : BroadcastReceiver() {
+
 
     override fun onReceive(context: Context?, intent: Intent?) {
         // Generate an Id for each notification
@@ -79,9 +84,8 @@ import com.amirami.simapp.radiostations.utils.Constatnts.EXTRA_MESSAGE_VALUE
              else PlaySystemAlarm(context)
      */
 
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putString("radioURL", "Empty").apply()
+
+        dataViewModel.saveRadioUrl("Empty")
 
         fun getfullScreenPendingIntent(): PendingIntent {
             val fullScreenIntent = Intent(context, MainActivity::class.java)

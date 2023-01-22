@@ -22,10 +22,10 @@ import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.TagsAdapterHorizantal
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentMainBinding
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
-import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -60,9 +60,9 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private val popularImagetagList: ArrayList<Int> = ArrayList()
     private lateinit var binding: FragmentMainBinding
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val preferencesViewModel: PreferencesViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private lateinit var radioAdapterLastPlayedRadioHorizantal: RadioFavoriteAdapterHorizantal
     private lateinit var tagsAdapterHorizantal: TagsAdapterHorizantal
@@ -127,7 +127,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 //  retrofitRadioViewModel.getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
                 loadImageString(
                     requireContext(),
-                    COUNTRY_FLAGS_BASE_URL + preferencesViewModel.preferencesFlow.first().default_country.lowercase(Locale.ROOT),
+                    COUNTRY_FLAGS_BASE_URL + dataViewModel.getDefaultCountr().lowercase(Locale.ROOT),
                     imagedefaulterrorurl,
                     binding.localradiomview,
                     Constatnts.CORNER_RADIUS_32F
@@ -331,36 +331,34 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     }
 
     private fun getPref() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            MainActivity.saveData = preferencesViewModel.preferencesFlow.first().save_data
 
-            MainActivity.firstTimeOpened = preferencesViewModel.preferencesFlow.first().first_open
+            MainActivity.saveData = dataViewModel.getSaveData()
 
-            if (!preferencesViewModel.preferencesFlow.first().first_open) {
+            MainActivity.firstTimeOpened = dataViewModel.getFirstOpen()
+
+            if (!dataViewModel.getFirstOpen()) {
                 val action = MainFragmentDirections.actionMainFragmentToInfoBottomSheetFragment("BatterieOptimisation")
                 this@MainFragment.findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-
-                //   MainActivity.firstTimeOpened =true
-                preferencesViewModel.onFirstTimeopenRecordFolderChanged(true)
+                dataViewModel.saveFirstTimeopenRecordFolder(true)
             }
 
-            MainActivity.BASE_URL = preferencesViewModel.preferencesFlow.first().choosen_server
-            if (preferencesViewModel.preferencesFlow.first().choosen_server !in MainActivity.server_arraylist) {
+            MainActivity.BASE_URL = dataViewModel.getChoosenServer()
+            if (dataViewModel.getChoosenServer() !in MainActivity.server_arraylist) {
                 val randomNumber: Int = Random().nextInt(MainActivity.server_arraylist.size - 1)
                 MainActivity.BASE_URL = MainActivity.server_arraylist[randomNumber] // "http://91.132.145.114"   remove this line when all user dont use 2.2.35
             }
 
             //  binding.localcountryTxtVw.text= RadioFunction.countryCodeToName(preferencesViewModel.preferencesFlow.first().default_country)
-            defaultCountry = preferencesViewModel.preferencesFlow.first().default_country
+            defaultCountry = dataViewModel.getDefaultCountr()
 
-            MainActivity.firstTimeopenRecordfolder = preferencesViewModel.preferencesFlow.first().first_timeopen_record_folder
+            MainActivity.firstTimeopenRecordfolder = dataViewModel.getFirstTimeopenRecordFolder()
 
-            MainActivity.BASE_URL = preferencesViewModel.preferencesFlow.first().choosen_server
-            if (preferencesViewModel.preferencesFlow.first().choosen_server !in MainActivity.server_arraylist) {
+            MainActivity.BASE_URL = dataViewModel.getChoosenServer()
+            if (dataViewModel.getChoosenServer() !in MainActivity.server_arraylist) {
                 val randomNumber: Int = Random().nextInt(MainActivity.server_arraylist.size - 1)
                 MainActivity.BASE_URL = MainActivity.server_arraylist[randomNumber] // "http://91.132.145.114"   remove this line when all user dont use 2.2.35
             }
-        }
+
     }
     private fun setupTheme() {
         lifecycleScope.launchWhenStarted {
@@ -379,42 +377,58 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 Configuration.UI_MODE_NIGHT_YES -> darkTheme = true
                 Configuration.UI_MODE_NIGHT_NO -> darkTheme = false
             }
-            preferencesViewModel.onDarkThemeChanged(darkTheme)
+            dataViewModel.saveDarkTheme(darkTheme)
         }
     }
 
     private fun btnClick() {
         binding.btnAllcountry.setSafeOnClickListener {
-            //   retrofitRadioViewModel.getListRadios(getString(R.string.countries))
-            val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
-            findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                //   retrofitRadioViewModel.getListRadios(getString(R.string.countries))
+                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
+                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
         }
         binding.localradiomview.setSafeOnClickListener {
-            retrofitRadioViewModel.getRadios(defaultCountry, "Empty")
-            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(defaultCountry)
-            findNavController().navigate(action) // NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                retrofitRadioViewModel.getRadios(defaultCountry, "Empty")
+                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(defaultCountry)
+                findNavController().navigate(action) // NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
         }
 
         binding.viewAllFavRadio.setSafeOnClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToFavoriteRadioFragment()
-            findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                val action = MainFragmentDirections.actionMainFragmentToFavoriteRadioFragment()
+                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+
         }
 
         binding.btnTopClicks.setSafeOnClickListener {
-            retrofitRadioViewModel.getRadios("Top clicks", "300")
-            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top clicks", "300")
-            findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                retrofitRadioViewModel.getRadios("Top clicks", "300")
+                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top clicks", "300")
+                findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+
         }
 
         binding.btnTopVotes.setSafeOnClickListener {
-            retrofitRadioViewModel.getRadios("Top Votes", "300")
-            val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top Votes", "300")
-            findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                retrofitRadioViewModel.getRadios("Top Votes", "300")
+                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top Votes", "300")
+                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+
         }
         binding.btnRecodedFiles.setSafeOnClickListener {
-            retrofitRadioViewModel.getListRadios(getString(R.string.Recordings))
-            val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.Recordings))
-            findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                retrofitRadioViewModel.getListRadios(getString(R.string.Recordings))
+                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.Recordings))
+                findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+
         }
         /*    binding.recentTxtVw.setSafeOnClickListener {
                 val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(getString(R.string.recents),"300")
@@ -423,9 +437,12 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
          */
         binding.tagsTxtVw.setSafeOnClickListener {
-            retrofitRadioViewModel.getListRadios(getString(R.string.tags))
-            val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.tags))
-            findNavController().navigate(action) //    NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            if (canNavigate()) {
+                retrofitRadioViewModel.getListRadios(getString(R.string.tags))
+                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.tags))
+                findNavController().navigate(action) //    NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+
         }
     }
 
@@ -439,21 +456,25 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     override fun onItemClick(radio: RadioVariables) {
         if (radio.stationuuid == "") {
-            try {
-                //   RadioFunction.countryCodeToName(radio.name)
-                retrofitRadioViewModel.getRadios(getString(R.string.countries), radio.name)
-                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(getString(R.string.countries), radio.name)
-                this@MainFragment.findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-            } catch (e: IOException) {
-                // Catch the exception
-                e.printStackTrace()
-            } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
-            } catch (e: SecurityException) {
-                e.printStackTrace()
-            } catch (e: IllegalStateException) {
-                e.printStackTrace()
+            if (canNavigate()) {
+                try {
+
+                    //   RadioFunction.countryCodeToName(radio.name)
+                    retrofitRadioViewModel.getRadios(getString(R.string.countries), radio.name)
+                    val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(getString(R.string.countries), radio.name)
+                    this@MainFragment.findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+                } catch (e: IOException) {
+                    // Catch the exception
+                    e.printStackTrace()
+                } catch (e: IllegalArgumentException) {
+                    e.printStackTrace()
+                } catch (e: SecurityException) {
+                    e.printStackTrace()
+                } catch (e: IllegalStateException) {
+                    e.printStackTrace()
+                }
             }
+
         } else {
             try {
                 MainActivity.imageLinkForNotification = radio.favicon
@@ -478,30 +499,32 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     override fun onItemTagsClick(item: String, image: Int) {
         //   val intentActivityRadio = Intent(context, RadiosFragment::class.java)
         // val intentActivityListRadio = Intent(context, ListRadioFragment::class.java)
+        if (canNavigate()) {
+            when (item) {
+                getString(R.string.Languages) -> {
+                    retrofitRadioViewModel.getListRadios(getString(R.string.languages))
+                    val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.languages))
+                    this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
+                }
+                getString(R.string.States) -> {
+                    retrofitRadioViewModel.getListRadios(getString(R.string.states))
+                    val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.states))
+                    this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
+                }
+                getString(R.string.Codecs) -> {
+                    retrofitRadioViewModel.getListRadios(getString(R.string.codecs))
+                    val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.codecs))
+                    this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
+                }
+                else -> {
+                    //  intentActivityRadio.putExtra("TagName", items[position])
 
-        when (item) {
-            getString(R.string.Languages) -> {
-                retrofitRadioViewModel.getListRadios(getString(R.string.languages))
-                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.languages))
-                this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
+                    retrofitRadioViewModel.getRadios(item, "Empty")
+                    val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(item)
+                    this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
+                }
             }
-            getString(R.string.States) -> {
-                retrofitRadioViewModel.getListRadios(getString(R.string.states))
-                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.states))
-                this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
-            }
-            getString(R.string.Codecs) -> {
-                retrofitRadioViewModel.getListRadios(getString(R.string.codecs))
-                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.codecs))
-                this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
-            }
-            else -> {
-                //  intentActivityRadio.putExtra("TagName", items[position])
 
-                retrofitRadioViewModel.getRadios(item, "Empty")
-                val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(item)
-                this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
-            }
         }
     }
 
@@ -560,4 +583,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             }
         }
     }
+
+
+    private fun canNavigate() : Boolean = findNavController().currentDestination?.id == R.id.mainFragment
 }

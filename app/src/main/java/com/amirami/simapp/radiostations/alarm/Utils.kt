@@ -2,20 +2,39 @@ package com.amirami.simapp.radiostations.alarm
 
 import android.app.AlarmManager
 import android.app.AlarmManager.AlarmClockInfo
+import android.app.PendingIntent
 import android.app.PendingIntent.*
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
+import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
-import androidx.preference.PreferenceManager
 
 @UnstableApi object Utils {
     const val requestalarmId = 11421
-    private val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
+     val immutableFlag = if (Build.VERSION.SDK_INT >= 23) /*PendingIntent.FLAG_IMMUTABLE*/ PendingIntent.FLAG_MUTABLE else 0
 
     fun setAlarm(context: Context, timeOfAlarm: Long) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = ContextCompat.getSystemService(context, AlarmManager::class.java)
+            if (alarmManager?.canScheduleExactAlarms() == false) {
+                Intent().also { intent ->
+                    intent.action =  Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                    context.startActivity(intent)
+                }
+            }
+            else setAlarms(context, timeOfAlarm)
+
+        }
+        else setAlarms(context, timeOfAlarm)
+
+
+
+    }
+    fun setAlarms(context: Context, timeOfAlarm: Long) {
         // Intent to start the Broadcast Receiver
         val broadcastIntent = Intent(context, AlarmReceiver::class.java)
 
@@ -30,18 +49,13 @@ import androidx.preference.PreferenceManager
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         if (System.currentTimeMillis() < timeOfAlarm) {
-            PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putLong("timeInMilli", timeOfAlarm).apply()
 
             val alarmClockInfo = AlarmClockInfo(timeOfAlarm, pIntent)
             alarmMgr.setAlarmClock(alarmClockInfo, pIntent)
 
             enableBootReceiver(context)
-        } else {
-            PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putLong("timeInMilli", timeOfAlarm + 86400000L).apply()
+        }
+        else {
             val alarmClockInfo = AlarmClockInfo(timeOfAlarm + 86400000L/* add one day*/, pIntent)
             alarmMgr.setAlarmClock(alarmClockInfo, pIntent)
 
@@ -61,9 +75,7 @@ import androidx.preference.PreferenceManager
         )
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (pIntent != null) {
-            PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putString("radioURL", "Empty").apply()
+
 
             val receiver = ComponentName(context, BootCompleteReceiver::class.java)
             context.packageManager.setComponentEnabledSetting(

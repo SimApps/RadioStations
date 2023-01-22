@@ -30,10 +30,11 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.imageLinkForNotification
 import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterrorurl
 import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
+import com.amirami.simapp.radiostations.alarm.Utils
+import com.amirami.simapp.radiostations.alarm.Utils.immutableFlag
 
 class NotificationChannelService : Service() {
     val notifID = 93696
-    val immutableFlag = if (Build.VERSION.SDK_INT >= 23) FLAG_IMMUTABLE else 0
 
     /*  private fun handlePlayPause() {
          if (playWhenReady && getIsPlaying) pausePlayer()

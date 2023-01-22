@@ -28,12 +28,12 @@ import com.amirami.simapp.radiostations.RadioFunction.gradiancolorNestedScrollVi
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.succesToast
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentSettingBinding
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioRoom
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.model.Status
-import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -55,7 +55,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     private lateinit var binding: FragmentSettingBinding
 
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val preferencesViewModel: PreferencesViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
@@ -153,11 +153,9 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     /*    if(getuserid()!="no_user"){
             userTxtVwVisibiity(true)
         }*/
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                binding.favCountryTxv.text = getString(R.string.defaultCountry, countryCodeToName(preferencesViewModel.preferencesFlow.first().default_country))
-            }
-        }
+
+                binding.favCountryTxv.text = getString(R.string.defaultCountry, countryCodeToName(dataViewModel.getDefaultCountr()))
+
 
         binding.radioServersTxv.text = getString(R.string.currentserver, BASE_URL)
 
@@ -210,12 +208,12 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         binding.saveData.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 binding.saveData.text = getString(R.string.Disable_Load_radio_images)
-                preferencesViewModel.onSaveDataChanged(isChecked)
-                saveData = isChecked
+                dataViewModel.saveSaveData(true)
+                saveData = true
             } else {
                 binding.saveData.text = getString(R.string.Enable_Load_radio_images)
-                preferencesViewModel.onSaveDataChanged(isChecked)
-                saveData = isChecked
+                dataViewModel.saveSaveData(false)
+                saveData = false
             }
         }
 

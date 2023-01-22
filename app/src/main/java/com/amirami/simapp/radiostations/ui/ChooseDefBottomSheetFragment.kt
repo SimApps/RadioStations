@@ -16,10 +16,12 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.darkTheme
 import com.amirami.simapp.radiostations.MainActivity.Companion.systemTheme
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.BottomsheetChooseDefDialogueBinding
 import com.amirami.simapp.radiostations.model.RadioVariables
 import com.amirami.simapp.radiostations.model.Status
-import com.amirami.simapp.radiostations.preferencesmanager.PreferencesViewModel
+import com.amirami.simapp.radiostations.utils.connectivity.internet.ListenNetwork
+import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -33,7 +35,7 @@ import java.io.IOException
 class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapterVertical.OnItemClickListener {
     private var _binding: BottomsheetChooseDefDialogueBinding? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val preferencesViewModel: PreferencesViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private lateinit var radioAdapterVertical: RadioListAdapterVertical
     override fun onCreateView(
@@ -136,8 +138,8 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                             }
                         }
                     }
-                    preferencesViewModel.onDarkThemeChanged(darkTheme)
-                    preferencesViewModel.onSystemThemeChanged(systemTheme)
+                    dataViewModel.saveDarkTheme(darkTheme)
+                    dataViewModel.saveSystemTheme(systemTheme)
                     infoViewModel.putPutDefThemeInfo(darkTheme, systemTheme)
 
                     infoViewModel.putThemes(darkTheme)
@@ -150,8 +152,8 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         if (radio.ip != "") {
             try {
                 //    if(globalserversJson[position]!=""){
-                preferencesViewModel.onChoosenServerChanged("http://" + radio.ip)
 
+                dataViewModel.saveChoosenServer("http://" + radio.ip)
                 MainActivity.BASE_URL = "http://" + radio.ip
                 infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
 
@@ -170,7 +172,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
             }
         } else {
             try {
-                preferencesViewModel.onDefaultCountryChanged(radio.name)
+              dataViewModel.saveDefaultCountry(radio.name)
                 MainActivity.defaultCountry = radio.name
                 infoViewModel.putDefCountryInfo(RadioFunction.countryCodeToName(radio.name))
                 // fav_country_txv.text = getString(R.string.defaultCountry,  RadioFunction.countryCodeToName(globalCountriesJson[position]))

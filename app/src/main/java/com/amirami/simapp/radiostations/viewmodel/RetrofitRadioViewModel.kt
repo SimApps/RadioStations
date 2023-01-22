@@ -1,11 +1,8 @@
 package com.amirami.simapp.radiostations.viewmodel
 
 import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
 import android.net.ConnectivityManager.*
 import android.net.NetworkCapabilities.*
-import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.amirami.simapp.radiostations.MainActivity
@@ -14,6 +11,7 @@ import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
 import com.amirami.simapp.radiostations.model.Resource
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.repository.RetrofitRadioRepository
+import com.amirami.simapp.radiostations.utils.connectivity.internet.ListenNetwork
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,6 +23,7 @@ class RetrofitRadioViewModel
 @Inject
 constructor(
     private val repository: RetrofitRadioRepository,
+    private val listenNetwork: ListenNetwork,
     app: Application
 ) : AndroidViewModel(app) {
 
@@ -52,17 +51,19 @@ constructor(
     private val _responseLocalRadio = MutableStateFlow(Resource(Status.SUCCESS, null, ""))
     val responseLocalRadio = _responseLocalRadio.asStateFlow()
 
-    init {
-        /*viewModelScope.launch {
+    private val _isConnected = MutableStateFlow(true)
+    val isConnected = _isConnected.asStateFlow()
 
-            getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
-        }
-           viewModelScope.launch {
-               getLocalRadio(Locale.getDefault().country)
-           }*/
+    init {
         getListCountrieRadios()
+        getNetworkState()
     }
 
+    fun getNetworkState() = viewModelScope.launch {
+        listenNetwork.isConnected.collect {
+            _isConnected.value = it
+        }
+    }
     fun getListservers() = viewModelScope.launch {
         getListserver()
     }
@@ -71,7 +72,7 @@ constructor(
         _responseListRadio.value = Resource.loading(null)
         //    delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getListServers().let { response ->
                     if (response.isSuccessful) _responseListRadio.value = Resource.success(response.body())
                     else _responseListRadio.value = Resource.error(response.code().toString(), response.body())
@@ -95,7 +96,7 @@ constructor(
         //   _statsresponse.postValue(Resource.loading(null))
         //   delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getStatistics().let { response ->
                     if (response.isSuccessful) _statsresponse.value =
                         Resource.success(response.body()) as Resource<Nothing> // .postValue(Resource.success(response.body()))
@@ -125,7 +126,7 @@ constructor(
         _responseLocalRadio.value = Resource.loading(null) // .postValue(Resource.loading(null))
         //  delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getRadiosLocals(countriecode).let { response ->
 
                     if (response.isSuccessful) _responseLocalRadio.value =
@@ -157,7 +158,7 @@ constructor(
         _responseLastClicked.value = Resource.loading(null)
         //   delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getClickedLast(nbr).let { response ->
                     if (response.isSuccessful) _responseLastClicked.value = Resource.success(response.body())
                     else _responseLastClicked.value = Resource.error(response.code().toString(), response.body())
@@ -186,7 +187,7 @@ constructor(
         _responseRadioUID.value = Resource.loading(null)
         //    delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getRadiobyuid(UId).let { response ->
                     if (response.isSuccessful) _responseRadioUID.value = Resource.success(response.body()) // _responseRadioSreach.emit(Resource.success(response.body()))
                     else _responseRadioUID.value = Resource.error(response.code().toString(), response.body()) // _responseRadioSreach.emit(Resource.error(response.code().toString(), response.body()))
@@ -206,7 +207,7 @@ constructor(
         _responseRadioSreach.value = Resource.loading(null)
         //    delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getRadioByname(name).let { response ->
                     if (response.isSuccessful) _responseRadioSreach.value = Resource.success(response.body()) // _responseRadioSreach.emit(Resource.success(response.body()))
 
@@ -230,7 +231,7 @@ constructor(
         _responseRadio.value = Resource.loading(null)
         //  delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.apply {
                     when (msg) {
                         MainActivity.defaultCountry -> getRadiobyCountriesCodeExact(msg)
@@ -313,7 +314,7 @@ constructor(
         _responseListCountrieRadio.value = Resource.loading(null)
         //    delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.getCountriesList().let { response ->
                     if (response.isSuccessful) _responseListCountrieRadio.value =
                         Resource.success(response.body())
@@ -335,7 +336,7 @@ constructor(
         _responseListRadio.value = Resource.loading(null)
         //    delay(1500)
         try {
-            if (hasInternetConnection()) {
+            if (_isConnected.value) {
                 repository.apply {
                     when (msg) {
                         getApplication<RadioApplication>().resources.getString(R.string.languages) -> getLanguagesList()
@@ -369,30 +370,4 @@ constructor(
         } else MainActivity.repeat_tryconnect_server = -1
     }
 
-    private fun hasInternetConnection(): Boolean {
-        val connectivityManager = getApplication<RadioApplication>().getSystemService(
-            Context.CONNECTIVITY_SERVICE
-        ) as ConnectivityManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return when {
-                capabilities.hasTransport(TRANSPORT_WIFI) -> true
-                capabilities.hasTransport(TRANSPORT_CELLULAR) -> true
-                capabilities.hasTransport(TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } else {
-            connectivityManager.activeNetworkInfo?.run {
-                return when (type) {
-                    TYPE_WIFI -> true
-                    TYPE_MOBILE -> true
-                    TYPE_ETHERNET -> true
-                    else -> false
-                }
-            }
-        }
-        return false
-    }
 }

@@ -407,7 +407,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
         )
 if(defaultRingtoneUri== null) defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
     context,
-    RingtoneManager.TYPE_RINGTONE
+    RingtoneManager.TYPE_ALL
 )
         initializePlayer(context, true, defaultRingtoneUri)
         startPlayer()
