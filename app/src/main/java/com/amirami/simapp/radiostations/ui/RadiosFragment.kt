@@ -21,6 +21,7 @@ import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -33,6 +34,8 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
 
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
+    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+
     private lateinit var radioAdapterHorizantal: RadioAdapterVertical
     val argsFrom: RadiosFragmentArgs by navArgs()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -20,6 +20,8 @@ import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.asmtunis.player_service.service.SimpleMediaServiceHandler
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -31,6 +33,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
     private lateinit var binding: FragmentSearchBinding
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
+    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
     private lateinit var radioAdapterHorizantal: RadioAdapterVertical
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

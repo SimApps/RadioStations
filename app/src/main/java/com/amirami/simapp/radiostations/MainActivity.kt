@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     private val retrofitRadioViewModel: RetrofitRadioViewModel by viewModels()
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by viewModels()
 
     private val radioRoom: MutableList<RadioEntity> = mutableListOf()
 
@@ -436,6 +437,9 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         }
 
         binding.radioplayer.pauseplayButtonMain.setSafeOnClickListener {
+         //   simpleMediaViewModel.loadData(radio)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
             if (Exoplayer.player != null && GlobalstateString == "Player.STATE_PAUSED") {
                 Exoplayer.startPlayer()
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)

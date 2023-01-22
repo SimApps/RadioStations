@@ -30,6 +30,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -62,6 +63,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
+    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+
 
     private lateinit var radioAdapterLastPlayedRadioHorizantal: RadioFavoriteAdapterHorizantal
     private lateinit var tagsAdapterHorizantal: TagsAdapterHorizantal

@@ -28,6 +28,7 @@ import com.amirami.simapp.radiostations.databinding.FragmentFavoriteBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -48,6 +49,7 @@ class FavoriteRadioFragment :
     //  private var currentNativeAdFavori:  NativeAd? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
+    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
 
     private val radioRoom: MutableList<RadioEntity> = mutableListOf()
     private lateinit var binding: FragmentFavoriteBinding

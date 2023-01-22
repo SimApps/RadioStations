@@ -34,6 +34,7 @@ import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -44,6 +45,8 @@ import java.io.IOException
 class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapterVertical.OnItemClickListener, RecordedFilesAdapter.OnItemClickListener {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
+    private val simpleMediaServiceHandler: SimpleMediaViewModel by activityViewModels()
+
     private lateinit var radioAdapterHorizantal: RadioListAdapterVertical
     private lateinit var recordedFilesAdapter: RecordedFilesAdapter
     private lateinit var binding: FragmentListradioBinding
