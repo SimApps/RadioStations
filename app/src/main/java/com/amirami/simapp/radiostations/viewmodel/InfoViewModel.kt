@@ -11,7 +11,7 @@ import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.stopService
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.datamonitor.DataUsageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -30,15 +30,15 @@ class InfoViewModel @Inject constructor(
     private val recordEventsChannel = MutableSharedFlow<RecordInfoEvents>()
     val recordEvents = recordEventsChannel.asSharedFlow()
 
-    private val _putRadioInfo = MutableStateFlow(RadioVariables())
+    private val _putRadioInfo = MutableStateFlow(RadioEntity())
     val putRadioInfo = _putRadioInfo.asStateFlow()
 
-    private val _putRadioPlayerInfo = MutableStateFlow(RadioVariables())
-    val putRadioPlayerInfo: StateFlow<RadioVariables>
+    private val _putRadioPlayerInfo = MutableStateFlow(RadioEntity())
+    val putRadioPlayerInfo: StateFlow<RadioEntity>
         get() = _putRadioPlayerInfo
 
-    private val _putRadioAlarmInfo = MutableStateFlow(RadioVariables())
-    val putRadioAlarmInfo: StateFlow<RadioVariables>
+    private val _putRadioAlarmInfo = MutableStateFlow(RadioEntity())
+    val putRadioAlarmInfo: StateFlow<RadioEntity>
         get() = _putRadioAlarmInfo
 
     private val _putTitleText = MutableStateFlow("")
@@ -243,13 +243,13 @@ class InfoViewModel @Inject constructor(
         }
     }
 
-    fun putRadioInfo(radiovar: RadioVariables) {
+    fun putRadioInfo(radiovar: RadioEntity) {
         viewModelScope.launch {
             _putRadioInfo.value = radiovar
         }
     }
 
-    fun putRadiopalyerInfo(radiovar: RadioVariables) {
+    fun putRadiopalyerInfo(radiovar: RadioEntity) {
         viewModelScope.launch {
             // radioEventsChannel.send(RadioInfoEvents.PutDefCountryInfo(radiovar))
 
@@ -258,7 +258,7 @@ class InfoViewModel @Inject constructor(
         }
     }
 
-    fun putRadioalarmInfo(radiovar: RadioVariables) {
+    fun putRadioalarmInfo(radiovar: RadioEntity) {
         viewModelScope.launch {
             // radioEventsChannel.send(RadioInfoEvents.PutDefCountryInfo(radiovar))
 

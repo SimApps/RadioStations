@@ -1,6 +1,6 @@
 package com.amirami.simapp.radiostations.api
 
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.RetrofitRadioResponse
 import com.google.gson.JsonObject
 import retrofit2.Call
@@ -73,13 +73,13 @@ interface ApiService {
     // var countrie:Call<List<RadioVariables>>
 
     @get:GET("/json/servers")
-    val servers: Call<List<RadioVariables>>
+    val servers: Call<List<RadioEntity>>
 
     //  @get:GET("")
     //  val first: Call<List<RadioVariables>>
 
     @GET("/json/url/{id}")
-    fun addclick(@Path("id") postId: String): Call<List<RadioVariables>>
+    fun addclick(@Path("id") postId: String): Call<List<RadioEntity>>
 
     // @GET("/json/vote/{id}")
     // fun vote(@Path("id") postId:String):Call<List<RadioVariables>>

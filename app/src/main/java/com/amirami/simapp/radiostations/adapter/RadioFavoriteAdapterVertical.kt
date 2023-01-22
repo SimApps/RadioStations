@@ -8,20 +8,20 @@ import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
-import com.amirami.simapp.radiostations.model.RadioRoom
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
 class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
-    ListAdapter<MutableList<RadioRoom>, RadioFavoriteAdapterVertical.FavViewHolder>(DiffCallback()),
+    ListAdapter<MutableList<RadioEntity>, RadioFavoriteAdapterVertical.FavViewHolder>(DiffCallback()),
     FastScrollRecyclerView.SectionedAdapter {
     // class RadioFavoriteAdapter (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioFavoriteAdapter.FavViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
-    private val items = ArrayList<RadioRoom>()
-    private lateinit var productShopingRoom: RadioRoom
+    private val items = ArrayList<RadioEntity>()
+    private lateinit var productShopingRoom: RadioEntity
 
-    fun setItems(items: MutableList<RadioRoom>) {
+    fun setItems(items: MutableList<RadioEntity>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -58,7 +58,7 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(radioRoom: RadioRoom) {
+        fun bind(radioRoom: RadioEntity) {
             binding.apply {
                 RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
                 RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
@@ -83,20 +83,20 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
 
     interface OnItemClickListener {
 
-        fun onItemClick(radioRoom: RadioRoom)
-        fun onMoreItemClick(radio: RadioRoom)
+        fun onItemClick(radioRoom: RadioEntity)
+        fun onMoreItemClick(radio: RadioEntity)
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<MutableList<RadioRoom>>() {
+    class DiffCallback : DiffUtil.ItemCallback<MutableList<RadioEntity>>() {
         override fun areItemsTheSame(
-            oldItem: MutableList<RadioRoom>,
-            newItem: MutableList<RadioRoom>
+            oldItem: MutableList<RadioEntity>,
+            newItem: MutableList<RadioEntity>
         ) =
-            oldItem[0].radiouid == newItem[0].radiouid
+            oldItem[0].stationuuid == newItem[0].stationuuid
 
         override fun areContentsTheSame(
-            oldItem: MutableList<RadioRoom>,
-            newItem: MutableList<RadioRoom>
+            oldItem: MutableList<RadioEntity>,
+            newItem: MutableList<RadioEntity>
         ) =
             oldItem == newItem
     }

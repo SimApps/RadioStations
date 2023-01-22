@@ -2,6 +2,7 @@ package com.amirami.simapp.radiostations.room
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.amirami.simapp.radiostations.model.RadioEntity
 
 // ktlint-disable no-wildcard-imports
 
@@ -17,7 +18,7 @@ interface RadioDAO {
     //  @Query("DELETE FROM custom_table WHERE Id = :id")
     // fun delete(id : Int?)
 
-    @Query("DELETE FROM radio_table WHERE radiouid = :radiouid and fav=:fav")
+    @Query("DELETE FROM radio_table WHERE stationuuid = :radiouid and fav=:fav")
     fun delete(radiouid: String?, fav: Boolean)
 
     @Query("DELETE FROM radio_table WHERE radioid IN (SELECT radioid FROM radio_table ORDER BY radioid DESC LIMIT 1 OFFSET 8) and fav=:fav")

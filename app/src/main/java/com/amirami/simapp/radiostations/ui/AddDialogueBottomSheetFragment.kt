@@ -18,7 +18,7 @@ import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentAdddialogueBinding
-import com.amirami.simapp.radiostations.model.RadioRoom
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
@@ -86,7 +86,7 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                             )
                         )
                 ) {
-                    val radioroom = RadioRoom(
+                    val radioroom = RadioEntity(
                         sdfDate,
                         binding.RadioNameTXviewadd.text.toString(),
                         binding.RadioBitrateTXviewadd.text.toString(),

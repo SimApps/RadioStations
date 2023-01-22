@@ -25,8 +25,7 @@ import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentFavoriteBinding
-import com.amirami.simapp.radiostations.model.RadioRoom
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.play.core.appupdate.AppUpdateInfo
@@ -50,7 +49,7 @@ class FavoriteRadioFragment :
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
 
-    private val radioRoom: MutableList<RadioRoom> = mutableListOf()
+    private val radioRoom: MutableList<RadioEntity> = mutableListOf()
     private lateinit var binding: FragmentFavoriteBinding
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterVertical
 
@@ -131,7 +130,7 @@ class FavoriteRadioFragment :
         }
     }
 
-    private fun populateRecyclerView(radioRoom: MutableList<RadioRoom>) {
+    private fun populateRecyclerView(radioRoom: MutableList<RadioEntity>) {
         if (radioRoom.isNotEmpty()) {
             //     radioFavoriteAdapter.radiodiffer = radioRoom
             radioFavoriteAdapterVertical.setItems(radioRoom)
@@ -140,21 +139,21 @@ class FavoriteRadioFragment :
         }
     }
 
-    override fun onItemClick(radioRoom: RadioRoom) {
+    override fun onItemClick(radioRoom: RadioEntity) {
         try {
             MainActivity.imageLinkForNotification = radioRoom.favicon
             initializePlayer(requireContext(), false, Uri.parse(radioRoom.streamurl))
             startPlayer()
-            val radioVariables = RadioVariables()
+            val radioVariables = RadioEntity()
             radioVariables.apply {
                 name = radioRoom.name
                 bitrate = radioRoom.bitrate
                 country = radioRoom.country
-                stationuuid = radioRoom.radiouid
+                stationuuid = radioRoom.stationuuid
                 favicon = radioRoom.favicon
                 language = radioRoom.language
                 state = radioRoom.state
-                url_resolved = radioRoom.streamurl
+                streamurl = radioRoom.streamurl
                 homepage = radioRoom.homepage
                 tags = radioRoom.tags
             }
@@ -174,17 +173,17 @@ class FavoriteRadioFragment :
         }
     }
 
-    override fun onMoreItemClick(radio: RadioRoom) {
-        val radioVariables = RadioVariables()
+    override fun onMoreItemClick(radio: RadioEntity) {
+        val radioVariables = RadioEntity()
 
         radioVariables.name = radio.name
         radioVariables.bitrate = radio.bitrate
         radioVariables.country = radio.country
-        radioVariables.stationuuid = radio.radiouid
+        radioVariables.stationuuid = radio.stationuuid
         radioVariables.favicon = radio.favicon
         radioVariables.language = radio.language
         radioVariables.state = radio.state
-        radioVariables.url_resolved = radio.streamurl
+        radioVariables.streamurl = radio.streamurl
         radioVariables.homepage = radio.homepage
         radioVariables.tags = radio.tags
         infoViewModel.putRadioInfo(radioVariables)

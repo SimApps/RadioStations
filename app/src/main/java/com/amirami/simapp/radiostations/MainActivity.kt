@@ -44,8 +44,7 @@ import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.alarm.RadioAlarmRoomViewModel
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
-import com.amirami.simapp.radiostations.model.RadioRoom
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
 import com.amirami.simapp.radiostations.utils.ManagePermissions
@@ -91,7 +90,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
 
-    private val radioRoom: MutableList<RadioRoom> = mutableListOf()
+    private val radioRoom: MutableList<RadioEntity> = mutableListOf()
 
     var recordDrawable = R.drawable.pop
 
@@ -267,26 +266,26 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         }
     }
 
-    private fun setPlayer(radioVar: RadioVariables) {
+    private fun setPlayer(radioVar: RadioEntity) {
         stationuuid = radioVar.stationuuid
         imageLinkForNotification = radioVar.favicon
         GlobalRadioName = radioVar.name
 
         if (!Exoplayer.is_playing_recorded_file) {
             if (Exoplayer.player != null) {
-                val radioroom = RadioRoom(
-                    radioVar.stationuuid,
-                    radioVar.name,
-                    radioVar.bitrate,
-                    radioVar.homepage,
-                    radioVar.favicon,
-                    radioVar.tags,
-                    radioVar.country,
-                    radioVar.state,
+                val radioroom = RadioEntity(
+                    stationuuid =  radioVar.stationuuid,
+                    name = radioVar.name,
+                    bitrate =  radioVar.bitrate,
+                    homepage =   radioVar.homepage,
+                    favicon = radioVar.favicon,
+                    tags = radioVar.tags,
+                    country = radioVar.country,
+                    state =   radioVar.state,
                     // var RadiostateDB: String?,
-                    radioVar.language,
-                    radioVar.url_resolved,
-                    false
+                    language =  radioVar.language,
+                    streamurl =  radioVar.streamurl,
+                    fav = false
                 )
                 radioRoomViewModel.upsertRadio(radioroom, "Radio added")
                 radioRoomViewModel.deletelistened(false, "Radio listened deleted")
@@ -795,22 +794,20 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         turnScreenOnAndKeyguardOff()
         radioAlarmRoomViewModel.getAll().observe(this) { list ->
             if (list.isNotEmpty() && fromAlarm) {
-                val radioVar = RadioVariables(
+                val radioVar = RadioEntity(
                     1,
-                    list[0].name,
-                    /*ip*/"",
-                    /*stationcount*/"",
-                    list[0].homepage,
-                    list[0].favicon,
-                    list[0].tags,
-                    list[0].country,
-                    list[0].state,
-                    list[0].language,
-                    list[0].streamurl,
-                    list[0].bitrate,
-                    list[0].radiouid,
-                    /*iso_639*/"",
-                    list[0].moreinfo
+                   name =  list[0].name,
+
+                    homepage =   list[0].homepage,
+                    favicon=   list[0].favicon,
+                    tags = list[0].tags,
+                    country =  list[0].country,
+                    state =  list[0].state,
+                    language =  list[0].language,
+                    streamurl = list[0].streamurl,
+                    bitrate =  list[0].bitrate,
+                    stationuuid =  list[0].radiouid,
+                    moreinfo =    list[0].moreinfo
                 )
 
                 if (list[0].radiouid == "") Exoplayer.initializePlayer(this, true, Uri.parse(list[0].streamurl))
@@ -856,16 +853,16 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
 
             if (Exoplayer.player == null) {
                 if (list.isNotEmpty()) {
-                    val radioVariables = RadioVariables()
+                    val radioVariables = RadioEntity()
                     radioVariables.apply {
                         name = list[0].name
                         bitrate = list[0].bitrate
                         country = list[0].country
-                        stationuuid = list[0].radiouid
+                        stationuuid = list[0].streamurl
                         favicon = list[0].favicon
                         language = list[0].language
                         state = list[0].state
-                        url_resolved = list[0].streamurl
+                        streamurl = list[0].streamurl
                         homepage = list[0].homepage
                         tags = list[0].tags
                     }
@@ -873,9 +870,9 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
                     infoViewModel.putRadiopalyerInfo(radioVariables)
 
                     GlobalRadiourl = Uri.parse(list[0].streamurl)
-                    stationuuid = list[0].radiouid
+                    stationuuid = list[0].stationuuid
 
-                    if (setfavIcons(list[0].radiouid)) {
+                    if (setfavIcons(list[0].stationuuid)) {
                         binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_liked)
                         binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_liked)
                     } else {
@@ -1060,7 +1057,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
     }
 
     private fun favRadio(
-        radioVar: RadioVariables
+        radioVar: RadioEntity
     ) {
         /*
         val retrofit = Retrofit.Builder()
@@ -1071,7 +1068,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         val api = retrofit.create(Api::class.java)
         */
 
-        val radio = RadioVariables()
+        val radio = RadioEntity()
 
         if (!setfavIcons(radioVar.stationuuid) && radioVar.stationuuid != "") {
             // jsonCall = api.addclick(idListJson)
@@ -1086,23 +1083,23 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
             radio.country = radioVar.country
             radio.language = radioVar.language
             radio.bitrate = radioVar.bitrate
-            radio.url_resolved = radioVar.url_resolved
+            radio.streamurl = radioVar.streamurl
             radio.favicon = radioVar.favicon
             radio.homepage = radioVar.homepage
 
-            val radioroom = RadioRoom(
-                radioVar.stationuuid,
-                radioVar.name,
-                radioVar.bitrate,
-                radioVar.homepage,
-                radioVar.favicon,
-                radioVar.tags,
-                radioVar.country,
-                radioVar.state,
+            val radioroom = RadioEntity(
+                stationuuid =    radioVar.stationuuid,
+                name =  radioVar.name,
+                bitrate =  radioVar.bitrate,
+                homepage =  radioVar.homepage,
+                favicon =  radioVar.favicon,
+                tags = radioVar.tags,
+                country =  radioVar.country,
+                state =   radioVar.state,
                 // var RadiostateDB: String?,
-                radioVar.language,
-                radioVar.url_resolved,
-                true
+                language = radioVar.language,
+                streamurl = radioVar.streamurl,
+             fav =    true
             )
             addFavoriteRadioIdInArrayFirestore(radioVar.stationuuid)
             radioRoomViewModel.upsertRadio(radioroom, "Radio added")
@@ -1148,7 +1145,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         var idIn = false
         if (radioRoom.size > 0) {
             loop@ for (i in 0 until radioRoom.size) {
-                if (stationuuid == radioRoom[i].radiouid /*&& radioRoom[i].fav */) {
+                if (stationuuid == radioRoom[i].stationuuid /*&& radioRoom[i].fav */) {
                     idIn = true
                     break@loop
                 }
@@ -1168,7 +1165,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
 
     }
 
-    private fun populateRecyclerView(radioRoom: MutableList<RadioRoom>) {
+    private fun populateRecyclerView(radioRoom: List<RadioEntity>) {
         if (radioRoom.isNotEmpty()) {
             radioFavoriteAdapterVertical.setItems(radioRoom)
             binding.radioplayer.favRadioPlayerRv.visibility = View.VISIBLE
@@ -1185,23 +1182,23 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         }
     }
 
-    override fun onItemFavClick(radioRoom: RadioRoom) {
+    override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
             populateFavRv = false
             imageLinkForNotification = radioRoom.favicon
             Exoplayer.initializePlayer(this, false, Uri.parse(radioRoom.streamurl))
             Exoplayer.startPlayer()
 
-            val radioVariables = RadioVariables()
+            val radioVariables = RadioEntity()
             radioVariables.apply {
                 name = radioRoom.name
                 bitrate = radioRoom.bitrate
                 country = radioRoom.country
-                stationuuid = radioRoom.radiouid
+                stationuuid = radioRoom.stationuuid
                 favicon = radioRoom.favicon
                 language = radioRoom.language
                 state = radioRoom.state
-                url_resolved = radioRoom.streamurl
+                streamurl = radioRoom.streamurl
                 homepage = radioRoom.homepage
                 tags = radioRoom.tags
             }
@@ -1221,7 +1218,7 @@ dataViewModel.saveFirstTimeopenRecordFolder(firstTimeopenRecordfolder)
         }
     }
 
-    override fun onMoreItemFavClick(radio: RadioRoom) {
+    override fun onMoreItemFavClick(radio: RadioEntity) {
         TODO("Not yet implemented")
     }
 

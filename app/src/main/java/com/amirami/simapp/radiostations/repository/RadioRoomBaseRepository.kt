@@ -1,7 +1,7 @@
 package com.amirami.simapp.radiostations.repository
 
 import androidx.lifecycle.LiveData
-import com.amirami.simapp.radiostations.room.RadioEntity
+import com.amirami.simapp.radiostations.model.RadioEntity
 
 interface RadioRoomBaseRepository {
 

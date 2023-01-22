@@ -3,7 +3,7 @@ package com.amirami.simapp.radiostations.utils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.amirami.simapp.radiostations.model.RadioRoom
-import com.amirami.simapp.radiostations.room.RadioEntity
+import com.amirami.simapp.radiostations.model.RadioEntity
 
 object ConvertRadioClass {
     private fun toListModel(prodNamesEntity: List<RadioEntity>): MutableList<RadioRoom> {
@@ -11,11 +11,11 @@ object ConvertRadioClass {
         prodNamesEntity.map {
             itemList.add(
                 RadioRoom(
-                    it.radiouid ?: "",
+                    it.stationuuid ?: "",
                     it.name ?: "",
                     it.bitrate ?: "",
                     it.homepage ?: "",
-                    it.imageurl ?: "",
+                    it.favicon ?: "",
                     it.tags ?: "",
                     it.country ?: "",
                     it.state ?: "",

@@ -24,8 +24,7 @@ import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.TagsAdapterHorizantal
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentMainBinding
-import com.amirami.simapp.radiostations.model.RadioRoom
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -454,7 +453,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         RadioFunction.nativeSmallAds(requireContext(), binding.adsFrame, adViewSmallActivitymain)
     }
 
-    override fun onItemClick(radio: RadioVariables) {
+    override fun onItemClick(radio: RadioEntity) {
         if (radio.stationuuid == "") {
             if (canNavigate()) {
                 try {
@@ -478,7 +477,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         } else {
             try {
                 MainActivity.imageLinkForNotification = radio.favicon
-                Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.url_resolved))
+                Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.streamurl))
                 Exoplayer.startPlayer()
 
                 infoViewModel.putRadiopalyerInfo(radio)
@@ -528,21 +527,21 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
     }
 
-    override fun onItemFavClick(radioRoom: RadioRoom) {
+    override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
             MainActivity.imageLinkForNotification = radioRoom.favicon
             Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radioRoom.streamurl))
             Exoplayer.startPlayer()
-            val radioVariables = RadioVariables()
+            val radioVariables = RadioEntity()
             radioVariables.apply {
                 name = radioRoom.name
                 bitrate = radioRoom.bitrate
                 country = radioRoom.country
-                stationuuid = radioRoom.radiouid
+                stationuuid = radioRoom.stationuuid
                 favicon = radioRoom.favicon
                 language = radioRoom.language
                 state = radioRoom.state
-                url_resolved = radioRoom.streamurl
+                streamurl = radioRoom.streamurl
                 homepage = radioRoom.homepage
                 tags = radioRoom.tags
             }
@@ -562,7 +561,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
     }
 
-    override fun onMoreItemFavClick(radio: RadioRoom) = Unit
+    override fun onMoreItemFavClick(radio: RadioEntity) = Unit
 
     private fun getLastPlayedRadio() {
         radioRoomViewModel.getAll(false).observe(viewLifecycleOwner) { list ->

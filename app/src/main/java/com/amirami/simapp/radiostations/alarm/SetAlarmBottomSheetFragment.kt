@@ -27,7 +27,7 @@ import com.amirami.simapp.radiostations.alarm.Utils.enableBootReceiver
 import com.amirami.simapp.radiostations.alarm.Utils.immutableFlag
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.BottomsheetAddalarmBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -54,7 +54,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by activityViewModels()
 
-    private lateinit var radioVariable: RadioVariables
+    private lateinit var radioVariable: RadioEntity
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -196,7 +196,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
                             radioVariable.state,
                             // var RadiostateDB: String?,
                             radioVariable.language,
-                            radioVariable.url_resolved,
+                            radioVariable.streamurl,
                             radioVariable.moreinfo
                         )
                         radioAlarmRoomViewModel.upsertRadioAlarm(radioroom, "Radio added")

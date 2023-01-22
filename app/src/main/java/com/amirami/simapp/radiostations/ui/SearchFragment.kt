@@ -16,7 +16,7 @@ import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.adapter.RadioAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentSearchBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
@@ -78,7 +78,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                                 // radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
                                 setupRadioLisRV()
                                 // DynamicToast.makeError(requireContext(), "query" , 3).show()
-                                radioAdapterHorizantal.setItems(response.data as MutableList<RadioVariables>)
+                                radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
                             } else showErrorConnection(response.message!!)
                         }
                         Status.ERROR -> {
@@ -161,10 +161,10 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
         //  GlobalQuery =""
     }
 
-    override fun onItemClick(radio: RadioVariables) {
+    override fun onItemClick(radio: RadioEntity) {
         try {
             MainActivity.imageLinkForNotification = radio.favicon
-            Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.url_resolved))
+            Exoplayer.initializePlayer(requireContext(), false, Uri.parse(radio.streamurl))
             Exoplayer.startPlayer()
             infoViewModel.putRadiopalyerInfo(radio)
             // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
@@ -181,7 +181,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
         }
     }
 
-    override fun onMoreItemClick(radio: RadioVariables) {
+    override fun onMoreItemClick(radio: RadioEntity) {
         infoViewModel.putRadioInfo(radio)
         this@SearchFragment.findNavController().navigate(R.id.action_searchFragment_to_moreBottomSheetFragment) //     NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_searchFragment_to_moreBottomSheetFragment)
     }

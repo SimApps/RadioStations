@@ -31,8 +31,7 @@ import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentSettingBinding
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
-import com.amirami.simapp.radiostations.model.RadioRoom
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
@@ -504,8 +503,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                         Status.SUCCESS -> {
                             if (response.data != null) {
                                 hideProgressBar()
-                                val radio = response.data as MutableList<RadioVariables> // as RadioRoom
-                                val radioroom = RadioRoom(
+                                val radio = response.data as MutableList<RadioEntity> // as RadioRoom
+                                val radioroom = RadioEntity(
                                     radio[0].stationuuid,
                                     radio[0].name,
                                     radio[0].bitrate,
@@ -516,7 +515,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                                     radio[0].state,
                                     // var RadiostateDB: String?,
                                     radio[0].language,
-                                    radio[0].url_resolved,
+                                    radio[0].streamurl,
                                     true
                                 )
                                 radioRoomViewModel.upsertRadio(radioroom, "Radio added")
@@ -551,7 +550,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             if (list.isNotEmpty()) {
                 val favoriteFirestore = FavoriteFirestore(
                     getuserid(),
-                    list.map { it.radiouid } as ArrayList<String>,
+                    list.map { it.stationuuid } as ArrayList<String>,
                     getCurrentDate()
                 )
                 createUserDocument(favoriteFirestore)

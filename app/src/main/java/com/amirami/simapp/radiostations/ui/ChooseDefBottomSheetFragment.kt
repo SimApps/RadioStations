@@ -18,7 +18,7 @@ import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.BottomsheetChooseDefDialogueBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.utils.connectivity.internet.ListenNetwork
 import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
@@ -148,7 +148,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         }
     }
 
-    override fun onItemClick(radio: RadioVariables) {
+    override fun onItemClick(radio: RadioEntity) {
         if (radio.ip != "") {
             try {
                 //    if(globalserversJson[position]!=""){
@@ -198,7 +198,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                         hideProgressBar()
                         binding.itemErrorMessage.root.visibility = View.INVISIBLE
                         // radioAdapterVertical.radioListdffer = response.data as List<RadioVariables>
-                        radioAdapterVertical.setItems(response.data as MutableList<RadioVariables>)
+                        radioAdapterVertical.setItems(response.data as MutableList<RadioEntity>)
                     } else showErrorConnection(response.message!!)
                 }
                 Status.ERROR -> {
@@ -221,7 +221,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                         hideProgressBar()
                         binding.itemErrorMessage.root.visibility = View.INVISIBLE
                         // radioAdapterVertical.radioListdffer = response.data as List<RadioVariables>
-                        radioAdapterVertical.setItems(response.data as MutableList<RadioVariables>)
+                        radioAdapterVertical.setItems(response.data as MutableList<RadioEntity>)
                     } else showErrorConnection(response.message!!)
                 }
                 Status.ERROR -> {

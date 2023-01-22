@@ -9,7 +9,7 @@ import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import java.util.*
@@ -17,10 +17,10 @@ import java.util.*
 // class RadioAdapterHorizantal (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterHorizantal.MyViewHolder>() {
 
 class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
-    ListAdapter<RadioVariables, RadioAdapterHorizantal.MyViewHolder>(DiffCallback()) {
+    ListAdapter<RadioEntity, RadioAdapterHorizantal.MyViewHolder>(DiffCallback()) {
 
-    private val items = ArrayList<RadioVariables>()
-    fun setItems(items: MutableList<RadioVariables>) {
+    private val items = ArrayList<RadioEntity>()
+    fun setItems(items: MutableList<RadioEntity>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -40,7 +40,7 @@ class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(currentTvShow: RadioVariables) {
+        fun bind(currentTvShow: RadioEntity) {
             binding.apply {
                 RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
                 RadioFunction.secondarytextviewColor(descriptionTxV, MainActivity.darkTheme)
@@ -126,11 +126,11 @@ class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
             differ.submitList(value)
         }*/
 
-    class DiffCallback : DiffUtil.ItemCallback<RadioVariables>() {
-        override fun areItemsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
+    class DiffCallback : DiffUtil.ItemCallback<RadioEntity>() {
+        override fun areItemsTheSame(oldItem: RadioEntity, newItem: RadioEntity) =
             oldItem.stationuuid == newItem.stationuuid
 
-        override fun areContentsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
+        override fun areContentsTheSame(oldItem: RadioEntity, newItem: RadioEntity) =
             oldItem == newItem
     }
 
@@ -152,6 +152,6 @@ class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
     override fun getItemCount() = items.size // differ.currentList.size
 
     interface OnItemClickListener {
-        fun onItemClick(radio: RadioVariables)
+        fun onItemClick(radio: RadioEntity)
     }
 }

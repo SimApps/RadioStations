@@ -12,7 +12,7 @@ import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
@@ -21,10 +21,10 @@ import java.util.*
 // class RadioListAdapterVertical (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioListAdapterVertical.MyViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
 class RadioListAdapterVertical(private val listener: OnItemClickListener) :
-    ListAdapter<RadioVariables, RadioListAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
+    ListAdapter<RadioEntity, RadioListAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
-    private val items = ArrayList<RadioVariables>()
-    fun setItems(items: MutableList<RadioVariables>) {
+    private val items = ArrayList<RadioEntity>()
+    fun setItems(items: MutableList<RadioEntity>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -43,7 +43,7 @@ class RadioListAdapterVertical(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(radioVariables: RadioVariables) {
+        fun bind(radioVariables: RadioEntity) {
             binding.apply {
                 ExpandImageView.visibility = View.GONE
                 RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
@@ -140,11 +140,11 @@ class RadioListAdapterVertical(private val listener: OnItemClickListener) :
             differ.submitList(value)
         }
 */
-    class DiffCallback : DiffUtil.ItemCallback<RadioVariables>() {
-        override fun areItemsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
+    class DiffCallback : DiffUtil.ItemCallback<RadioEntity>() {
+        override fun areItemsTheSame(oldItem: RadioEntity, newItem: RadioEntity) =
             oldItem.stationuuid == newItem.stationuuid
 
-        override fun areContentsTheSame(oldItem: RadioVariables, newItem: RadioVariables) =
+        override fun areContentsTheSame(oldItem: RadioEntity, newItem: RadioEntity) =
             oldItem == newItem
     }
 
@@ -161,7 +161,7 @@ class RadioListAdapterVertical(private val listener: OnItemClickListener) :
     override fun getItemCount() = items.size // differ.currentList.size
 
     interface OnItemClickListener {
-        fun onItemClick(radio: RadioVariables)
+        fun onItemClick(radio: RadioEntity)
     }
 
     override fun onBindViewHolder(holder: RadioListAdapterVertical.MyViewHolder, position: Int) {

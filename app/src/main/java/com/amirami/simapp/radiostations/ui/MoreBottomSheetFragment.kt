@@ -18,8 +18,7 @@ import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentMoreBinding
-import com.amirami.simapp.radiostations.model.RadioRoom
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -37,7 +36,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
-    private val radioRoom: MutableList<RadioRoom> = mutableListOf()
+    private val radioRoom: MutableList<RadioEntity> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +63,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                     radioVar.favicon,
                     radioVar.name,
                     radioVar.homepage,
-                    radioVar.url_resolved,
+                    radioVar.streamurl,
                     radioVar.country,
                     radioVar.bitrate,
                     radioVar.language,
@@ -80,7 +79,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                     requireContext(),
                     radioVar.name,
                     radioVar.homepage,
-                    radioVar.url_resolved,
+                    radioVar.streamurl,
                     radioVar.country,
                     radioVar.language,
                     radioVar.bitrate
@@ -124,7 +123,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun btnsVisibility(radioVar: RadioVariables) {
+    private fun btnsVisibility(radioVar: RadioEntity) {
         if (radioVar.moreinfo == "fromplayer") binding.likeImageView.visibility = View.GONE
         else binding.likeImageView.visibility = View.VISIBLE
 
@@ -137,7 +136,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun getFavRadioRoom(radioVar: RadioVariables) {
+    private fun getFavRadioRoom(radioVar: RadioEntity) {
         radioRoomViewModel.getAll(true).observe(this) { list ->
             //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
             if (list.isNotEmpty()) {
@@ -148,7 +147,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
                 if (list.size > 0) {
                     loop@ for (i in 0 until list.size) {
-                        if (radioVar.stationuuid == list[i].radiouid) {
+                        if (radioVar.stationuuid == list[i].stationuuid) {
                             idIn = true
                             break@loop
                         }
@@ -186,14 +185,14 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         val api = retrofit.create(Api::class.java)
 
       */
-        val radio = RadioVariables()
+        val radio = RadioEntity()
 
         var idIn = false
 
         var position = -1
         if (radioRoom.size > 0) {
             loop@ for (i in 0 until radioRoom.size) {
-                if (idListJson == radioRoom[i].radiouid) {
+                if (idListJson == radioRoom[i].stationuuid) {
                     idIn = true
                     position = i
                     break@loop
@@ -213,11 +212,11 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             radio.country = countryJson
             radio.language = languageJson
             radio.bitrate = bitrateJson
-            radio.url_resolved = urlJson
+            radio.streamurl = urlJson
             radio.favicon = faviconJson
             radio.homepage = homepageJson
 
-            val radioroom = RadioRoom(
+            val radioroom = RadioEntity(
                 idListJson,
                 nameJson,
                 bitrateJson,
@@ -237,7 +236,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         } else if (idIn) {
             binding.likeImageView.setImageResource(R.drawable.ic_like)
             //    binding.likeTxVw.text = getString(R.string.radio_like)
-            radioRoomViewModel.delete(radioRoom[position].radiouid, true, "Radio Deleted")
+            radioRoomViewModel.delete(radioRoom[position].stationuuid, true, "Radio Deleted")
 
             deleteFavoriteRadioFromArrayinfirestore(idListJson)
         }
@@ -284,7 +283,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setInfoRadio(it: RadioVariables) {
+    private fun setInfoRadio(it: RadioEntity) {
         if (it.stationuuid == "") {
             binding.RadioImage.setImageResource(R.drawable.rec_on)
             //  RadioFunction.loadImageInt(R.drawable.recordings, MainActivity.imagedefaulterrorurl, binding.RadioImage)
@@ -308,7 +307,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             binding.RadioNameTXview.text = getString(R.string.infoRadioname, it.name)
             binding.RadioHomepageTXview.text = getString(R.string.infoHomepage, it.homepage)
 
-            binding.RadioStreamURLTXview.text = getString(R.string.infoRadiostreamURL, it.url_resolved)
+            binding.RadioStreamURLTXview.text = getString(R.string.infoRadiostreamURL, it.streamurl)
             binding.RadioCountryTXview.text = getString(R.string.infoCountry, it.country)
             binding.RadioLanguageTXview.text = getString(R.string.infoLanguage, it.language)
             binding.RadioBitrateTXview.text = getString(R.string.infoBitrate, it.bitrate)

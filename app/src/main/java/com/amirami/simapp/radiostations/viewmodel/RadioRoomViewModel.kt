@@ -3,7 +3,7 @@ package com.amirami.simapp.radiostations.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.amirami.simapp.radiostations.model.RadioRoom
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.repository.RadioRoomBaseRepository
 import com.amirami.simapp.radiostations.utils.ConvertRadioClass
 import com.amirami.simapp.radiostations.utils.Coroutines
@@ -20,11 +20,11 @@ class RadioRoomViewModel @Inject constructor(
     private val tasksEventChannel = Channel<ShopListEvents>()
     val shopListEvents = tasksEventChannel.receiveAsFlow()
 
-    private val liveList: MutableLiveData<MutableList<RadioRoom>> by lazy(LazyThreadSafetyMode.NONE, initializer = {
-        MutableLiveData<MutableList<RadioRoom>>()
+    private val liveList: MutableLiveData<MutableList<RadioEntity>> by lazy(LazyThreadSafetyMode.NONE, initializer = {
+        MutableLiveData<MutableList<RadioEntity>>()
     })
-    private val liveUpdate: MutableLiveData<RadioRoom> by lazy(LazyThreadSafetyMode.NONE, initializer = {
-        MutableLiveData<RadioRoom>()
+    private val liveUpdate: MutableLiveData<RadioEntity> by lazy(LazyThreadSafetyMode.NONE, initializer = {
+        MutableLiveData<RadioEntity>()
     })
 
     fun getInstance(): String {
@@ -65,10 +65,10 @@ class RadioRoomViewModel @Inject constructor(
     }
 */
 
-    fun upsertRadio(item: RadioRoom, msg: String) {
+    fun upsertRadio(item: RadioEntity, msg: String) {
         Coroutines.io(this@RadioRoomViewModel) {
             if (item.name != "") { // prevent add alarm played station
-                sholistRoomBaseRepository.upsert(ConvertRadioClass.toEntity(item))
+                sholistRoomBaseRepository.upsert(item)
                 tasksEventChannel.send(ShopListEvents.ProdAddToShopMsg(msg))
             }
         }
@@ -101,10 +101,9 @@ class RadioRoomViewModel @Inject constructor(
         }
     }
 
-    fun getAll(fav: Boolean): LiveData<MutableList<RadioRoom>> { // return  liveList
-        return ConvertRadioClass.toLiveDataListModel(
-            sholistRoomBaseRepository.getAll(fav)
-        )
+    fun getAll(fav: Boolean): LiveData<List<RadioEntity>> { // return  liveList
+        return sholistRoomBaseRepository.getAll(fav)
+
     }
 
     sealed class ShopListEvents {

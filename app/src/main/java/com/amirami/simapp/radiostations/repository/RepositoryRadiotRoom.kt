@@ -2,7 +2,7 @@ package com.amirami.simapp.radiostations.repository
 
 import androidx.lifecycle.LiveData
 import com.amirami.simapp.radiostations.room.RadioDAO
-import com.amirami.simapp.radiostations.room.RadioEntity
+import com.amirami.simapp.radiostations.model.RadioEntity
 import javax.inject.Inject
 
 class RepositoryRadiotRoom @Inject constructor(

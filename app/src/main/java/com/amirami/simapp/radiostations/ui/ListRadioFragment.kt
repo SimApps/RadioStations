@@ -27,7 +27,7 @@ import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
 import com.amirami.simapp.radiostations.adapter.RecordedFilesAdapter
 import com.amirami.simapp.radiostations.databinding.FragmentListradioBinding
-import com.amirami.simapp.radiostations.model.RadioVariables
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.utils.ManagePermissions
@@ -145,7 +145,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                                     hideProgressBar()
                                     binding.itemErrorMessage.root.visibility = View.INVISIBLE
                                     //     radioAdapterHorizantal.radioListdffer = response.data as List<RadioVariables>
-                                    radioAdapterHorizantal.setItems(response.data as MutableList<RadioVariables>)
+                                    radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
                                 } else showErrorConnection(response.message!!)
                             }
                             Status.ERROR -> {
@@ -170,7 +170,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                                     hideProgressBar()
                                     binding.itemErrorMessage.root.visibility = View.INVISIBLE
                                     //     radioAdapterHorizantal.radioListdffer = response.data as List<RadioVariables>
-                                    radioAdapterHorizantal.setItems(response.data as MutableList<RadioVariables>)
+                                    radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
                                 } else showErrorConnection(response.message!!)
                             }
                             Status.ERROR -> {
@@ -221,7 +221,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
         }
     }
 
-    override fun onItemClick(radio: RadioVariables) {
+    override fun onItemClick(radio: RadioEntity) {
         try {
             retrofitRadioViewModel.getRadios(argsFrom.msg, radio.name)
             val action = ListRadioFragmentDirections.actionListRadioFragmentToRadiosFragment(argsFrom.msg, radio.name)
@@ -246,8 +246,8 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
             /* if(recordInfo.uri!=null) recordInfo.uri!! else Uri.parse("")*/
         )
 
-        val radioVariables = RadioVariables()
-        radioVariables.url_resolved = recordInfo.uri.toString()
+        val radioVariables = RadioEntity()
+        radioVariables.streamurl = recordInfo.uri.toString()
 
         if (recordInfo.name.contains("_ _", true) && recordInfo.name.contains("___", true)) {
             radioVariables.name = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
