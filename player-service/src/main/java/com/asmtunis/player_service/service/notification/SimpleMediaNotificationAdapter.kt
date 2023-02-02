@@ -24,7 +24,8 @@ class SimpleMediaNotificationAdapter(
         pendingIntent
 
     override fun getCurrentContentText(player: Player): CharSequence =
-        player.mediaMetadata.displayTitle ?: ""
+        //player.mediaMetadata.displayTitle ?: ""
+        player.mediaMetadata.title ?: ""
 
     override fun getCurrentLargeIcon(
         player: Player,

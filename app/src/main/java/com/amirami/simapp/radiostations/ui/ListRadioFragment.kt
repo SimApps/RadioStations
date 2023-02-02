@@ -270,17 +270,8 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
             radioVariables.homepage = ""
         }
 
-        // DynamicToast.makeSuccess(requireContext(), "refresh frag PLAYER", 9).show()
-        simpleMediaViewModel.loadData(radioVariables)
-        simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+        simpleMediaViewModel.loadData(radioVariables,true)
 
-
-       // Exoplayer.startPlayer()
-        Exoplayer.Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles("", radioVariables.homepage))
-        Exoplayer.Observer.changeText("text view", icyandStateWhenPlayRecordFiles("", radioVariables.homepage))
-        // Exoplayer.Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles("",radioVariables.homepage))
-
-        infoViewModel.putRadiopalyerInfo(radioVariables)
     }
 
     override fun onRecMoreItemClick(recordInfo: RecordInfo, position: Int) {

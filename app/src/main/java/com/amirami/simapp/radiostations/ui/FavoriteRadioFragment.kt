@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.IntentSender
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResult
@@ -16,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
@@ -114,21 +112,27 @@ class FavoriteRadioFragment :
     }
 
     private fun getFavRadioRoom() {
-        radioRoomViewModel.getAll(true).observe(viewLifecycleOwner) { list ->
-            //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
-            if (list.isNotEmpty()) {
-                radioRoom.clear()
-                radioRoom.addAll(list)
 
-                //    DynamicToast.makeError(requireContext(), list.size.toString(), 3).show()
-                populateRecyclerView(radioRoom)
-                binding.whenemptyfavImage.visibility = View.GONE
-                binding.rv.visibility = View.VISIBLE
-            } else {
-                binding.whenemptyfavImage.visibility = View.VISIBLE
-                binding.rv.visibility = View.INVISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                radioRoomViewModel.favList.collectLatest { list ->
+                    //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
+                    if (list.isNotEmpty()) {
+                        radioRoom.clear()
+                        radioRoom.addAll(list)
+
+                        //    DynamicToast.makeError(requireContext(), list.size.toString(), 3).show()
+                        populateRecyclerView(radioRoom)
+                        binding.whenemptyfavImage.visibility = View.GONE
+                        binding.rv.visibility = View.VISIBLE
+                    } else {
+                        binding.whenemptyfavImage.visibility = View.VISIBLE
+                        binding.rv.visibility = View.INVISIBLE
+                    }
+                }
             }
         }
+
     }
 
     private fun populateRecyclerView(radioRoom: MutableList<RadioEntity>) {
@@ -144,7 +148,7 @@ class FavoriteRadioFragment :
         try {
 
             simpleMediaViewModel.loadData(radioRoom)
-            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+          //  simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
             val radioVariables = RadioEntity()
             radioVariables.apply {
@@ -160,7 +164,6 @@ class FavoriteRadioFragment :
                 tags = radioRoom.tags
             }
 
-            infoViewModel.putRadiopalyerInfo(radioVariables)
 
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
         } catch (e: IOException) {

@@ -12,6 +12,8 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.datamonitor.DataUsageManager
+import com.asmtunis.player_service.service.PlayerEvent
+import com.asmtunis.player_service.service.SimpleMediaServiceHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InfoViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val simpleMediaServiceHandler: SimpleMediaServiceHandler,
     app: Application
 ) : AndroidViewModel(app) { // : ViewModel() {
 
@@ -32,9 +35,7 @@ class InfoViewModel @Inject constructor(
     private val _putRadioInfo = MutableStateFlow(RadioEntity())
     val putRadioInfo = _putRadioInfo.asStateFlow()
 
-    private val _putRadioPlayerInfo = MutableStateFlow(RadioEntity())
-    val putRadioPlayerInfo: StateFlow<RadioEntity>
-        get() = _putRadioPlayerInfo
+
 
     private val _putRadioAlarmInfo = MutableStateFlow(RadioEntity())
     val putRadioAlarmInfo: StateFlow<RadioEntity>
@@ -88,7 +89,7 @@ class InfoViewModel @Inject constructor(
         }
     }
 
-    fun putDataConsumptiontimer(data: kotlin.Long) {
+    fun putDataConsumptiontimer(data: Long) {
         job = viewModelScope.launch {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val networkStatsManager = getApplication<RadioApplication>().getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
@@ -155,8 +156,11 @@ class InfoViewModel @Inject constructor(
             MainActivity.downloader?.cancelDownload()
             Exoplayer.is_downloading = false // without this line player continue paly and rec stop
         }
+        viewModelScope.launch {
+            simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Stop)
+        }
+
        // stopService(getApplication<RadioApplication>(), true)
-        //   Exoplayer.releasePlayer(getApplication<RadioApplication>())
     }
 
 /*
@@ -248,14 +252,6 @@ class InfoViewModel @Inject constructor(
         }
     }
 
-    fun putRadiopalyerInfo(radiovar: RadioEntity) {
-        viewModelScope.launch {
-            // radioEventsChannel.send(RadioInfoEvents.PutDefCountryInfo(radiovar))
-
-            // _putRadioPlayerInfo.value = radiovar
-            _putRadioPlayerInfo.emit(radiovar)
-        }
-    }
 
     fun putRadioalarmInfo(radiovar: RadioEntity) {
         viewModelScope.launch {

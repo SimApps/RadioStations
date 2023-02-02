@@ -53,16 +53,22 @@ class SimpleMediaNotificationManager @Inject constructor(
                     pendingIntent = mediaSession.sessionActivity
                 )
             )
-            .setSmallIconResourceId(R.drawable.media3_icon_circular_play)
+            //.setSmallIconResourceId(R.drawable.media3_icon_circular_play)
+            .setStopActionIconResourceId(R.drawable.stop_2)
+            .setPlayActionIconResourceId(R.drawable.play_2)
+            .setPauseActionIconResourceId(R.drawable.pause_2)
             .build()
             .also {
                 it.setMediaSessionToken(mediaSession.sessionCompatToken as MediaSessionCompat.Token)
                 it.setUseFastForwardActionInCompactView(true)
                 it.setUseRewindActionInCompactView(true)
                 it.setUseNextActionInCompactView(false)
-                it.setPriority(NotificationCompat.PRIORITY_LOW)
+                it.setPriority(NotificationCompat.PRIORITY_MAX)
+                it.setUseStopAction(true)
+
                 it.setPlayer(player)
             }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -78,7 +84,7 @@ class SimpleMediaNotificationManager @Inject constructor(
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
     }

@@ -31,30 +31,23 @@ import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_ID
 import com.amirami.simapp.radiostations.utils.Constatnts.ALARM_NOTIF_NAME
 
  object Exoplayer {
-    const val notifi_CHANNEL_ID = "SimAPPcganelIDradioApp"
 
     const val packagename = "com.amirami.simapp.radiostations"
     private const val PATH = "$packagename.action."
-    const val NOTIFICATION_DISMISSED = PATH + "NOTIFICATION_DISMISSED"
-    const val PLAYPAUSE = PATH + "PLAYPAUSE"
     const val STOP = PATH + "STOP"
-    const val STOPALL = PATH + "STOPALL"
-    var totalTime: Long = 0
-    var is_playing_recorded_file = false
+
     var is_downloading = false
      private  var player: ExoPlayer? = null
     lateinit var mMediaSession: MediaSession
-    var getIsPlaying = false
     private var playbackPosition: Long = 0
     private var currentWindow: Int = 0
     var playWhenReady = true
-    var playPauseIcon = R.drawable.pause_2 // if (!getIsPlaying()) R.drawable.ic_pause else R.drawable.ic_play
 
     fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     fun  initializePlayer(ctx: Context, isRecfile: Boolean, streamUrl: Uri) {
         if (streamUrl != Uri.parse("")) GlobalRadiourl = streamUrl
-        is_playing_recorded_file = isRecfile
+      //  is_playing_recorded_file = isRecfile
 
         val eContext = ctx.applicationContext
 

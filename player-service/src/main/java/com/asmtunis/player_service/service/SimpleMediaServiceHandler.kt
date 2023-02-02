@@ -25,6 +25,9 @@ class SimpleMediaServiceHandler @Inject constructor(
     private val _icyState = MutableStateFlow<String>("")
     val icyState = _icyState.asStateFlow()
 
+
+
+
     private var job: Job? = null
 
     init {
@@ -44,22 +47,25 @@ class SimpleMediaServiceHandler @Inject constructor(
 
     suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
         when (playerEvent) {
-            PlayerEvent.Backward -> player.seekBack()
-            PlayerEvent.Forward -> player.seekForward()
-            PlayerEvent.PlayPause -> {
+            is PlayerEvent.Backward -> player.seekBack()
+            is PlayerEvent.Forward -> player.seekForward()
+            is PlayerEvent.PlayPause -> {
                 if (player.isPlaying) {
+                    Log.d("iijkj","1")
                     player.pause()
                     stopProgressUpdate()
                 } else {
+                    Log.d("iijkj","2")
+                    player.prepare()
                     player.play()
                     _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = true)
                     startProgressUpdate()
                 }
             }
-            PlayerEvent.Stop -> {
-
+            is  PlayerEvent.Stop -> {
+                Log.d("iijkj","3")
                 stopProgressUpdate()
-                releasePlayer()
+                 releasePlayer()
             }
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
         }
@@ -72,25 +78,26 @@ class SimpleMediaServiceHandler @Inject constructor(
         when (playbackState) {
             ExoPlayer.STATE_IDLE // The player does not have any media to play.
             -> {
-
+                _icyState.value = ""
             }
             ExoPlayer.STATE_BUFFERING // The player needs to load media before playing.
             -> {
-                _simpleMediaState.value =
-                    SimpleMediaState.Buffering(player.currentPosition)
+                _icyState.value = "Buffering"
+                _simpleMediaState.value = SimpleMediaState.Buffering(player.currentPosition)
 
             }
             ExoPlayer.STATE_READY // The player is able to immediately play from its current position.
             -> {
-
+              //  _icyState.value = ""
+                _simpleMediaState.value = SimpleMediaState.Ready(player.duration)
              }
             ExoPlayer.STATE_ENDED // The player has finished playing the media.
             -> {
-
+                _icyState.value = ""
             }
             else -> {
               //  MainActivity.GlobalstateString = "UNKNOWN_STATE"
-
+                _icyState.value = ""
             }
         }
     }
@@ -116,9 +123,9 @@ class SimpleMediaServiceHandler @Inject constructor(
 
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
         super.onMediaMetadataChanged(mediaMetadata)
-        if(mediaMetadata.title.toString()== "null")
-            _icyState.value = "Buffering"
-            else _icyState.value = mediaMetadata.title.toString()
+
+       if(mediaMetadata.title.toString()!= "null")
+           _icyState.value = mediaMetadata.title.toString()
 
 
     }
@@ -150,10 +157,11 @@ class SimpleMediaServiceHandler @Inject constructor(
     }
 
     private fun releasePlayer(){
-        player.playWhenReady = player.playWhenReady
-        player.playbackState
+       // player.playWhenReady = player.playWhenReady
+       // player.playbackState
         player.stop()
-        player.release()
+
+     //   player.release()
     }
 }
 

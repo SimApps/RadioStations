@@ -167,11 +167,8 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
 
     override fun onItemClick(radio: RadioEntity) {
         try {
-
             simpleMediaViewModel.loadData(radio)
-            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
-            infoViewModel.putRadiopalyerInfo(radio)
             // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
             //   startServices(context)
         } catch (e: IOException) {

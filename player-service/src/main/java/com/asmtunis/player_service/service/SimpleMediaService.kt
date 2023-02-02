@@ -2,6 +2,7 @@ package com.asmtunis.player_service.service
 
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -39,9 +40,9 @@ class SimpleMediaService : MediaSessionService() {
         super.onDestroy()
         mediaSession.run {
             release()
-            if (player.playbackState != Player.STATE_IDLE) {
+           /* if (player.playbackState != Player.STATE_IDLE) {
                 player.release()
-            }
+            }*/
         }
     }
 

@@ -18,11 +18,13 @@ import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentMoreBinding
+import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
+import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +37,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomsheetfragmentMoreBinding? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
+    private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
     private val radioRoom: MutableList<RadioEntity> = mutableListOf()
 
@@ -75,15 +78,21 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             }
 
             binding.shareImageView.setSafeOnClickListener {
-                RadioFunction.shareRadio(
-                    requireContext(),
-                    radioVar.name,
-                    radioVar.homepage,
-                    radioVar.streamurl,
-                    radioVar.country,
-                    radioVar.language,
-                    radioVar.bitrate
-                )
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        simpleMediaViewModel.icyStreamInfoState.collectLatest { icy ->
+
+                            RadioFunction.shareRadio(
+                                requireContext(),
+                                radioVar,
+                                icy
+                            )
+                        }
+                    }
+                }
+
+
+
 
                 dismiss()
             }
@@ -137,32 +146,39 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun getFavRadioRoom(radioVar: RadioEntity) {
-        radioRoomViewModel.getAll(true).observe(this) { list ->
-            //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
-            if (list.isNotEmpty()) {
-                radioRoom.clear()
-                radioRoom.addAll(list)
 
-                var idIn = false
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                radioRoomViewModel.favList.collectLatest { list ->
+                    //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
+                    if (list.isNotEmpty()) {
+                        radioRoom.clear()
+                        radioRoom.addAll(list)
 
-                if (list.size > 0) {
-                    loop@ for (i in 0 until list.size) {
-                        if (radioVar.stationuuid == list[i].stationuuid) {
-                            idIn = true
-                            break@loop
+                        var idIn = false
+
+                        if (list.size > 0) {
+                            loop@ for (i in 0 until list.size) {
+                                if (radioVar.stationuuid == list[i].stationuuid) {
+                                    idIn = true
+                                    break@loop
+                                }
+                            }
                         }
-                    }
-                }
 
-                if (idIn) {
-                    binding.likeImageView.setImageResource(R.drawable.ic_liked)
-                    //  binding.likeTxVw.text = getString(R.string.radio_dislike)
-                } else {
-                    binding.likeImageView.setImageResource(R.drawable.ic_like)
-                    //   binding.likeTxVw.text = getString(R.string.radio_like)
+                        if (idIn) {
+                            binding.likeImageView.setImageResource(R.drawable.ic_liked)
+                            //  binding.likeTxVw.text = getString(R.string.radio_dislike)
+                        } else {
+                            binding.likeImageView.setImageResource(R.drawable.ic_like)
+                            //   binding.likeTxVw.text = getString(R.string.radio_like)
+                        }
+                    } else radioRoom.clear()
                 }
-            } else radioRoom.clear()
+            }
         }
+
+
     }
 
     private fun favRadio(

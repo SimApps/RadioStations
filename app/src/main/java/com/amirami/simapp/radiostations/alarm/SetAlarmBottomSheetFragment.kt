@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -52,7 +51,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var _binding: BottomsheetAddalarmBinding? = null
 
-    private val radioAlarmRoomViewModel: RadioAlarmRoomViewModel by activityViewModels()
+    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
 
     private lateinit var radioVariable: RadioEntity
     override fun onCreateView(
@@ -123,7 +122,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
             description
         }
     }
-    private fun viewsVisibility(radioAlarmEmpty: MutableList<RadioAlarmRoom>) {
+    private fun viewsVisibility(radioAlarmEmpty: List<RadioEntity>) {
         if (radioAlarmEmpty.isEmpty()) {
            /* _binding!!.textView.visibility = View.VISIBLE
             _binding!!.textView2.visibility = View.VISIBLE
@@ -136,8 +135,8 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
             _binding!!.infoalarm.text = getString(
                 R.string.radioAlarmIsSetAT,
                 shortformateDate(dataViewModel.getTimeInMillis().toLong()),
-                if (radioAlarmEmpty[0].radiouid != "") getString(R.string.RadioStationName) else getString(R.string.RecordedStationName),
-                radioAlarmEmpty[0].name + if (radioAlarmEmpty[0].radiouid != "") "" else formatRcordDescriptionName(radioAlarmEmpty[0].homepage)
+                if (radioAlarmEmpty[0].stationuuid != "") getString(R.string.RadioStationName) else getString(R.string.RecordedStationName),
+                radioAlarmEmpty[0].name + if (radioAlarmEmpty[0].stationuuid != "") "" else formatRcordDescriptionName(radioAlarmEmpty[0].homepage)
             )
             _binding!!.infoalarm.visibility = View.VISIBLE
 
@@ -159,8 +158,8 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun getAlarmRadioRoom() {
         // radioAlarmRoomViewModel.deleteAll("")
-        radioAlarmRoomViewModel.getAll().observe(this) { list ->
-// errorToast(requireContext(),list.isEmpty().toString())
+        collectLatestLifecycleFlow(radioRoomViewModel.alarmList) {list->
+            // errorToast(requireContext(),list.isEmpty().toString())
 
             viewsVisibility(list)
             _binding!!.buttonStartCancelalarm.setSafeOnClickListener {
@@ -185,21 +184,21 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
                     timeInMilliSeconds = date!!.time
 
                     if (timeInMilliSeconds.toInt() != 0) {
-                        val radioroom = RadioAlarmRoom(
-                            radioVariable.stationuuid,
-                            radioVariable.name,
-                            radioVariable.bitrate,
-                            radioVariable.homepage,
-                            radioVariable.favicon,
-                            radioVariable.tags,
-                            radioVariable.country,
-                            radioVariable.state,
+                        val radioroom = RadioEntity(
+                            stationuuid = radioVariable.stationuuid,
+                            name=  radioVariable.name,
+                            bitrate=    radioVariable.bitrate,
+                            homepage= radioVariable.homepage,
+                            favicon= radioVariable.favicon,
+                            tags= radioVariable.tags,
+                            country=radioVariable.country,
+                            state=radioVariable.state,
                             // var RadiostateDB: String?,
-                            radioVariable.language,
-                            radioVariable.streamurl,
-                            radioVariable.moreinfo
+                            language = radioVariable.language,
+                            streamurl =  radioVariable.streamurl,
+                            moreinfo =  radioVariable.moreinfo
                         )
-                        radioAlarmRoomViewModel.upsertRadioAlarm(radioroom, "Radio added")
+                        radioRoomViewModel.upsertRadioAlarm(radioroom, "Radio added")
 
                         enableBootReceiver(requireContext())
 
@@ -217,7 +216,7 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
                     )
                     val alarmMg = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
                     if (pInten != null) {
-                        radioAlarmRoomViewModel.deleteAll("")
+                        radioRoomViewModel.deleteAll("")
                         cancelAlarm(requireContext())
                         dataViewModel.saveRadioUrl("Empty")
 
@@ -229,5 +228,6 @@ class SetAlarmBottomSheetFragment : BottomSheetDialogFragment() {
                 RadioFunction.interatialadsShow(requireContext())
             }
         }
+
     }
 }

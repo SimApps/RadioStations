@@ -11,13 +11,19 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.amirami.simapp.radiostations.Exoplayer
 import com.amirami.simapp.radiostations.MainActivity
+import com.amirami.simapp.radiostations.MainActivity.Companion.Globalurl
+import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
+import com.amirami.simapp.radiostations.MainActivity.Companion.is_playing_recorded_file
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Resource
 import com.amirami.simapp.radiostations.model.Status
+import com.amirami.simapp.radiostations.repository.RadioRoomBaseRepository
+import com.amirami.simapp.radiostations.utils.Coroutines
 import com.asmtunis.player_service.service.PlayerEvent
 import com.asmtunis.player_service.service.SimpleMediaServiceHandler
 import com.asmtunis.player_service.service.SimpleMediaState
@@ -25,6 +31,7 @@ import com.asmtunis.player_service.service.SimpleMediaState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -34,7 +41,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SimpleMediaViewModel @Inject constructor(
     private val simpleMediaServiceHandler: SimpleMediaServiceHandler,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val player: ExoPlayer,
+    private val favListRoomBaseRepository: RadioRoomBaseRepository
 ) : ViewModel() {
 
  /*
@@ -44,6 +53,13 @@ class SimpleMediaViewModel @Inject constructor(
     var isPlaying by savedStateHandle.saveable { mutableStateOf(false) }
 
   */
+ //private val videoUris: StateFlow<List<Uri>> = savedStateHandle.getStateFlow(VIDEO_URIS, emptyList())
+
+
+
+    fun getPlayer(): Player? {
+        return player
+    }
 
     private val _duration = MutableStateFlow(0L)
     val duration = _duration.asStateFlow()
@@ -60,22 +76,35 @@ class SimpleMediaViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
     val uiState = _uiState.asStateFlow()
 
-    private val _icyStreamInfoState = MutableStateFlow<String>("")
+    private val _icyStreamInfoState = MutableStateFlow("")
     val icyStreamInfoState = _icyStreamInfoState.asStateFlow()
 
+
+    private val _radioVar = MutableStateFlow(RadioEntity())
+    val radioVar = _radioVar.asStateFlow()
+
+
+
+    private val _isRecFile = MutableStateFlow(false)
+    val isRecFile = _isRecFile.asStateFlow()
+
+    fun setRadioVar(radioVar : RadioEntity) {
+        _radioVar.value  = radioVar
+    }
     init {
         viewModelScope.launch {
 
             simpleMediaServiceHandler.simpleMediaState.collect { mediaState ->
                 when (mediaState) {
                     is SimpleMediaState.Buffering -> calculateProgressValues(mediaState.progress)
-                    SimpleMediaState.Initial -> _uiState.value = UIState.Initial
+                    is SimpleMediaState.Initial -> _uiState.value = UIState.Initial
                     is SimpleMediaState.Playing -> _isPlaying.value = mediaState.isPlaying
                     is SimpleMediaState.Progress -> calculateProgressValues(mediaState.progress)
                     is SimpleMediaState.Ready -> {
                         _duration.value =  mediaState.duration
                         //duration =  mediaState.duration
                         _uiState.value = UIState.Ready
+
                     }
                 }
             }
@@ -84,8 +113,8 @@ class SimpleMediaViewModel @Inject constructor(
         }
         viewModelScope.launch {
             simpleMediaServiceHandler.icyState.collect { icyStreamInfo ->
-
-            _icyStreamInfoState.value =      icyStreamInfo
+                icyandState = icyStreamInfo
+            _icyStreamInfoState.value = icyStreamInfo
 
             }
         }
@@ -100,9 +129,11 @@ class SimpleMediaViewModel @Inject constructor(
 
     fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
         when (uiEvent) {
-            UIEvent.Backward -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Backward)
-            UIEvent.Forward -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Forward)
-            UIEvent.PlayPause -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.PlayPause)
+            is UIEvent.Backward -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Backward)
+            is UIEvent.Forward -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Forward)
+            is UIEvent.PlayPause -> {
+                simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.PlayPause)
+            }
             is UIEvent.UpdateProgress -> {
                 _progress.value = uiEvent.newProgress
                 simpleMediaServiceHandler.onPlayerEvent(
@@ -112,7 +143,7 @@ class SimpleMediaViewModel @Inject constructor(
                 )
             }
 
-            UIEvent.Stop ->  viewModelScope.launch {
+            is  UIEvent.Stop ->  viewModelScope.launch {
                 simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Stop)
             }
         }
@@ -132,9 +163,29 @@ class SimpleMediaViewModel @Inject constructor(
         _progress.value = if (currentProgress > 0) (currentProgress.toFloat() / _duration.value) else 0f
         _progressString.value = formatDuration(currentProgress)
     }
+    fun deletelistened(fav: Boolean) {
+        Coroutines.io(this@SimpleMediaViewModel) {
+            favListRoomBaseRepository.deletelistened(fav)
+        }
+    }
 
-     fun loadData(radio : RadioEntity) {
+    fun upsertRadio(item: RadioEntity) {
+        Coroutines.io(this@SimpleMediaViewModel) {
+            if (item.name != "") { // prevent add alarm played station
+                favListRoomBaseRepository.upsert(item)
+            }
+        }
+    }
 
+    fun loadData(radio : RadioEntity, isRec : Boolean = false) {
+        _isRecFile.value = isRec
+         is_playing_recorded_file = isRec
+        _radioVar.value = radio
+
+        Globalurl = radio.streamurl
+        MainActivity.GlobalRadioName = radio.name
+        upsertRadio(radio)
+        deletelistened(false)
         val mediaItem = MediaItem.Builder()
             .setUri(radio.streamurl)
             .setMediaMetadata(
@@ -163,6 +214,8 @@ class SimpleMediaViewModel @Inject constructor(
 
         simpleMediaServiceHandler.addMediaItem(mediaItem)
         //simpleMediaServiceHandler.addMediaItemList(mediaItemList)
+
+         onUIEvent(UIEvent.PlayPause)
 
     }
 

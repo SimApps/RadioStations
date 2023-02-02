@@ -1,11 +1,9 @@
 package com.amirami.simapp.radiostations
 
-import alirezat775.lib.downloader.Downloader
-import alirezat775.lib.downloader.core.OnDownloadListener
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ServiceStartNotAllowedException
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Paint
@@ -32,10 +30,11 @@ import coil.decode.SvgDecoder
 import coil.load
 import coil.request.CachePolicy
 import coil.transform.RoundedCornersTransformation
+import com.amirami.simapp.downloader.Downloader
+import com.amirami.simapp.downloader.core.OnDownloadListener
 import com.amirami.simapp.radiostations.Exoplayer.isOreoPlus
-import com.amirami.simapp.radiostations.Exoplayer.is_playing_recorded_file
 import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadiourl
+import com.amirami.simapp.radiostations.MainActivity.Companion.Globalurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.color1
 import com.amirami.simapp.radiostations.MainActivity.Companion.color2
 import com.amirami.simapp.radiostations.MainActivity.Companion.color3
@@ -47,8 +46,10 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.downloader
 import com.amirami.simapp.radiostations.MainActivity.Companion.handlers
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
 import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
+import com.amirami.simapp.radiostations.MainActivity.Companion.is_playing_recorded_file
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.utils.Constatnts.RECORDS_FILE_NAME
@@ -86,14 +87,10 @@ object RadioFunction {
 
     fun shareRadio(
         context: Context,
-        radioName: String,
-        radioHomepage: String,
-        radioStreamURL: String,
-        radioCountry: String,
-        radioLanguage: String,
-        radioBitrate: String
+        radio: RadioEntity,
+        icy : String
     ) {
-        if (radioName != "") {
+        if (radio.name != "") {
             if (is_playing_recorded_file) {
                 try {
                     val intent = Intent(Intent.ACTION_SEND)
@@ -101,11 +98,11 @@ object RadioFunction {
                     intent.type = "text/plain"
                     intent.putExtra(
                         Intent.EXTRA_TEXT,
-                        "I am listening to $radioName recorded with ${context.resources.getString(R.string.app_name)} application.\n" +
-                            "Information about redorded file : $icyandState \n" +
+                        "I am listening to ${radio.name} recorded with ${context.resources.getString(R.string.app_name)} application.\n" +
+                            "Information about redorded file : $icy \n" +
                             "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
                     )
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : $radioName")
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : ${radio.name}")
                     context.startActivity(
                         Intent.createChooser(
                             intent,
@@ -122,15 +119,15 @@ object RadioFunction {
                     intent.type = "text/plain"
                     intent.putExtra(
                         Intent.EXTRA_TEXT,
-                        "I am listening to $radioName on ${context.resources.getString(R.string.app_name)}  application.\n" +
-                            "Radio Homepage : $radioHomepage \n" +
-                            "Radio Stream URL : $radioStreamURL \n" +
-                            "Radio Country : $radioCountry  \n" +
-                            "Radio Language : $radioLanguage \n" +
-                            "Radio Bitrate : $radioBitrate \n \n" +
+                        "I am listening to ${radio.name} on ${context.resources.getString(R.string.app_name)}  application.\n" +
+                            "Radio Homepage : ${radio.homepage} \n" +
+                            "Radio Stream URL : ${radio.streamurl} \n" +
+                            "Radio Country : ${radio.country}  \n" +
+                            "Radio Language : ${radio.language} \n" +
+                            "Radio Bitrate : ${radio.bitrate} \n \n" +
                             "Download App from :  http://play.google.com/store/apps/details?id=" + context.packageName
                     )
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : $radioName")
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Radio Name : ${radio.name}")
                     context.startActivity(
                         Intent.createChooser(
                             intent,
@@ -442,7 +439,7 @@ object RadioFunction {
         //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
         //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
 
-        downloader = Downloader.Builder(context, GlobalRadiourl.toString())
+        downloader = Downloader.Builder(context, Globalurl)
             .downloadListener(object : OnDownloadListener {
                 override fun onStart() {
                     Exoplayer.is_downloading = true

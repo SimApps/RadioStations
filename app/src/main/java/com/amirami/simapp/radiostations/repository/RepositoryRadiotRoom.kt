@@ -3,6 +3,7 @@ package com.amirami.simapp.radiostations.repository
 import androidx.lifecycle.LiveData
 import com.amirami.simapp.radiostations.room.RadioDAO
 import com.amirami.simapp.radiostations.model.RadioEntity
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class RepositoryRadiotRoom @Inject constructor(
@@ -32,19 +33,30 @@ class RepositoryRadiotRoom @Inject constructor(
         )
     }*/
 
-    override suspend fun delete(radiouId: String?, fav: Boolean) {
-        radioDAO.delete(radiouId, fav)
-    }
-    override suspend fun deletelistened(fav: Boolean) {
-        radioDAO.deletelistened(fav)
-    }
+    override suspend fun delete(radiouId: String?, fav: Boolean)
+      =  radioDAO.deleteFav(radiouId, fav)
 
-    override suspend fun deleteAll() {
-        radioDAO.deleteAll()
-    }
+    override suspend fun deleteAlarm(radioId: String?, isAlarm: Boolean)
+    = radioDAO.deleteAlarm(radioId, true)
 
-    override fun getAll(fav: Boolean): LiveData<List<RadioEntity>> {
+    override suspend fun deletelistened(fav: Boolean)
+        =radioDAO.deletelistened(fav)
+
+
+    override suspend fun deleteAll()
+       = radioDAO.deleteAll()
+
+    override suspend fun deleteAllAlarm()  =radioDAO.deleteAllAlarm(true)
+
+    override suspend fun deleteAllFav()  =radioDAO.deleteAllFav(true)
+
+
+    override fun getAll(fav: Boolean): Flow<List<RadioEntity>> {
         return radioDAO.getAll(fav)
     }
+
+    override fun getAllAlarm(): Flow<List<RadioEntity>> =
+        radioDAO.getAlarm(true)
+
     //endregion
 }

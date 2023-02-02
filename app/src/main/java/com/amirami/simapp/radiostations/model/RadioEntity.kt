@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "radio_table", indices = [Index(value = ["stationuuid", "fav"], unique = true)])
 data class RadioEntity(
 
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "radioid")
     @SerializedName("radioID")
     var radioID: Int = 0,
@@ -62,7 +62,10 @@ data class RadioEntity(
 
     @ColumnInfo(name = "moreinfo")
     @SerializedName("moreinfo")
-    var moreinfo: String = ""
+    var moreinfo: String = "",
+
+    @ColumnInfo(name = "isAlarm")
+    var isAlarm: Boolean= false
 ) {
 
     constructor(

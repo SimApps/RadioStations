@@ -1,7 +1,6 @@
 package com.amirami.simapp.radiostations.ui
 
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -41,7 +40,6 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
@@ -387,7 +385,6 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private fun btnClick() {
         binding.btnAllcountry.setSafeOnClickListener {
             if (canNavigate()) {
-                //   retrofitRadioViewModel.getListRadios(getString(R.string.countries))
                 val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
                 findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
             }
@@ -482,9 +479,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             try {
 
                 simpleMediaViewModel.loadData(radio)
-                simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+               // simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
-                infoViewModel.putRadiopalyerInfo(radio)
                 //    jsonLocalRadioCall = api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
             } catch (e: IOException) {
                 // Catch the exception
@@ -533,11 +529,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
-
-
             simpleMediaViewModel.loadData(radioRoom)
-            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
-
             val radioVariables = RadioEntity()
             radioVariables.apply {
                 name = radioRoom.name
@@ -552,7 +544,6 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 tags = radioRoom.tags
             }
 
-            infoViewModel.putRadiopalyerInfo(radioVariables)
 
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
         } catch (e: IOException) {
@@ -570,23 +561,28 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     override fun onMoreItemFavClick(radio: RadioEntity) = Unit
 
     private fun getLastPlayedRadio() {
-        radioRoomViewModel.getAll(false).observe(viewLifecycleOwner) { list ->
-            if (list.isNotEmpty()) {
-                radioAdapterLastPlayedRadioHorizantal = RadioFavoriteAdapterHorizantal(this)
-                binding.lastPlayedRadioRv.apply {
-                    adapter = radioAdapterLastPlayedRadioHorizantal
-                    layoutManager = GridLayoutManager(requireContext(), 1, LinearLayoutManager.HORIZONTAL, false)
-                    setHasFixedSize(true)
-                }
-                radioAdapterLastPlayedRadioHorizantal.setItems(list)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                radioRoomViewModel.lastListnedList.collectLatest {list ->
+                    if (list.isNotEmpty()) {
+                        radioAdapterLastPlayedRadioHorizantal = RadioFavoriteAdapterHorizantal(this@MainFragment)
+                        binding.lastPlayedRadioRv.apply {
+                            adapter = radioAdapterLastPlayedRadioHorizantal
+                            layoutManager = GridLayoutManager(requireContext(), 1, LinearLayoutManager.HORIZONTAL, false)
+                            setHasFixedSize(true)
+                        }
+                        radioAdapterLastPlayedRadioHorizantal.setItems(list)
 
-                binding.lastPlayedRadioRv.visibility = View.VISIBLE
-                binding.recentrecentlyplayedTxV.visibility = View.VISIBLE
-            } else {
-                binding.recentrecentlyplayedTxV.visibility = View.GONE
-                binding.lastPlayedRadioRv.visibility = View.GONE
+                        binding.lastPlayedRadioRv.visibility = View.VISIBLE
+                        binding.recentrecentlyplayedTxV.visibility = View.VISIBLE
+                    } else {
+                        binding.recentrecentlyplayedTxV.visibility = View.GONE
+                        binding.lastPlayedRadioRv.visibility = View.GONE
+                    }
+                }
             }
         }
+
     }
 
 

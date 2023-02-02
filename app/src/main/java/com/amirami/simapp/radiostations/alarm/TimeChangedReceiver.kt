@@ -19,7 +19,7 @@ class TimeChangedReceiver @Inject constructor(
             //   val sharedPref = context?.getSharedPreferences("MyPref",Context.MODE_PRIVATE) ?: return
             //   val timeInMilli = sharedPref.getLong("timeInMilli", 1)
 
-            val timeInMilli = dataViewModel.getTimeInMillis().toLong().toLong()
+            val timeInMilli = dataViewModel.getTimeInMillis().toLong()
 
             if (context != null) {
                 Utils.setAlarm(context, timeInMilli)

@@ -45,7 +45,6 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -545,17 +544,24 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     }
 
     private fun getFavRadioRoom() {
-        radioRoomViewModel.getAll(true).observe(viewLifecycleOwner) { list ->
-            //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
-            if (list.isNotEmpty()) {
-                val favoriteFirestore = FavoriteFirestore(
-                    getuserid(),
-                    list.map { it.stationuuid } as ArrayList<String>,
-                    getCurrentDate()
-                )
-                createUserDocument(favoriteFirestore)
-            } else createUserDocument(FavoriteFirestore(getuserid(), ArrayList<String>(), getCurrentDate()))
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                radioRoomViewModel.favList.collectLatest { list ->
+                    //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
+                    if (list.isNotEmpty()) {
+                        val favoriteFirestore = FavoriteFirestore(
+                            getuserid(),
+                            list.map { it.stationuuid } as ArrayList<String>,
+                            getCurrentDate()
+                        )
+                        createUserDocument(favoriteFirestore)
+                    } else createUserDocument(FavoriteFirestore(getuserid(), ArrayList<String>(), getCurrentDate()))
+                }
+            }
         }
+
+
     }
 
     private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
