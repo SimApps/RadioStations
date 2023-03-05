@@ -14,6 +14,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
+    @Provides
+    fun provideRoomDatabaseCallback(): RoomDatabase.Callback {
+        return object : RoomDatabase.Callback() {
+        }
+    }
 
     @Provides
     @Singleton
@@ -35,9 +40,5 @@ object DataModule {
         return radioDatabase.customDao()
     }
 
-    @Provides
-    fun provideRoomDatabaseCallback(): RoomDatabase.Callback {
-        return object : RoomDatabase.Callback() {
-        }
-    }
+
 }

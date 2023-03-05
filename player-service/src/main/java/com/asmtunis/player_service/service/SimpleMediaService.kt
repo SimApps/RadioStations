@@ -2,9 +2,7 @@ package com.asmtunis.player_service.service
 
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -28,7 +26,7 @@ class SimpleMediaService : MediaSessionService() {
     @RequiresApi(Build.VERSION_CODES.O)
     @UnstableApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        notificationManager.startNotificationService(
+       notificationManager.startNotificationService(
             mediaSessionService = this,
             mediaSession = mediaSession
         )

@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.navArgs
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
@@ -20,22 +21,28 @@ import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentAdddialogueBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.ManagePermissions
+import com.amirami.simapp.radiostations.viewmodel.DownloaderViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private var _binding: BottomsheetfragmentAdddialogueBinding? = null
     private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
+    private val downloaderViewModel: DownloaderViewModel by activityViewModels()
+
     val argsFrom: AddDialogueBottomSheetFragmentArgs by navArgs()
 
     private lateinit var managePermissions: ManagePermissions
@@ -99,7 +106,7 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                         binding.RadioLanguageTXviewadd.text.toString(),
                         if ("https" in binding.RadioStreamlinkTXviewadd.text.toString()) binding.RadioStreamlinkTXviewadd.text.toString()
                         else binding.RadioStreamlinkTXviewadd.text.toString().replace(Regex("http"), "https"),
-                        true
+                        fav = true,
 
                     )
 
@@ -186,13 +193,16 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
                 if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
                     managePermissions.checkPermissions()
                 } else {
-                    //  customurltodownload= StreamURLTXview.text.toString()
-                    if ("https" in binding.RadioStreamlinkTXviewadd.text.toString()) {
-                        RadioFunction.getCutomDownloader(requireActivity(), binding.RadioNameTXviewadd.text.toString(), binding.RadioStreamlinkTXviewadd.text.toString())
+                    val url = if ("https" in binding.RadioStreamlinkTXviewadd.text.toString()) {
+                      binding.RadioStreamlinkTXviewadd.text.toString()
+
                     } else {
-                        RadioFunction.getCutomDownloader(requireActivity(), binding.RadioNameTXviewadd.text.toString(), binding.RadioStreamlinkTXviewadd.text.toString().replace(Regex("http"), "https"))
+                        binding.RadioStreamlinkTXviewadd.text.toString().replace(Regex("http"), "https")
                     }
-                    MainActivity.customdownloader?.download()
+
+                    downloaderViewModel.startDownloader (customRecName =binding.RadioNameTXviewadd.text.toString() ,customUrl= url)
+
+
 
                     dismiss()
                     RadioFunction.interatialadsShow(requireContext())
@@ -209,41 +219,9 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
     }
-    private val requestMultiplePermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            permissions.entries.forEach {
-                if (it.value) {
 
-                    if ("https" in binding.RadioStreamlinkTXviewadd.text.toString()) RadioFunction.getCutomDownloader(
-                        requireContext(),
-                        binding.RadioNameTXviewadd.text.toString(),
-                        binding.RadioStreamlinkTXviewadd.text.toString()
-                    )
-                    else RadioFunction.getCutomDownloader(
-                        requireContext(),
-                        binding.RadioNameTXviewadd.text.toString(),
-                        binding.RadioStreamlinkTXviewadd.text.toString().replace(
-                            Regex(resources.getString(R.string.http)),
-                            resources.getString(R.string.https)
-                        )
-                    )
 
-                    MainActivity.customdownloader?.download()
-                    DynamicToast.makeSuccess(
-                        requireContext(),
-                        getString(R.string.Permissionsgranted),
-                        9
-                    ).show()
-                } else {
-                    DynamicToast.makeError(
-                        requireContext(),
-                        getString(R.string.PermissionsNotgranted),
-                        9
-                    ).show()
-                    MainActivity.customdownloader?.cancelDownload()
-                }
-            }
-        }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

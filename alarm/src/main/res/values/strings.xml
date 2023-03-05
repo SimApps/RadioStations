@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Alarm</string>
+
+    <string name="alarm_service_desc">Alarm Service</string>
+</resources>

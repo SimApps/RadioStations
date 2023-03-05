@@ -7,13 +7,11 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 // @Entity(tableName = "radio_table" )
-@Entity(tableName = "radio_table", indices = [Index(value = ["stationuuid", "fav"], unique = true)])
+@Entity(tableName = "radio_table", indices = [Index(value = ["stationuuid"], unique = true)])
 data class RadioEntity(
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "radioid")
-    @SerializedName("radioID")
-    var radioID: Int = 0,
+
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "stationuuid")
     @SerializedName("stationuuid")
     var stationuuid: String = "",
@@ -65,7 +63,13 @@ data class RadioEntity(
     var moreinfo: String = "",
 
     @ColumnInfo(name = "isAlarm")
-    var isAlarm: Boolean= false
+    var isAlarm: Boolean= false,
+
+    @ColumnInfo(name = "isLastListned")
+    var isLastListned: Boolean= false,
+
+    @ColumnInfo(name = "timeStamp")
+    var timeStamp : Long = System.currentTimeMillis()
 ) {
 
     constructor(

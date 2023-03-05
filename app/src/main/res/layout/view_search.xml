@@ -56,7 +56,7 @@
             android:layout_toStartOf="@+id/add_alarm_button"
             android:layout_toEndOf="@+id/openclose_search_button"
             android:gravity="center_horizontal"
-            android:text="TextView"
+            android:text=""
             android:textAlignment="center"
             android:textColor="#A1887F"
             android:textSize="18sp" />

@@ -5,9 +5,11 @@ import android.net.ConnectivityManager.*
 import android.net.NetworkCapabilities.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Resource
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.repository.RetrofitRadioRepository
@@ -18,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
-@HiltViewModel
+@UnstableApi @HiltViewModel
 class RetrofitRadioViewModel
 @Inject
 constructor(
@@ -45,7 +47,7 @@ constructor(
     private val _responseRadioSreach = MutableStateFlow<Resource<*>>(Resource(Status.LOADING, null, ""))
     val responseRadioSreach = _responseRadioSreach.asStateFlow()
 
-    private val _responseRadioUID = MutableStateFlow<Resource<*>>(Resource(Status.LOADING, null, ""))
+    private val _responseRadioUID = MutableStateFlow<Resource<List<RadioEntity>>>(Resource(Status.LOADING, null, ""))
     val responseRadioUID = _responseRadioUID.asStateFlow()
 
     private val _responseLocalRadio = MutableStateFlow(Resource(Status.SUCCESS, null, ""))

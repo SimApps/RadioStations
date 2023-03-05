@@ -14,14 +14,17 @@ interface RadioRoomBaseRepository {
 
     // suspend fun  delete(customEntity : CustomEntity)
     suspend fun delete(radioId: String?, fav: Boolean)
+    suspend fun updateFav(radioId: String?, fav: Boolean)
     suspend fun deleteAlarm(radioId: String?, isAlarm: Boolean)
 
-    suspend fun deletelistened(fav: Boolean)
+    suspend fun deletelistened()
 
     suspend fun deleteAll()
     suspend fun deleteAllAlarm()
     suspend fun deleteAllFav()
 
-    fun getAll(fav: Boolean): Flow<List<RadioEntity>>
+    fun getFavList(fav: Boolean): Flow<List<RadioEntity>>
+    fun getLastListenedList(lastListen: Boolean): Flow<List<RadioEntity>>
+    fun getAllRadioList(): Flow<List<RadioEntity>>
     fun getAllAlarm(): Flow<List<RadioEntity>>
 }

@@ -170,8 +170,8 @@
             android:id="@+id/action_moreBottomSheetFragment_to_infoBottomSheetFragment"
             app:destination="@id/infoBottomSheetFragment" />
         <action
-            android:id="@+id/action_moreBottomSheetFragment_to_setAlarmBottomSheetFragment"
-            app:destination="@id/setAlarmBottomSheetFragment" />
+            android:id="@+id/action_moreBottomSheetFragment_to_mainAlarmFragment"
+            app:destination="@id/mainAlarmFragment" />
     </dialog>
     <dialog
         android:id="@+id/addDialogueBottomSheetFragment"
@@ -186,10 +186,46 @@
         android:id="@+id/setTimerBottomSheetFragment"
         android:name="com.amirami.simapp.radiostations.ui.SetTimerBottomSheetFragment"
         android:label="SetTimerBottomSheetFragment" />
+
+
+
+
+
     <dialog
-        android:id="@+id/setAlarmBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.alarm.SetAlarmBottomSheetFragment"
-        android:label="SetAlarmBottomSheetFragment" >
+        android:id="@+id/mainAlarmFragment"
+        android:name="com.amirami.simapp.radiostations.alarm.ui.main.MainAlarmFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/alarm_fragment_main" >
+        <action
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+
+            android:id="@+id/action_mainFragment_to_createAlarmFragment"
+            app:destination="@id/createAlarmFragment" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/settingsFragment"
+        android:name="com.amirami.simapp.radiostations.alarm.ui.settings.SettingsAlarmFragment"
+        android:label="settings_fragment"
+        tools:layout="@layout/alarm_settings_fragment" >
 
     </dialog>
+    <dialog
+        android:id="@+id/createAlarmFragment"
+        android:name="com.amirami.simapp.radiostations.alarm.ui.createAlarm.CreateAlarmFragment"
+        android:label="fragment_create_alarm"
+        tools:layout="@layout/fragment_create_alarm" />
 </navigation>

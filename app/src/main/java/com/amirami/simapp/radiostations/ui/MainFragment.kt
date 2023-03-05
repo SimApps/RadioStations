@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,7 +31,6 @@ import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
-import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.OnItemClickListener, TagsAdapterHorizantal.OnItemClickListener, RadioFavoriteAdapterHorizantal.OnItemClickListener {
     // private lateinit var fragmentClass: Class<*>
     private lateinit var adViewSmallActivitymain: NativeAdView
@@ -78,7 +78,23 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         btnClick()
         adsLooad()
         setUpTagsRv()
-        getLastPlayedRadio()
+        getRadioList()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                infoViewModel.putTheme.collectLatest {
+                    RadioFunction.gradiancolorNativeAdslayout(binding.adsFrame, 0)
+                    RadioFunction.gradiancolorNativeAdslayout(binding.adsFrames, 0)
+                    RadioFunction.gradiancolorConstraintLayoutTransition(binding.Radiomain, 4, it)
+
+                    // RadioFunction.maintextviewColor(binding.countryTxtVw,it)
+                    RadioFunction.maintextviewColor(binding.recentrecentlyplayedTxV, it)
+                    RadioFunction.maintextviewColor(binding.tagsTxtVw, it)
+                }
+            }
+
+
+        }
     }
     private fun setUpTagsRv() {
         if (popularTagList.size == 0 && popularImagetagList.size == 0) {
@@ -362,17 +378,9 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     }
     private fun setupTheme() {
-        lifecycleScope.launchWhenStarted {
-            infoViewModel.putTheme.collectLatest {
-                RadioFunction.gradiancolorNativeAdslayout(binding.adsFrame, 0)
-                RadioFunction.gradiancolorNativeAdslayout(binding.adsFrames, 0)
-                RadioFunction.gradiancolorConstraintLayoutTransition(binding.Radiomain, 4, it)
 
-                // RadioFunction.maintextviewColor(binding.countryTxtVw,it)
-                RadioFunction.maintextviewColor(binding.recentrecentlyplayedTxV, it)
-                RadioFunction.maintextviewColor(binding.tagsTxtVw, it)
-            }
-        }
+
+
         if (MainActivity.systemTheme) {
             when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_YES -> darkTheme = true
@@ -530,19 +538,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
             simpleMediaViewModel.loadData(radioRoom)
-            val radioVariables = RadioEntity()
-            radioVariables.apply {
-                name = radioRoom.name
-                bitrate = radioRoom.bitrate
-                country = radioRoom.country
-                stationuuid = radioRoom.stationuuid
-                favicon = radioRoom.favicon
-                language = radioRoom.language
-                state = radioRoom.state
-                streamurl = radioRoom.streamurl
-                homepage = radioRoom.homepage
-                tags = radioRoom.tags
-            }
+
 
 
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
@@ -560,18 +556,20 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     override fun onMoreItemFavClick(radio: RadioEntity) = Unit
 
-    private fun getLastPlayedRadio() {
+    private fun getRadioList() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                radioRoomViewModel.lastListnedList.collectLatest {list ->
-                    if (list.isNotEmpty()) {
+                radioRoomViewModel.radioList.collectLatest { list ->
+
+                    val ladtListned = list.filter { it.isLastListned }
+                    if (ladtListned.isNotEmpty()) {
                         radioAdapterLastPlayedRadioHorizantal = RadioFavoriteAdapterHorizantal(this@MainFragment)
                         binding.lastPlayedRadioRv.apply {
                             adapter = radioAdapterLastPlayedRadioHorizantal
                             layoutManager = GridLayoutManager(requireContext(), 1, LinearLayoutManager.HORIZONTAL, false)
                             setHasFixedSize(true)
                         }
-                        radioAdapterLastPlayedRadioHorizantal.setItems(list)
+                        radioAdapterLastPlayedRadioHorizantal.setItems(ladtListned)
 
                         binding.lastPlayedRadioRv.visibility = View.VISIBLE
                         binding.recentrecentlyplayedTxV.visibility = View.VISIBLE

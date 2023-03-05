@@ -1,0 +1,78 @@
+plugins {
+    id ("com.android.library")
+    id ("org.jetbrains.kotlin.android")
+
+    //dager hilt
+    id ("dagger.hilt.android.plugin")
+
+    id ("kotlin-kapt")
+}
+
+android {
+    namespace = "com.asmtunis.player_service"
+    compileSdk = 33
+
+    defaultConfig {
+        minSdk = 21
+
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
+dependencies {
+
+    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Needed MediaSessionCompat.Token
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+
+    //dager hilt
+    implementation("com.google.dagger:hilt-android:2.45")
+    kapt("com.google.dagger:hilt-compiler:2.45")
+
+    kapt ("androidx.hilt:hilt-compiler:1.0.0")
+
+
+
+    implementation("androidx.media3:media3-ui:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer:1.0.0-rc01")
+    // For DASH playback support with ExoPlayer
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.0-rc01")
+    // For HLS playback support with ExoPlayer
+    implementation("androidx.media3:media3-exoplayer-hls:1.0.0-rc01")
+// For RTSP playback support with ExoPlayer
+    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.0-rc01")
+// For exposing and controlling media sessions
+    implementation("androidx.media3:media3-session:1.0.0-rc01")
+
+
+
+    //COIL
+    implementation("io.coil-kt:coil:2.2.2")
+
+}
+
+kapt {
+    correctErrorTypes = true
+}

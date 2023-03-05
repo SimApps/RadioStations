@@ -5,8 +5,11 @@ import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.* // ktlint-disable no-wildcard-imports
-import com.amirami.simapp.radiostations.Exoplayer
+import androidx.media3.common.util.UnstableApi
+import com.amirami.simapp.radiostations.DefaultDispatcher
+import com.amirami.simapp.radiostations.IoDispatcher
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
@@ -19,8 +22,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-@HiltViewModel
+@UnstableApi @HiltViewModel
 class InfoViewModel @Inject constructor(
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
     private val simpleMediaServiceHandler: SimpleMediaServiceHandler,
     app: Application
@@ -70,12 +75,12 @@ class InfoViewModel @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val networkStatsManager = getApplication<RadioApplication>().getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
                 val managers = getApplication<RadioApplication>().packageManager
-                val info: ApplicationInfo = managers.getApplicationInfo(Exoplayer.packagename, 0)
+                val info: ApplicationInfo = managers.getApplicationInfo(MainActivity.packagename, 0)
                 val uid: Int = info.uid
                 // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 // val manager= DataUsageManager(networkStatsManager, Settings.Secure.ANDROID_ID)
                 // val manager= DataUsageManager(networkStatsManager, uid.toString())
-                val manager = DataUsageManager(networkStatsManager, Exoplayer.packagename)
+                val manager = DataUsageManager(networkStatsManager, MainActivity.packagename)
 
                 if (MainActivity.data == 0L) {
                     MainActivity.data = manager.getUsage(uid).downloads + manager.getUsage(uid).uploads
@@ -94,12 +99,12 @@ class InfoViewModel @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val networkStatsManager = getApplication<RadioApplication>().getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
                 val managers = getApplication<RadioApplication>().packageManager
-                val info: ApplicationInfo = managers.getApplicationInfo(Exoplayer.packagename, 0)
+                val info: ApplicationInfo = managers.getApplicationInfo(MainActivity.packagename, 0)
                 val uid: Int = info.uid
                 // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 // val manager= DataUsageManager(networkStatsManager, Settings.Secure.ANDROID_ID)
                 // val manager= DataUsageManager(networkStatsManager, uid.toString())
-                val manager = DataUsageManager(networkStatsManager, Exoplayer.packagename)
+                val manager = DataUsageManager(networkStatsManager, MainActivity.packagename)
 
                 if (MainActivity.data == 0L) {
                     MainActivity.data = manager.getUsage(uid).downloads + manager.getUsage(uid).uploads
@@ -151,11 +156,14 @@ class InfoViewModel @Inject constructor(
         }
     }
 
+
+
+
     private fun stopPlayer() {
-        if (Exoplayer.is_downloading) {
-            MainActivity.downloader?.cancelDownload()
-            Exoplayer.is_downloading = false // without this line player continue paly and rec stop
-        }
+       // if (Exoplayer.is_downloading) {
+        //    MainActivity.downloader?.cancelDownload()
+        //    Exoplayer.is_downloading = false // without this line player continue paly and rec stop
+       // }
         viewModelScope.launch {
             simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Stop)
         }

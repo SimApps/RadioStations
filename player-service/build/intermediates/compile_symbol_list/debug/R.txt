@@ -2991,6 +2991,7 @@ int drawable notification_tile_bg 0x0
 int drawable notify_panel_notification_icon_bg 0x0
 int drawable pause_2 0x0
 int drawable play_2 0x0
+int drawable radioerror 0x0
 int drawable stop_2 0x0
 int drawable test_level_drawable 0x0
 int drawable tooltip_frame_dark 0x0

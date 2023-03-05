@@ -51,21 +51,18 @@ class SimpleMediaServiceHandler @Inject constructor(
             is PlayerEvent.Forward -> player.seekForward()
             is PlayerEvent.PlayPause -> {
                 if (player.isPlaying) {
-                    Log.d("iijkj","1")
                     player.pause()
                     stopProgressUpdate()
                 } else {
-                    Log.d("iijkj","2")
-                    player.prepare()
+                    //player.prepare()
                     player.play()
                     _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = true)
                     startProgressUpdate()
                 }
             }
             is  PlayerEvent.Stop -> {
-                Log.d("iijkj","3")
                 stopProgressUpdate()
-                 releasePlayer()
+                player.stop()
             }
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
         }
@@ -126,6 +123,7 @@ class SimpleMediaServiceHandler @Inject constructor(
 
        if(mediaMetadata.title.toString()!= "null")
            _icyState.value = mediaMetadata.title.toString()
+        else if (_icyState.value == "Buffering") _icyState.value = ""
 
 
     }
@@ -133,7 +131,7 @@ class SimpleMediaServiceHandler @Inject constructor(
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
 
-        releasePlayer()
+        player.stop()
 
     }
 
@@ -156,13 +154,7 @@ class SimpleMediaServiceHandler @Inject constructor(
 
     }
 
-    private fun releasePlayer(){
-       // player.playWhenReady = player.playWhenReady
-       // player.playbackState
-        player.stop()
 
-     //   player.release()
-    }
 }
 
 sealed class PlayerEvent {

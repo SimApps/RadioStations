@@ -15,7 +15,9 @@ import javax.inject.Provider;
 @DaggerGenerated
 @SuppressWarnings({
     "unchecked",
-    "rawtypes"
+    "rawtypes",
+    "KotlinInternal",
+    "KotlinInternalInJava"
 })
 public final class SimpleMediaModule_ProvideServiceHandlerFactory implements Factory<SimpleMediaServiceHandler> {
   private final SimpleMediaModule module;

@@ -7,6 +7,7 @@ import com.amirami.simapp.downloader.helper.ConnectionHelper
 import android.Manifest
 import android.content.Context
 import android.os.AsyncTask
+import android.util.Log
 import androidx.annotation.CheckResult
 import androidx.annotation.RequiresPermission
 import java.lang.ref.WeakReference
@@ -33,10 +34,14 @@ class Downloader private constructor(downloadTask: DownloadTask) : IDownload {
 
     //region method interface
     @RequiresPermission(Manifest.permission.INTERNET)
-    override fun download() {
+    override suspend fun download() {
+
+        Log.d("ffdcc","qqq")
+
         if (mDownloadTask == null)
             throw IllegalAccessException("Rebuild new instance after \"pause or cancel\" download")
-        mDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        mDownloadTask?.doOperation() //executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
     }
 
     override fun cancelDownload() {
@@ -49,7 +54,7 @@ class Downloader private constructor(downloadTask: DownloadTask) : IDownload {
         mDownloadTask = null
     }
 
-    override fun resumeDownload() {
+    override suspend fun resumeDownload() {
         mDownloadTask?.resume = true
         download()
     }
@@ -102,9 +107,9 @@ class Downloader private constructor(downloadTask: DownloadTask) : IDownload {
          * @return builder
          */
         @CheckResult
-        fun fileName(fileName: String, extension: String): Builder {
+        fun fileName(fileName: String/*, extension: String*/): Builder {
             this.mFileName = fileName
-            this.mExtension = extension
+           // this.mExtension = extension
             return this
         }
 

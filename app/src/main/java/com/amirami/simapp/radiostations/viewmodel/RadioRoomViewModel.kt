@@ -1,5 +1,6 @@
 package com.amirami.simapp.radiostations.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,21 +41,16 @@ class RadioRoomViewModel @Inject constructor(
     private val _alarmList  = MutableStateFlow(emptyList<RadioEntity>())
     val alarmList = _alarmList.asStateFlow()
 
-    private val _lastListnedList  = MutableStateFlow(emptyList<RadioEntity>())
-    val lastListnedList = _lastListnedList.asStateFlow()
+    private val _radioList  = MutableStateFlow(emptyList<RadioEntity>())
+    val radioList = _radioList.asStateFlow()
+
+
+    private val _isFav = MutableStateFlow(false)
+    val isFav = _isFav.asStateFlow()
+
 
     fun getRepositoryInstance(): String {
         return favListRoomBaseRepository.giveRepository()
-    }
-
-   // @Deprecated("For Static Data")
-    fun setItems() {
-        Coroutines.default {
-            favListRoomBaseRepository.deleteAll()
-            //  for (index in 0 until 500) {
-            // sholistRoomBaseRepository.insert(ConvertList.toEntity(ProductShopingRoom(index,"name $index")))
-            // }
-        }
     }
 
 // NEVER NEVER DONT DELTE AND SEE IF IT POSSIBLE TO USE IT
@@ -78,7 +74,7 @@ class RadioRoomViewModel @Inject constructor(
 */
     init {
     getFavRadioRoom()
-    getLastListened()
+    getRadioList()
     getAllAlarm()
     }
 
@@ -104,9 +100,18 @@ class RadioRoomViewModel @Inject constructor(
         }
     }
 
+    fun updateFav(raduiuid: String?, fav: Boolean, msg: String) {
+        Coroutines.io(this@RadioRoomViewModel) {
+            favListRoomBaseRepository.updateFav(raduiuid, fav)
+            tasksEventChannel.send(RoomListEvents.ProdDeleteFromRoomMsg(msg))
+        }
+    }
+
+
+
     fun deletelistened(fav: Boolean, msg: String) {
         Coroutines.io(this@RadioRoomViewModel) {
-            favListRoomBaseRepository.deletelistened(fav)
+            favListRoomBaseRepository.deletelistened()
             tasksEventChannel.send(RoomListEvents.ProdDeleteFromRoomMsg(msg))
         }
     }
@@ -118,10 +123,10 @@ class RadioRoomViewModel @Inject constructor(
         }
     }
 
-    fun getLastListened() { // return  liveList
+    fun getRadioList() { // return  liveList
         viewModelScope.launch {
-            favListRoomBaseRepository.getAll(false).collect {list ->
-                _lastListnedList.value = list
+            favListRoomBaseRepository.getAllRadioList().collect { list ->
+                _radioList.value = list
 
             }
         }
@@ -188,7 +193,7 @@ class RadioRoomViewModel @Inject constructor(
 
      fun getFavRadioRoom() {
         viewModelScope.launch() {
-            favListRoomBaseRepository.getAll(true).collect {list ->
+            favListRoomBaseRepository.getFavList(true).collect { list ->
                 _favList.value = list
 
             }
@@ -198,44 +203,24 @@ class RadioRoomViewModel @Inject constructor(
     }
 
     fun setFavRadio(
-        radioVar: RadioEntity,
-        isFav : Boolean
+        radioVar: RadioEntity
     ) {
+        Log.d("kkjdns","aaa")
+        Log.d("kkjdns","cc cc " + radioVar.stationuuid)
+        if (!radioVar.fav && radioVar.stationuuid != "") {
+            radioVar.fav = true
+            _isFav.value = true
+            Log.d("kkjdns","ww")
 
-        val radio = RadioEntity()
-
-        if (!isFav && radioVar.stationuuid != "") {
-            radio.name = radioVar.name
-            radio.tags = radioVar.tags
-            radio.stationuuid = radioVar.stationuuid
-            radio.country = radioVar.country
-            radio.language = radioVar.language
-            radio.bitrate = radioVar.bitrate
-            radio.streamurl = radioVar.streamurl
-            radio.favicon = radioVar.favicon
-            radio.homepage = radioVar.homepage
-
-            val radioroom = RadioEntity(
-                stationuuid =    radioVar.stationuuid,
-                name =  radioVar.name,
-                bitrate =  radioVar.bitrate,
-                homepage =  radioVar.homepage,
-                favicon =  radioVar.favicon,
-                tags = radioVar.tags,
-                country =  radioVar.country,
-                state =   radioVar.state,
-                // var RadiostateDB: String?,
-                language = radioVar.language,
-                streamurl = radioVar.streamurl,
-                fav =    true
-            )
+            upsertRadio(radioVar, "Radio added")
+        } else if (radioVar.fav) {
+            Log.d("kkjdns","cccc")
 
 
-            upsertRadio(radioroom, "Radio added")
-        } else if (isFav) {
-                delete(
+            _isFav.value = false
+                updateFav(
                     radioVar.stationuuid,
-                    true,
+                    false,
                     "Radio Deleted"
                 )
 
@@ -244,17 +229,8 @@ class RadioRoomViewModel @Inject constructor(
         }
     }
 
-     fun isFavoriteStation(stationuuid: String): Boolean {
-        var idIn = false
-        if (favList.value.isNotEmpty()) {
-            loop@ for (i in 0 until favList.value.size) {
-                if (stationuuid == favList.value[i].stationuuid /*&& radioRoom[i].fav */) {
-                    idIn = true
-                    break@loop
-                }
-            }
-        }
-        return idIn
+     fun SetFavStation(radio: RadioEntity) {
+      _isFav.value = radio.fav
     }
 
     sealed class RoomListEvents {

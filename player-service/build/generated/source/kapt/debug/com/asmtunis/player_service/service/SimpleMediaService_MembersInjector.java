@@ -14,7 +14,9 @@ import javax.inject.Provider;
 @DaggerGenerated
 @SuppressWarnings({
     "unchecked",
-    "rawtypes"
+    "rawtypes",
+    "KotlinInternal",
+    "KotlinInternalInJava"
 })
 public final class SimpleMediaService_MembersInjector implements MembersInjector<SimpleMediaService> {
   private final Provider<ExoPlayer> playerProvider;

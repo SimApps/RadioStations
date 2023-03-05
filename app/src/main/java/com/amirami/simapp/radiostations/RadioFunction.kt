@@ -1,28 +1,29 @@
 package com.amirami.simapp.radiostations
 
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.*
-import android.content.pm.PackageManager
 import android.graphics.Paint
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Environment.*
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.annotation.NonNull
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.*
 import androidx.core.graphics.toColorInt
 import androidx.core.widget.NestedScrollView
+import androidx.media3.common.util.UnstableApi
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -30,22 +31,13 @@ import coil.decode.SvgDecoder
 import coil.load
 import coil.request.CachePolicy
 import coil.transform.RoundedCornersTransformation
-import com.amirami.simapp.downloader.Downloader
-import com.amirami.simapp.downloader.core.OnDownloadListener
-import com.amirami.simapp.radiostations.Exoplayer.isOreoPlus
-import com.amirami.simapp.radiostations.MainActivity.Companion.GlobalRadioName
-import com.amirami.simapp.radiostations.MainActivity.Companion.Globalurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.color1
 import com.amirami.simapp.radiostations.MainActivity.Companion.color2
 import com.amirami.simapp.radiostations.MainActivity.Companion.color3
 import com.amirami.simapp.radiostations.MainActivity.Companion.color4
 import com.amirami.simapp.radiostations.MainActivity.Companion.currentNativeAd
-import com.amirami.simapp.radiostations.MainActivity.Companion.customdownloader
 import com.amirami.simapp.radiostations.MainActivity.Companion.darkTheme
-import com.amirami.simapp.radiostations.MainActivity.Companion.downloader
-import com.amirami.simapp.radiostations.MainActivity.Companion.handlers
 import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
-import com.amirami.simapp.radiostations.MainActivity.Companion.isDownloadingCustomurl
 import com.amirami.simapp.radiostations.MainActivity.Companion.is_playing_recorded_file
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
@@ -65,7 +57,9 @@ import java.lang.reflect.Field
 import java.text.SimpleDateFormat
 import java.util.*
 
-object RadioFunction {
+@UnstableApi object RadioFunction {
+    val immutableFlag = if (Build.VERSION.SDK_INT >= 23) /*PendingIntent.FLAG_IMMUTABLE*/ PendingIntent.FLAG_MUTABLE else 0
+
     fun getCurrentDate(): Long {
         return System.currentTimeMillis() // DateFormat.getDateTimeInstance().format(currentDate) // formated
     }
@@ -84,6 +78,7 @@ object RadioFunction {
         )
         else Date
     }
+    fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     fun shareRadio(
         context: Context,
@@ -145,23 +140,6 @@ object RadioFunction {
         ).show()
     }
 
-  /*  fun startServices(context: Context) {
-        try {
-            if (player != null) {
-                val serviceIntent = Intent(context, NotificationChannelService::class.java)
-                serviceIntent.putExtra("input_radio_name", GlobalRadioName)
-                startForegroundService(context, serviceIntent)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: IllegalArgumentException) {
-            e.printStackTrace()
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        } catch (e: IllegalStateException) {
-            e.printStackTrace()
-        }
-    }*/
 
 
     fun unwrap(context: Context): Activity {
@@ -431,398 +409,8 @@ object RadioFunction {
     fun isNumber(s: String?): Boolean =
         if (s.isNullOrEmpty()) false else s.all { Character.isDigit(it) }
 
-    fun getDownloader(context: Context) {
-        var recordFileName =
-            GlobalRadioName + "_ _" + " " + icyandState + "___" + System.currentTimeMillis()
-        recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
 
-        //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
-        //  var recordFileName= GlobalRadioName + "_ _" + icyandState + " " + sdfDate.format(Date())
 
-        downloader = Downloader.Builder(context, Globalurl)
-            .downloadListener(object : OnDownloadListener {
-                override fun onStart() {
-                    Exoplayer.is_downloading = true
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.rec_on
-                        )
-
-                        DynamicToast.make(
-                            context,
-                            "Recording Started . . .",
-                            getDrawable(context, R.drawable.rec_on),
-                            getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium),
-                            9
-                        ).show()
-                    //    startServices(unwrap(context))
-                    }
-                }
-
-                override fun onPause() {
-                    Exoplayer.is_downloading = false
-                    //
-                    DynamicToast.makeSuccess(context, "Recording paused", 3).show()
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-
-                      //  startServices(unwrap(context))
-                    }
-                }
-
-                override fun onResume() {
-                    Exoplayer.is_downloading = true
-
-                    DynamicToast.makeSuccess(context, "Recording resumed", 3).show()
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.rec_on
-                        )
-
-                    //    startServices(unwrap(context))
-                    }
-                    //  Log.d(TAG, "onResume")
-                }
-
-                override fun onProgressUpdate(percent: Int, downloadedSize: Int, totalSize: Int) {
-                    Exoplayer.is_downloading = true
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.rec_on
-                        )
-                        //  current_status_txt.text = "onProgressUpdate"
-                        //   percent_txt.text = percent.toString().plus("%")
-                        //   size_txt.text = getSize(downloadedSize)
-                        //   total_size_txt.text = getSize(totalSize)
-                        //  download_progress.progress = percent
-                    }
-                    // Log.d(TAG, "onProgressUpdate: percent --> $percent downloadedSize --> $downloadedSize totalSize --> $totalSize ")
-                }
-
-                override fun onCompleted(file: File?) {
-                    Exoplayer.is_downloading = false
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-
-                        DynamicToast.make(
-                            context,
-                            "Recording Saved",
-                            getDrawable(context, R.drawable.rec_on),
-                            getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium),
-                            9
-                        ).show()
-
-                       // startServices(unwrap(context))
-                    }
-                    // Log.d(TAG, "onCompleted: file --> $file")
-                }
-
-                override fun onFailure(reason: String?) {
-                    handlers.post {
-                        Exoplayer.is_downloading = false
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-
-                        DynamicToast.makeError(context, reason!!, 9).show()
-
-                     //   startServices(unwrap(context))
-                    }
-                    //  Log.d(TAG, "onFailure: reason --> $reason")
-                }
-
-                override fun onCancel() {
-                    handlers.post {
-                        Exoplayer.is_downloading = false
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-
-                        DynamicToast.make(
-                            context,
-                            "Recording Saved",
-                            getDrawable(context, R.drawable.rec_on),
-                            getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium),
-                            9
-                        ).show()
-
-                     //   startServices(unwrap(context))
-                    }
-                    //  Log.d(TAG, "onCancel")
-                }
-            }).fileName(recordFileName, "mp3").downloadDirectory(getDownloadDir(context).toString())
-            .build()
-    }
-
-    fun getCutomDownloader(context: Context, nameRecord: String, url: String) {
-        //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
-        // var recordFileName= nameRecord+ "_ _"  + sdfDate.format(Date())
-
-        var recordFileName = nameRecord + "_ _" + System.currentTimeMillis()
-        recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
-
-        customdownloader =
-            Downloader.Builder(context, url).downloadListener(object : OnDownloadListener {
-                override fun onStart() {
-                    isDownloadingCustomurl = true
-
-                    handlers.post {
-                        DynamicToast.make(
-                            context,
-                            "Download Started . . .",
-                            getDrawable(context, R.drawable.rec_on),
-                            getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium),
-                            9
-                        ).show()
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button_on
-                        )
-
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.rec_on
-                        )
-                    }
-                    //  Log.d(TAG, "onStart")
-                }
-
-                override fun onPause() {
-                    isDownloadingCustomurl = false
-                    // icy="Download Completed"
-
-                    handlers.post {
-                        DynamicToast.makeSuccess(context, "Download paused", 3).show()
-
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button
-                        )
-                        Exoplayer.Observer.changeText("Main text view", "Download Completed")
-                        Exoplayer.Observer.changeText("text view", "Download Completed")
-                    }
-                    // Log.d(TAG, "onPause")
-                }
-
-                override fun onResume() {
-                    isDownloadingCustomurl = true
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button_on
-                        )
-                        DynamicToast.makeSuccess(context, "Download resumed", 3).show()
-                    }
-                    //  Log.d(TAG, "onResume")
-                }
-
-                override fun onProgressUpdate(percent: Int, downloadedSize: Int, totalSize: Int) {
-                    isDownloadingCustomurl = true
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.rec_on
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button_on
-                        )
-                        Exoplayer.Observer.changeText(
-                            "Main text view",
-                            if (percent < 0) {
-                                nameRecord + " is Downloading"
-                            } else {
-                                nameRecord + " is Downloading: " + bytesIntoHumanReadable(
-                                    downloadedSize.toLong()
-                                ) + " / " + bytesIntoHumanReadable(totalSize.toLong())
-                            }
-                        )
-
-                        Exoplayer.Observer.changeText(
-                            "text view",
-                            if (percent < 0) {
-                                "$nameRecord is Downloading"
-                            } else {
-                                "$nameRecord is Downloading: " + bytesIntoHumanReadable(
-                                    downloadedSize.toLong()
-                                ) + " / " + bytesIntoHumanReadable(totalSize.toLong())
-                            }
-                        )
-                        //  current_status_txt.text = "onProgressUpdate"
-                        //   percent_txt.text = percent.toString().plus("%")
-                        //   size_txt.text = getSize(downloadedSize)
-                        //   total_size_txt.text = getSize(totalSize)
-                        //  download_progress.progress = percent
-                    }
-                    // Log.d(TAG, "onProgressUpdate: percent --> $percent downloadedSize --> $downloadedSize totalSize --> $totalSize ")
-                }
-
-                override fun onCompleted(file: File?) {
-                    isDownloadingCustomurl = false
-                    // icy="Download Completed"
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button
-                        )
-                        DynamicToast.make(
-                            context,
-                            "Download Complete",
-                            getDrawable(context, R.drawable.rec_on),
-                            getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium),
-                            9
-                        ).show()
-                        Exoplayer.Observer.changeText("Main text view", "Download Completed")
-                        Exoplayer.Observer.changeText("text view", "Download Completed")
-                    }
-                    // Log.d(TAG, "onCompleted: file --> $file")
-                }
-
-                override fun onFailure(reason: String?) {
-                    isDownloadingCustomurl = false
-
-                    handlers.post {
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button
-                        )
-                        // icy="Download Completed"
-                        Exoplayer.Observer.changeText(
-                            "Main text view",
-                            "Download Failed : " + reason
-                        )
-                        Exoplayer.Observer.changeText("text view", "Download Failed : " + reason)
-
-                        DynamicToast.makeError(context, /*"Download Failed"*/reason, 9).show()
-                        // DynamicToast.makeError(context, GlobalRadiourl, 9).show()
-                    }
-                    //  Log.d(TAG, "onFailure: reason --> $reason")
-                }
-
-                override fun onCancel() {
-                    isDownloadingCustomurl = false
-
-                    handlers.post {
-                        // icy="Download Completed"
-                        Exoplayer.Observer.changeText("Main text view", "Download Completed")
-                        Exoplayer.Observer.changeText("text view", "Download Completed")
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main record image view",
-                            R.drawable.rec_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "Main stop image view",
-                            R.drawable.stop_2
-                        )
-                        Exoplayer.Observer.changeImageRecord(
-                            "floatingActionAddDownload",
-                            R.drawable.ic_download_button
-                        )
-
-                        DynamicToast.make(
-                            context,
-                            "Download Saved",
-                            getDrawable(context, R.drawable.rec_on),
-                            getColor(context, R.color.blue),
-                            getColor(context, R.color.violet_medium),
-                            9
-                        ).show()
-                    }
-                    //  Log.d(TAG, "onCancel")
-                }
-            }).fileName(recordFileName, "").downloadDirectory(getDownloadDir(context).toString())
-                .build()
-    }
 
     fun removeWord(value: String, wordtoremove: String): String {
         var result = ""
@@ -874,7 +462,7 @@ object RadioFunction {
     }
 
     fun deleteRecordedItem(index: Int, context: Context) {
-        val file = getDownloadDir(context).listFiles()!![index]
+        val file = getDownloadDir().listFiles()!![index]
 
         try {
             deleteAllFileAndContents(file, context)
@@ -883,7 +471,7 @@ object RadioFunction {
         }
     }
 
-    private fun deleteAllFileAndContents(@NonNull file: File, context: Context) {
+    private fun deleteAllFileAndContents(file: File, context: Context) {
         if (file.exists()) {
             /*
               // if (file.isDirectory) {
@@ -923,31 +511,12 @@ object RadioFunction {
         } ?: emptyList()
     }
 
-    fun allPermissionsGranted(context: Context): Boolean {
-        if ((
-            checkSelfPermission(
-                    context,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) &&
-            (
-                checkSelfPermission(
-                        context,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                )
-        ) {
-            // Permission is not granted
-            return false
-        }
-        return true
-    }
 
     fun openRecordFolder(context: Context) {
-        if (getDownloadDir(context).exists()) {
+        if (getDownloadDir().exists()) {
             // val intent = Intent(Intent.ACTION_GET_CONTENT)
             // val intent = Intent(Intent.ACTION_VIEW)
-            val uri = Uri.parse(getDownloadDir(context).absolutePath)
+            val uri = Uri.parse(getDownloadDir().absolutePath)
 
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 // addCategory(Intent.CATEGORY_OPENABLE)
@@ -984,7 +553,7 @@ object RadioFunction {
         }
     }
 
-    private fun getDownloadDir(context: Context): File {
+     fun getDownloadDir(): File {
         val f = File(
             getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toString() +
                 File.separator + RECORDS_FILE_NAME
@@ -1005,9 +574,9 @@ object RadioFunction {
         val RcordInfo = ArrayList<RecordInfo>()
         // TARGET FOLDER
         var s: RecordInfo
-        if (getDownloadDir(context).exists()) {
+        if (getDownloadDir().exists()) {
             // GET ALL FILES IN DOWNLOAD FOLDER
-            val files = getDownloadDir(context).listFiles()
+            val files = getDownloadDir().listFiles()
             if (files != null) {
                 if (files.isNotEmpty()) {
                     // LOOP THRU THOSE FILES GETTING NAME AND URI
@@ -1151,7 +720,7 @@ object RadioFunction {
             Log.w("setNumberPickerTxtColor", e)
         } catch (e: IllegalAccessException) {
             Log.w("setNumberPickerTxtColor", e)
-        } catch (e: java.lang.IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             Log.w("setNumberPickerTxtColor", e)
         }
         val count = numberPicker.childCount
@@ -1199,7 +768,7 @@ object RadioFunction {
     }
 
     fun textcolorSearchviewTransition(
-        container: androidx.appcompat.widget.SearchView,
+        container: SearchView,
         theme: Boolean
     ) {
         if (!theme) {

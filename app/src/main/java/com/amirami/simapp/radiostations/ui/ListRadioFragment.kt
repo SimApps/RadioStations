@@ -6,21 +6,19 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
-import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
 import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransitionConstraint
-import com.amirami.simapp.radiostations.RadioFunction.icyandStateWhenPlayRecordFiles
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
@@ -32,21 +30,21 @@ import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.utils.exhaustive
+import com.amirami.simapp.radiostations.viewmodel.DownloaderViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
-import com.amirami.simapp.radiostations.viewmodel.UIEvent
-import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapterVertical.OnItemClickListener, RecordedFilesAdapter.OnItemClickListener {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
+    private val downloaderViewModel: DownloaderViewModel by activityViewModels()
 
     private lateinit var radioAdapterHorizantal: RadioListAdapterVertical
     private lateinit var recordedFilesAdapter: RecordedFilesAdapter
@@ -72,6 +70,26 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                             }
                         }
                     }.exhaustive
+                }
+            }
+        }
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                downloaderViewModel.downloadState.collectLatest { downloadState ->
+                    if (argsFrom.msg == resources.getString(R.string.Recordings)) {
+                        binding.floatingActionAddDownload.setSafeOnClickListener {
+                            if (downloadState.isDownloading) {
+                                 downloaderViewModel.cancelDownloader()
+                            } else {
+                                val action = ListRadioFragmentDirections.actionListRadioFragmentToAddDialogueBottomSheetFragment(true)
+                                NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -102,16 +120,6 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
 
             // fabColor(floating_action_addDownload)
 
-            binding.floatingActionAddDownload.setSafeOnClickListener {
-                if (MainActivity.isDownloadingCustomurl) {
-                    MainActivity.customdownloader?.cancelDownload()
-                } else {
-                    if (!Exoplayer.is_downloading) {
-                        val action = ListRadioFragmentDirections.actionListRadioFragmentToAddDialogueBottomSheetFragment(true)
-                        NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-                    } else DynamicToast.makeError(requireContext(), getString(R.string.cantadddownloedwhenrecord), 6).show()
-                }
-            }
 
             setUpRecord()
         }
@@ -125,17 +133,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
         }
     }
 
-    private val requestMultiplePermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            permissions.entries.forEach {
-                if (it.value) setUpRecord()
-                else {
-                    Log.d("kksjq", "not")
-                    errorToast(requireContext(), getString(R.string.PermissionsNotgranted))
-                    MainActivity.customdownloader?.cancelDownload()
-                }
-            }
-        }
+
 
     private fun setUpRv() {
         if (argsFrom.msg == getString(R.string.countries)) {
@@ -270,7 +268,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
             radioVariables.homepage = ""
         }
 
-        simpleMediaViewModel.loadData(radioVariables,true)
+        simpleMediaViewModel.loadData(radioVariables)
 
     }
 

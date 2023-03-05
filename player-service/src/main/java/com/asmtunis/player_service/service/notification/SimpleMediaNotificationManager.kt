@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
@@ -18,9 +19,9 @@ import com.asmtunis.player_service.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-private const val NOTIFICATION_ID = 200
-private const val NOTIFICATION_CHANNEL_NAME = "notification channel 1"
-private const val NOTIFICATION_CHANNEL_ID = "notification channel id 1"
+private const val NOTIFICATION_ID = 909090909
+private const val NOTIFICATION_CHANNEL_NAME = "Radio FM AM"
+private const val NOTIFICATION_CHANNEL_ID = "Radio FM AM Player Id"
 
 @RequiresApi(Build.VERSION_CODES.O)
 class SimpleMediaNotificationManager @Inject constructor(
@@ -74,9 +75,12 @@ class SimpleMediaNotificationManager @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startForegroundNotification(mediaSessionService: MediaSessionService) {
         val notification = Notification.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setCategory(Notification.CATEGORY_SERVICE)
+           // .setCategory(Notification.CATEGORY_SERVICE)
+            .setCategory(Notification.CATEGORY_EVENT)
             .build()
         mediaSessionService.startForeground(NOTIFICATION_ID, notification)
+
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -84,7 +88,8 @@ class SimpleMediaNotificationManager @Inject constructor(
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
+           // NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_LOW
         )
         notificationManager.createNotificationChannel(channel)
     }

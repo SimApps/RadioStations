@@ -125,6 +125,7 @@
     <string name="infoHomepage">Homepage : %s</string>
     <string name="infoRadiostreamURL">Radio Stream URL : %s</string>
     <string name="infoCountry">Country : %s</string>
+    <string name="infoState">State : %s</string>
     <string name="infoLanguage">Language : %s</string>
     <string name="infoBitrate">Bitrate : %s Kbps</string>
     <string name="infoTags">Tags : %s</string>

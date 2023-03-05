@@ -13,7 +13,9 @@ import dagger.internal.ScopeMetadata;
 @DaggerGenerated
 @SuppressWarnings({
     "unchecked",
-    "rawtypes"
+    "rawtypes",
+    "KotlinInternal",
+    "KotlinInternalInJava"
 })
 public final class SimpleMediaModule_ProvideAudioAttributesFactory implements Factory<AudioAttributes> {
   private final SimpleMediaModule module;

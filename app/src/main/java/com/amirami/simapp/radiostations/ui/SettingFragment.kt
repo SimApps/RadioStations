@@ -14,8 +14,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.MainActivity.Companion.BASE_URL
+import com.amirami.simapp.radiostations.MainActivity.Companion.firstTimeopenRecordfolder
 import com.amirami.simapp.radiostations.MainActivity.Companion.saveData
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
 import com.amirami.simapp.radiostations.R
@@ -47,7 +49,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class SettingFragment : Fragment(R.layout.fragment_setting) {
 
     private lateinit var binding: FragmentSettingBinding
@@ -281,7 +283,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             FirebaseAuth.getInstance().fetchSignInMethodsForEmail(FirebaseAuth.getInstance().currentUser!!.email!!)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        if (task.result.signInMethods!!.size == 0) setuserNotexistui() // email not existed
+                        if (task.result?.signInMethods!!.size == 0) setuserNotexistui() // email not existed
                         else setuserexistui() // email existed
                     }
                     //  else errorToast(requireContext(),task.exception!!.message.toString())// THIS LINE WORK BUT IT REDUNDENT
@@ -502,22 +504,10 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                         Status.SUCCESS -> {
                             if (response.data != null) {
                                 hideProgressBar()
-                                val radio = response.data as MutableList<RadioEntity> // as RadioRoom
-                                val radioroom = RadioEntity(
-                                    radio[0].stationuuid,
-                                    radio[0].name,
-                                    radio[0].bitrate,
-                                    radio[0].homepage,
-                                    radio[0].favicon,
-                                    radio[0].tags,
-                                    radio[0].country,
-                                    radio[0].state,
-                                    // var RadiostateDB: String?,
-                                    radio[0].language,
-                                    radio[0].streamurl,
-                                    true
-                                )
-                                radioRoomViewModel.upsertRadio(radioroom, "Radio added")
+                                val radio = response.data[0]
+
+                                radio.fav = true
+                                radioRoomViewModel.upsertRadio(radio, "Radio added")
                             }
                             // else showErrorConnection(response.message!!)
                         }

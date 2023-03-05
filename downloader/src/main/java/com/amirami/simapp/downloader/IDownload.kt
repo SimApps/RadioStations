@@ -7,8 +7,8 @@ package com.amirami.simapp.downloader
  */
 
 internal interface IDownload {
-    fun download()
+   suspend fun download()
     fun cancelDownload()
     fun pauseDownload()
-    fun resumeDownload()
+    suspend  fun resumeDownload()
 }

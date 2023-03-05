@@ -9,10 +9,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.time
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.CountdownTimerPopupBinding
+import com.amirami.simapp.radiostations.viewmodel.DownloaderViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -27,16 +29,15 @@ import kotlin.String
 import kotlin.Unit
 import kotlin.getValue
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class SetTimerBottomSheetFragment :
     BottomSheetDialogFragment(),
     NumberPicker.OnValueChangeListener {
 
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
-
+    private val downloaderViewModel: DownloaderViewModel by activityViewModels()
     private var _binding: CountdownTimerPopupBinding? = null
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,6 +64,8 @@ class SetTimerBottomSheetFragment :
             RadioFunction.switchColor(binding.switchTmerData, it)
         }
 
+
+
         collectLatestLifecycleFlow(infoViewModel.putTimer) {
             if (binding.timerUnitTxvw.text == getString(R.string.Minute)) {
                 //     DynamicToast.makeError(requireContext(), it.toString(), 3).show()
@@ -84,8 +87,11 @@ class SetTimerBottomSheetFragment :
                         binding.switchTmerData.visibility = View.VISIBLE
                         binding.numberpikerLl.visibility = View.VISIBLE
                         binding.textViewCountdown.visibility = View.GONE
+                        collectLatestLifecycleFlow(downloaderViewModel.downloadState) { downloadState ->
+                            downloaderViewModel.cancelDownloader()
+                        }
+
                         infoViewModel.stoptimer(true)
-                        //  Exoplayer.releasePlayer(requireContext())
                     }
                     -1 -> {
                         binding.buttonStartPause.text = resources.getString(R.string.Start)

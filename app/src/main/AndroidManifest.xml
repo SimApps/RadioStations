@@ -14,7 +14,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -23,7 +24,6 @@
 
 
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
@@ -35,6 +35,17 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        android:maxSdkVersion="19" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        android:maxSdkVersion="22" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!--   <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />-->
 
@@ -84,12 +95,7 @@
             android:showOnLockScreen="true"
 
             >
-            <!-- FOR PIC IN PIC
-          android:launchMode="singleTask"
-          android:configChanges="keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"
-          android:resizeableActivity="true"
-          android:supportsPictureInPicture="true"
-          tools:targetApi="n" -->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -101,42 +107,35 @@
         </activity>
 
 
-
-
-
-
-
-
-
-
-        <receiver android:name="com.amirami.simapp.radiostations.alarm.TimeChangedReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.TIME_SET" />
-                <!--  <flag android:name="android.intent.action.TIME_SET" /> -->
-
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name="com.amirami.simapp.radiostations.alarm.BootCompleteReceiver"
-            android:enabled="false"
-            android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
-
-        <!-- AdActivity from Google Play Services, needed by Tappx -->
-        <receiver
-            android:enabled="true"
-            android:exported="false"
-            android:name="com.amirami.simapp.radiostations.alarm.AlarmReceiver"
+        <activity
+            android:name=".alarm.ui.activities.RingActivity"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:configChanges="uiMode|orientation|screenSize|keyboard"
+            android:taskAffinity=""
+            android:showOnLockScreen="true"
             />
 
+        <service
+            android:name=".alarm.services.RescheduleAlarmService"
+            android:description="@string/alarm_service_desc"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".alarm.services.AlarmService"
+            android:description="@string/alarm_service_desc"
+            android:enabled="true"
+            android:exported="false" />
 
+        <receiver android:name=".alarm.broadCastReceiver.AlarmBroadCastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+        </receiver>
 
 
         <receiver

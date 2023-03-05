@@ -163,4 +163,21 @@
     <style name="Button.Orange" parent="Theme.MyApplication">
         <item name="colorPrimary">@color/orange</item>
     </style>
+
+    <style name="Widget.Button.Toggle" parent="android:Widget">
+        <item name="android:background">@drawable/toggle_bg</item>
+    </style>
+
+    <style name="toggleButton" parent="Theme.Momentix">
+        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle</item>
+        <item name="android:textColor">@color/primary_color</item>
+    </style>
+
+
+    <style name="roundedImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeBottomLeft">@dimen/_18sdp</item>
+        <item name="cornerSizeBottomRight">@dimen/_18sdp</item>
+
+    </style>
 </resources>
