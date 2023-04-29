@@ -2,12 +2,17 @@ package com.amirami.simapp.radiostations.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.firebase.encoders.annotations.Encodable
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 // @Entity(tableName = "radio_table" )
 @Entity(tableName = "radio_table", indices = [Index(value = ["stationuuid"], unique = true)])
+@Serializable
 data class RadioEntity(
 
 
@@ -65,41 +70,14 @@ data class RadioEntity(
     @ColumnInfo(name = "isAlarm")
     var isAlarm: Boolean= false,
 
+
+
     @ColumnInfo(name = "isLastListned")
     var isLastListned: Boolean= false,
 
     @ColumnInfo(name = "timeStamp")
-    var timeStamp : Long = System.currentTimeMillis()
-) {
+    var timeStamp : Long? = null,
 
-    constructor(
-        radiouid: String,
-        name: String,
-        bitrate: String,
-        homepage: String,
-        imageurl: String,
-        tags: String,
-        country: String,
-        state: String,
-        language: String,
-        streamurl: String,
-        fav: Boolean
-    ) : this() {
-
-        this.stationuuid = radiouid
-        this.name = name
-        this.bitrate = bitrate
-        this.homepage = homepage
-        this.favicon = imageurl
-        this.tags = tags
-        this.country = country
-        this.state = state
-        this.language = language
-        this.streamurl = streamurl
-        this.fav = fav
-    }
-
-    override fun toString(): String {
-        return "MessageThreadListEntity(Id=$stationuuid, Name=$name)"
-    }
-}
+     @Transient
+    var icyState : String? = "",
+)

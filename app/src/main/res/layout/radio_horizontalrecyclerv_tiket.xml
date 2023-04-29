@@ -9,7 +9,6 @@
     android:layout_marginStart="6dp"
     android:layout_marginEnd="3dp"
     android:layout_marginBottom="9dp"
-    android:background="@android:color/transparent"
     android:orientation="vertical"
     app:cardCornerRadius="8dp">
 
@@ -30,8 +29,6 @@
         android:layout_marginBottom="3dp"
         android:text="TextView"
         android:textAlignment="center"
-        android:textColor="@android:color/white"
-
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -46,7 +43,6 @@
         android:layout_marginStart="3dp"
         android:layout_marginBottom="8dp"
         android:textAlignment="center"
-        android:textColor="@color/txtGray"
         android:textSize="12sp" />
 
 </LinearLayout>

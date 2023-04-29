@@ -1,5 +1,6 @@
 package com.amirami.simapp.radiostations.firestore
 
+import android.util.Log
 import com.amirami.simapp.radiostations.RadioFunction.getuserid
 import com.amirami.simapp.radiostations.data.DataOrException
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
@@ -48,6 +49,11 @@ class ProductFirestoreRepository @Inject constructor(
             // products.set(favoriteFirestore,SetOptions.merge()).await()
             dataOrException.data = true
         } catch (e: FirebaseFirestoreException) {
+
+            Log.d("lldssqqqq",e.toString())
+            Log.d("lldssqqqq",e.code.name)
+
+
             dataOrException.e = e.toString()
         }
         return dataOrException
@@ -96,6 +102,8 @@ class ProductFirestoreRepository @Inject constructor(
                 }
             }*/
         } catch (e: FirebaseFirestoreException) {
+            Log.d("lldssqqqq","doc "+e.toString())
+            Log.d("lldssqqqq","doc "+e.code.name)
             dataOrException.e = e.toString()
         }
         return dataOrException

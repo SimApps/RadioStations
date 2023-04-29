@@ -11,8 +11,6 @@ import com.amirami.simapp.radiostations.data.datastore.utils.FIRST_OPEN_KEY
 import com.amirami.simapp.radiostations.data.datastore.utils.FIRST_TIMEOPEN_RECORD_FOLDER_KEY
 import com.amirami.simapp.radiostations.data.datastore.utils.RADIO_URL_KEY
 import com.amirami.simapp.radiostations.data.datastore.utils.SAVE_DATA_KEY
-import com.amirami.simapp.radiostations.data.datastore.utils.SYSTEM_THEME_KEY
-import com.amirami.simapp.radiostations.data.datastore.utils.TIME_IN_MILLIS_KEY
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -72,15 +70,7 @@ init {
     }
 
 
-    fun saveTimeInMillis(value: Int) {
-        viewModelScope.launch(dispatcher) {
-            repository.putInt(TIME_IN_MILLIS_KEY, value)
-        }
-    }
 
-    fun getTimeInMillis(): Int = runBlocking {
-        repository.getInt(TIME_IN_MILLIS_KEY)
-    }
 
 
 
@@ -104,15 +94,9 @@ init {
     fun getDarkTheme(): Boolean = runBlocking {
         repository.getBoolean(DARK_THEME_KEY)
     }
-    fun saveSystemTheme(value: Boolean) {
-        viewModelScope.launch(dispatcher) {
-            repository.putBoolean(SYSTEM_THEME_KEY, value)
-        }
-    }
 
-    fun getSystemTheme(): Boolean = runBlocking {
-        repository.getBoolean(SYSTEM_THEME_KEY)
-    }
+
+
 
     fun saveFirstOpen(value: Boolean) {
         viewModelScope.launch(dispatcher) {

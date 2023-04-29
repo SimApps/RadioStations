@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="weekend"
+            type="com.amirami.simapp.radiostations.pairalarm.database.table.Weekend" />
+
+        <variable
+            name="alarmData"
+            type="com.amirami.simapp.radiostations.pairalarm.database.table.AlarmData" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/itemLayout"
+        android:layout_width="@dimen/alarm_item_width"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/element_spacing_small"
+        android:orientation="vertical"
+        android:padding="@dimen/element_spacing_normal">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/alarmName_Text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:fontFamily="@font/naver_bold"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:maxLines="1"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="@{alarmData.name  + alarmData.component19().component2()}"
+                android:textSize="@dimen/text_p5"
+                android:paddingStart="@dimen/element_spacing_normal"
+                android:paddingEnd="@dimen/element_spacing_tiny"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/deleteImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Alarm name"
+                tools:ignore="RtlHardcoded" />
+
+            <ImageView
+                android:id="@+id/deleteImage"
+                android:layout_width="@dimen/element_spcaing_xxxxlarge"
+                android:layout_height="@dimen/element_spcaing_xxxxlarge"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_trash" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <LinearLayout
+            android:id="@+id/timeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/element_spacing_normal"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/hourText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/nanumgothicextrabold"
+                android:gravity="center"
+                android:textSize="@dimen/text_p1"
+                app:hour="@{alarmData.hour}"
+                tools:text="00" />
+
+            <TextView
+                android:id="@+id/Textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/nanumgothicextrabold"
+                android:gravity="center"
+                android:text="@string/time_split"
+                android:textSize="@dimen/text_p2" />
+
+            <TextView
+                android:id="@+id/minText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/nanumgothicextrabold"
+                android:gravity="center"
+                android:textSize="@dimen/text_p1"
+                app:min="@{alarmData.minute}"
+                tools:text="00" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/monText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/monday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.WEEK}"
+                app:weekClicked="@{alarmData.mon}" />
+
+            <TextView
+                android:id="@+id/tueText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/tuesday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.WEEK}"
+                app:weekClicked="@{alarmData.tue}" />
+
+            <TextView
+                android:id="@+id/wedText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/wednesday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.WEEK}"
+                app:weekClicked="@{alarmData.wed}" />
+
+            <TextView
+                android:id="@+id/thuText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/thursday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.WEEK}"
+                app:weekClicked="@{alarmData.thu}" />
+
+            <TextView
+                android:id="@+id/friText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/friday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.WEEK}"
+                app:weekClicked="@{alarmData.fri}" />
+
+            <TextView
+                android:id="@+id/satText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/saturday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.SAT}"
+                app:weekClicked="@{alarmData.sat}" />
+
+            <TextView
+                android:id="@+id/sunText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/naver_bold"
+                android:gravity="center"
+                android:text="@string/sunday_short"
+                android:textSize="@dimen/text_p3"
+                app:week="@{weekend.SUN}"
+                app:weekClicked="@{alarmData.sun}" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/vib_imageView"
+                android:layout_width="@dimen/element_spcaing_xxxxlarge"
+                android:layout_height="@dimen/element_spcaing_xxxxlarge"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_no_vib"
+                app:vibrateMode="@{alarmData.vibration}" />
+
+            <ImageView
+                android:id="@+id/volume_imageView"
+                android:layout_width="@dimen/element_spcaing_xxxxlarge"
+                android:layout_height="@dimen/element_spcaing_xxxxlarge"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/vib_imageView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/vol0"
+                app:volume="@{alarmData.volume}"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/onOffSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</layout>

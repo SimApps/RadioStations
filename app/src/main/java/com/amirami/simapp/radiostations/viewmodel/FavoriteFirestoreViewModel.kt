@@ -21,7 +21,9 @@ class FavoriteFirestoreViewModel @Inject constructor(
 
     fun addFavoriteRadioidinArrayFirestore(product: String, lastmodified: Long) = liveData(Dispatchers.IO) {
         if (RadioFunction.getuserid() != "no_user") {
-            emit(repository.addFavoriteRadioidInArrayFirestore(product, lastmodified))
+             emit(repository.addFavoriteRadioidInArrayFirestore(product, lastmodified))
+
+
         }
     }
 

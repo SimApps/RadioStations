@@ -38,6 +38,9 @@ constructor(
     private val _responseListCountrieRadio = MutableStateFlow<Resource<*>>(Resource(Status.SUCCESS, null, ""))
     val responseListCountrieRadio = _responseListCountrieRadio.asStateFlow()
 
+    private val _queryString = MutableStateFlow<String?>("")
+    val queryString = _queryString.asStateFlow()
+
     private val _responseRadio = MutableStateFlow<Resource<*>>(Resource(Status.SUCCESS, null, ""))
     val responseRadio = _responseRadio.asStateFlow()
 
@@ -61,6 +64,9 @@ constructor(
         getNetworkState()
     }
 
+    fun setQueryString(value:String?){
+        _queryString.value = value
+    }
     fun getNetworkState() = viewModelScope.launch {
         listenNetwork.isConnected.collect {
             _isConnected.value = it
@@ -310,6 +316,11 @@ constructor(
 
     fun getListCountrieRadios() = viewModelScope.launch {
         getListCountrieRadio()
+    }
+
+    fun setFilteredListCountrieRadio(radio : List<RadioEntity>){
+        _responseListCountrieRadio.value =
+            Resource.success(radio)
     }
 
     suspend fun getListCountrieRadio() = viewModelScope.launch {

@@ -4,11 +4,11 @@
 
 
     <color name="colorAccent">#CAEEFF</color>
-
+    <color name="background">#1D1D23</color>
     <color name="colorPrimaryWhite">#FFFFFF</color>
     <color name="colorPrimary">#ff4081</color>
     <color name="redish">#ffbe98</color>
-
+    <color name="subColor">#F0F757</color>
     <color name="violet">#e1c1ff</color>
     <color name="primary">#C41230</color>
     <color name="primaryDark">#9E0C24</color>
@@ -106,4 +106,26 @@
     <color name="switchTrackDisable">#FF3700B3</color>
     <color name="switchTrackActive">#AA8F16</color>
     <color name="switchTrackNormal">#AA8F16</color>
+
+
+    <color name="search_color">#f8f9fa</color>
+
+
+
+µ    <color name="mainColor">#FFBB86FC</color>
+µ    <color name="itemBackground">#34344A</color>
+    <color name="sub_item_background">#5e5e76</color>
+    <color name="sub_item_text_color">#ede7f6</color>
+    <color name="deep_yellow">#F5D042</color>
+    <color name="new_subTextColor">#949494</color>
+    <color name="Space_Purple">#CEABFA</color>
+    <color name="on_alarm_background">#070417</color>
+
+
+    <color name="main_pink">#ff66cc</color>
+    <color name="main_blue">#3366FF</color>
+    <color name="main_deep_orange">#FF3300</color>
+    <color name="main_deepPurple">#9900FF</color>
+    <color name="main_deepBlue">#0066cc</color>
+    <color name="main_orange">#FFC000</color>
 </resources>

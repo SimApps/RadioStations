@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: StatisticsDialogueBinding? = null
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
@@ -44,20 +45,13 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.itemErrorMessage.btnRetry.setOnClickListener {
             retrofitRadioViewModel.changeBseUrl()
-            infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+            infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
 
             retrofitRadioViewModel.getStatis()
             //      retrofitRadioViewModel.getStatis()
         }
 
-        collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorConstraintBottomSheet(binding.linearL, 0, it)
-            RadioFunction.maintextviewColor(binding.StationNbrTxV, it)
-            RadioFunction.maintextviewColor(binding.stationsBrokentxV, it)
-            RadioFunction.maintextviewColor(binding.tagsTxV, it)
-            RadioFunction.maintextviewColor(binding.languagesTxV, it)
-            RadioFunction.maintextviewColor(binding.countriesTxV, it)
-        }
+
 
         collectLatestLifecycleFlow(retrofitRadioViewModel.statsresponse) { response ->
             when (response.status) {
@@ -83,13 +77,13 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
-      /*  lifecycleScope.launchWhenCreated {
-            retrofitRadioViewModel.stateFlowTrigger.flowWithLifecycle(requireActivity().lifecycle, Lifecycle.State.STARTED)
-                .distinctUntilChanged()
-                .collectLatest {
+        /*  lifecycleScope.launchWhenCreated {
+              retrofitRadioViewModel.stateFlowTrigger.flowWithLifecycle(requireActivity().lifecycle, Lifecycle.State.STARTED)
+                  .distinctUntilChanged()
+                  .collectLatest {
 
-                }
-        }*/
+                  }
+          }*/
     }
 
     override fun onDestroyView() {

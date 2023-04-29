@@ -9,19 +9,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.MainActivity.Companion.darkTheme
-import com.amirami.simapp.radiostations.MainActivity.Companion.systemTheme
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.BottomsheetChooseDefDialogueBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
-import com.amirami.simapp.radiostations.utils.connectivity.internet.ListenNetwork
-import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -31,7 +28,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapterVertical.OnItemClickListener {
     private var _binding: BottomsheetChooseDefDialogueBinding? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
@@ -52,19 +49,13 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorTransitionBottomSheet(binding.defcountryRelativelay, 4, it)
-            RadioFunction.secondarytextviewColor(binding.choosedefTitle, it)
-            RadioFunction.buttonColor(binding.btnDark, it)
-            RadioFunction.buttonColor(binding.btnLight, it)
-            RadioFunction.buttonColor(binding.btnSysThme, it)
-        }
+
 
         setupRadioLisRV()
 
         binding.itemErrorMessage.btnRetry.setSafeOnClickListener {
             retrofitRadioViewModel.changeBseUrl()
-            infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+            infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
             when (argsFrom.msg) {
                 "defcountry" -> retrofitRadioViewModel.getListCountrieRadios() // retrofitRadioViewModel.getListRadios(getString(R.string.Countries))
                 "defserver" -> retrofitRadioViewModel.getListservers()
@@ -75,7 +66,6 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         when (argsFrom.msg) {
             "defcountry" -> {
                 setUpListCountryRv()
-                binding.toggleButtonGroup.visibility = View.GONE
                 binding.spinKitCountryFav.visibility = View.VISIBLE
                 binding.listViewCountries.visibility = View.VISIBLE
                 binding.choosedefTitle.text = getString(R.string.choose_countrie)
@@ -83,7 +73,6 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
             }
             "defserver" -> {
                 setUpRv()
-                binding.toggleButtonGroup.visibility = View.GONE
                 binding.spinKitCountryFav.visibility = View.VISIBLE
                 binding.listViewCountries.visibility = View.VISIBLE
                 binding.choosedefTitle.text = getString(R.string.choose_server)
@@ -92,58 +81,11 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
             "deftheme" -> {
                 binding.itemErrorMessage.root.visibility = View.INVISIBLE
                 binding.choosedefTitle.text = getString(R.string.choose_theme)
-                binding.toggleButtonGroup.visibility = View.VISIBLE
                 binding.spinKitCountryFav.visibility = View.GONE
                 binding.listViewCountries.visibility = View.GONE
 
-                if (systemTheme) binding.toggleButtonGroup.check(R.id.btnSysThme)
-                else {
-                    if (darkTheme) binding.toggleButtonGroup.check(R.id.btnDark)
-                    else binding.toggleButtonGroup.check(R.id.btnLight)
-                }
 
-                binding.toggleButtonGroup.addOnButtonCheckedListener { toggleButtonGroup, checkedId, isChecked ->
 
-                    if (isChecked) {
-                        when (checkedId) {
-                            R.id.btnDark -> {
-                                darkTheme = true
-                                systemTheme = false
-                                //  DynamicToast.makeError(requireContext(), "ssss", 9).show()
-                                dismiss()
-                            }
-                            R.id.btnLight -> {
-                                darkTheme = false
-                                systemTheme = false
-                                //   DynamicToast.makeError(requireContext(), "ffff", 9).show()
-                                dismiss()
-                            }
-                            R.id.btnSysThme -> {
-                                systemTheme = true
-                                val isNightTheme = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                                when (isNightTheme) {
-                                    Configuration.UI_MODE_NIGHT_YES -> darkTheme = true
-                                    Configuration.UI_MODE_NIGHT_NO -> darkTheme = false
-                                }
-                                //     DynamicToast.makeError(requireContext(), "rrrr", 9).show()
-                                dismiss()
-                            }
-                        }
-                    } else {
-                        if (toggleButtonGroup.checkedButtonId == View.NO_ID) {
-                            if (systemTheme) toggleButtonGroup.check(R.id.btnSysThme)
-                            else {
-                                if (darkTheme) toggleButtonGroup.check(R.id.btnDark)
-                                else toggleButtonGroup.check(R.id.btnLight)
-                            }
-                        }
-                    }
-                    dataViewModel.saveDarkTheme(darkTheme)
-                    dataViewModel.saveSystemTheme(systemTheme)
-                    infoViewModel.putPutDefThemeInfo(darkTheme, systemTheme)
-
-                    infoViewModel.putThemes(darkTheme)
-                }
             }
         }
     }
@@ -155,7 +97,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
 
                 dataViewModel.saveChoosenServer("http://" + radio.ip)
                 MainActivity.BASE_URL = "http://" + radio.ip
-                infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+                infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
 
                 dismiss()
                 // }
@@ -203,7 +145,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
                 }
                 Status.ERROR -> {
                     retrofitRadioViewModel.changeBseUrl()
-                    infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+                    infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
                     hideProgressBar()
                     showErrorConnection(response.message!!)
                 }

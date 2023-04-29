@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.time
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -52,17 +53,6 @@ class SetTimerBottomSheetFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorLinearlayoutTransition(binding.popupcountdown, 0, it)
-            RadioFunction.maintextviewColor(binding.textViewCountdown, it)
-            RadioFunction.maintextviewColor(binding.textView6, it)
-            RadioFunction.maintextviewColor(binding.timerUnitTxvw, it)
-            RadioFunction.setNumberPickerTextColor(binding.numberPickers, it)
-            RadioFunction.maintextviewColor(binding.textViewShutdown, it)
-
-            RadioFunction.maintextviewColor(binding.textView6, it)
-            RadioFunction.switchColor(binding.switchTmerData, it)
-        }
 
 
 
@@ -153,7 +143,6 @@ class SetTimerBottomSheetFragment :
         binding.numberPickers.wrapSelectorWheel = true
         binding.numberPickers.setOnValueChangedListener(this)
 
-        binding.switchTmerData.setTextColor(RadioFunction.parseColor("#FF546d79"))
 
 /*
         if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("switecher state", false)) {
@@ -194,6 +183,18 @@ class SetTimerBottomSheetFragment :
             //  switch_tmer_data?.textOff switch_tmer_data?.texton
             //   DynamicToast.makeError(context, isChecked.toString(), 3).show()
         }
+
+        binding.addalarmimageView.setSafeOnClickListener {
+
+            //  infoViewModel.putRadioalarmInfo(radioVar)
+            val action = SetTimerBottomSheetFragmentDirections.actionSetTimerBottomSheetFragmentToAlarmFragment()
+            this@SetTimerBottomSheetFragment.findNavController().navigate(action)
+
+
+
+
+        }
+
 
         binding.buttonStartPause.setSafeOnClickListener {
             collectLatestLifecycleFlow(simpleMediaViewModel.isPlaying) {

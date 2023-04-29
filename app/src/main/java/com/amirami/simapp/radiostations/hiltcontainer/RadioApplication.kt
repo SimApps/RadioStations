@@ -1,40 +1,35 @@
 package com.amirami.simapp.radiostations.hiltcontainer
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.os.Build
-import androidx.appcompat.app.AppCompatDelegate
-import com.amirami.simapp.radiostations.alarm.utils.Constants
-import com.amirami.simapp.radiostations.alarm.utils.Constants.CHANNEL_ID
-import com.amirami.simapp.radiostations.alarm.utils.Constants.CHANNEL_NAME
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import com.google.android.material.color.DynamicColors
+
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class RadioApplication : Application(){
+class RadioApplication : Application(), Configuration.Provider {
+    companion object {
+        val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    }
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder().setWorkerFactory(workerFactory).build()
+
+    lateinit var context: RadioApplication
 
     override fun onCreate() {
         super.onCreate()
+        context = this
 
-        createNotificationChannel()
-        val sp = getSharedPreferences(Constants.SHARED_PREFRENCE, 0)
-        if (sp.getBoolean(Constants.NIGHT_MODE_ENABLED, false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+        DynamicColors.applyToActivitiesIfAvailable(this);
 
     }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            val channel =
-                NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
-
-        }
-    }
-
-
 }

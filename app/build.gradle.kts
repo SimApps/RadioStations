@@ -2,8 +2,12 @@ plugins {
     id ("com.android.application")
     id ("kotlin-android")
 
-    id ("kotlin-parcelize")
+    id ("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.devtools.ksp")
     id ("kotlin-kapt")
+
+
+    id ("kotlin-parcelize")
 // Add the Firebase Crashlytics plugin.
     id ("com.google.firebase.crashlytics")
     id ("com.google.gms.google-services")
@@ -14,6 +18,9 @@ plugins {
     //dager hilt
     id ("dagger.hilt.android.plugin")
     id("org.jetbrains.kotlin.android")
+
+
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 android {
     compileSdk = 33
@@ -58,10 +65,10 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
-    implementation("androidx.activity:activity-ktx:1.6.1")
+    implementation("androidx.activity:activity-ktx:1.7.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     //implementation (project(path:(":player-service"))
@@ -70,51 +77,56 @@ dependencies {
     //implementation project(path:(":downloader"))
     implementation(project(":downloader"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
+    implementation("androidx.hilt:hilt-work:1.0.0")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // kotlin serialization
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+
 
     //reetrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     //splash screan
-    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     //in app review
     implementation("com.google.android.play:core-ktx:1.8.1")
     //autoUpdate
  //   implementation("com.google.android.play:app-update-ktx:2.0.0")
 
     //COIL
-    implementation("io.coil-kt:coil:2.2.2")
-    implementation("io.coil-kt:coil-gif:2.2.2")
-    implementation("io.coil-kt:coil-svg:2.2.2")
+    implementation("io.coil-kt:coil:2.3.0")
+    implementation("io.coil-kt:coil-gif:2.3.0")
+    implementation("io.coil-kt:coil-svg:2.3.0")
 
 
-    implementation("androidx.media3:media3-ui:1.0.0-rc01")
-    implementation("androidx.media3:media3-exoplayer:1.0.0-rc01")
+    implementation("androidx.media3:media3-ui:1.0.1")
+    implementation("androidx.media3:media3-exoplayer:1.0.1")
     // For DASH playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-dash:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.1")
     // For HLS playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-hls:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer-hls:1.0.1")
 // For RTSP playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.1")
 // For exposing and controlling media sessions
-    implementation("androidx.media3:media3-session:1.0.0-rc01")
+    implementation("androidx.media3:media3-session:1.0.1")
 
 
-    //key board event
-    implementation("net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0")
+
 
 
     //tappx
-    implementation("com.tappx.sdk.android:tappx-sdk:4.0.2")
+    implementation("com.tappx.sdk.android:tappx-sdk:4.0.4")
     implementation("com.google.android.gms:play-services-base:18.2.0")
 
 
     // Import the BoM for the Firebase platform
-    implementation (platform("com.google.firebase:firebase-bom:31.2.2"))
+    implementation (platform("com.google.firebase:firebase-bom:31.5.0"))
 
     // Add the Firebase Crashlytics SDK.
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -136,7 +148,7 @@ dependencies {
 
 
     //ads to remove in pro
-    implementation("com.google.android.gms:play-services-ads:21.5.0")
+    implementation("com.google.android.gms:play-services-ads:22.0.0")
 
 
     // When using the BoM, you don")t specify versions in Firebase library dependencies
@@ -144,7 +156,7 @@ dependencies {
 
 
     //custom toast
-    implementation("com.pranavpandey.android:dynamic-toasts:4.1.2")
+    implementation("com.pranavpandey.android:dynamic-toasts:4.1.3")
 
     //RecyclerView-FastScroll
     implementation("com.simplecityapps:recyclerview-fastscroll:2.0.1")
@@ -159,16 +171,16 @@ dependencies {
 
 
     // this line below because a wierd warning about viewbinding
-    compileOnly("com.android.databinding:viewbinding:7.4.1")
+    compileOnly("com.android.databinding:viewbinding:8.0.0")
 
 // Navigation Component dependencies
-    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0-alpha06")
-    implementation("androidx.navigation:navigation-ui-ktx:2.6.0-alpha06")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0-beta01")
+    implementation("androidx.navigation:navigation-ui-ktx:2.6.0-beta01")
 
     // Coroutine Lifecycle Scopes
-    implementation("androidx.fragment:fragment-ktx:1.5.5")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
    // implementation("androidx.lifecycle:lifecycle-extensions-ktx:2.5.1")
 
 
@@ -190,15 +202,14 @@ dependencies {
 
 
     // - - Room Persistence Library
-    implementation("androidx.room:room-runtime:2.5.0")
-    kapt("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-runtime:2.5.1")
+    ksp("androidx.room:room-compiler:2.5.1")
     // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:2.5.0")
+    implementation("androidx.room:room-ktx:2.5.1")
 
 
-   // def lottieVersion =(")5.0.3")
+
     implementation("com.airbnb.android:lottie:6.0.0")
-
 
 
 
@@ -210,8 +221,31 @@ dependencies {
     implementation ("com.github.Cutta:GifView:1.4")
 
 
+    implementation ("com.github.lisawray.groupie:groupie:2.10.1")
+    implementation ("com.github.lisawray.groupie:groupie-viewbinding:2.10.1")
+    implementation ("com.github.lisawray.groupie:groupie-databinding:2.10.1")
+
+
+
+    // Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+
+    implementation ("androidx.viewpager2:viewpager2:1.1.0-beta01")
+    implementation ("io.github.nikartm:fit-button:2.0.0")
+    implementation ("com.github.YvesCheung.RollingText:RollingText:1.2.11")
+
+    implementation(files("libs/customFloating-release.aar"))
     // ALARM LIB
-    implementation ("com.github.ColdTea-Projects:SmplrAlarm:2.1.1")
+    //implementation ("com.github.ColdTea-Projects:SmplrAlarm:2.1.1")
+  //  implementation ("com.carterchen247:alarm-scheduler:2.0.0") CURRENT ONE
+
+// GET LICENSE INFO
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
+
+
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.11")
+
+
 }
 
 kapt {

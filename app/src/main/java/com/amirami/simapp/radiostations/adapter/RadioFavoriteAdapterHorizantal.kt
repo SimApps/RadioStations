@@ -3,6 +3,7 @@ package com.amirami.simapp.radiostations.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
-class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) :
+@UnstableApi class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) :
     ListAdapter<MutableList<RadioEntity>, RadioFavoriteAdapterHorizantal.FavViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
     // class RadioFavoriteAdapter (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioFavoriteAdapter.FavViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
@@ -42,7 +43,7 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
 
     override fun getItemCount(): Int = items.size // differ.currentList.size     //fidCardDBList.size
 
-    inner class FavViewHolder(private val binding: RadioHorizontalrecyclervTiketBinding) :
+    @UnstableApi inner class FavViewHolder(private val binding: RadioHorizontalrecyclervTiketBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -60,8 +61,7 @@ class RadioFavoriteAdapterHorizantal(private val listener: OnItemClickListener) 
               /*  CountriesTxV.setTextColor(RadioFunction.parseColor("#FF546d79"))
                 NbrradioStationTxV.setTextColor(RadioFunction.parseColor("#FF546d79"))
 */
-                RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxV, MainActivity.darkTheme)
+
 
                 mainTxV.text = radioRoom.name
                 descriptionTxV.text = root.context.getString(

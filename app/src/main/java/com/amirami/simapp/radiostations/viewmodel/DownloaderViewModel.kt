@@ -14,7 +14,7 @@ import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.hiltcontainer.RadioApplication
 import com.amirami.simapp.radiostations.model.DownloadState
-import com.asmtunis.player_service.service.SimpleMediaServiceHandler
+import com.amirami.player_service.service.SimpleMediaServiceHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,14 +61,14 @@ class DownloaderViewModel @Inject constructor(
 
 
     }
-    fun startDownloader(customRecName : String = "", customUrl : String = "") {
+    fun startDownloader(customRecName : String = "", customUrl : String = "", icyandState: String = "") {
         Log.d("kkkkee",customUrl)
         if(customUrl=="" && MainActivity.Globalurl =="") return
         viewModelScope.launch(dispatcher) {
 
             val name = if(customRecName=="")  MainActivity.GlobalRadioName else customRecName
             var recordFileName =
-                name + "_ _" + " " + MainActivity.icyandState + "___" + System.currentTimeMillis()
+                name + "_ _" + " " + icyandState + "___" + System.currentTimeMillis()
             recordFileName = recordFileName.replace(Regex("[\\\\/:*?\"<>|]"), " ")
 
             //  val sdfDate = SimpleDateFormat("MMM d yy_HH-mm-ss", Locale.getDefault())
@@ -181,5 +181,17 @@ class DownloaderViewModel @Inject constructor(
         }
 
 
+    }
+
+
+    fun resetDownloadState(){
+        _downloadState.value =     DownloadState(
+             isDownloading = false,
+         downloadStarted = false,
+         downloadResumed = false,
+         completed  = false,
+         isPaused  = false,
+         error  = "",
+        )
     }
 }

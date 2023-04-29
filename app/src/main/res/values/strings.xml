@@ -1,12 +1,16 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Radio FM AM</string>
     <string name="RateRadioFMAM">Rate Radio FM AM</string>
+
+
     <string name="choosefilemanager">Select a file manager Then GO to : Download/Radio FM AM</string>
     <string name="IfyouenjoyusingRadioFMAM">If you enjoy using Radio FM AM, please take a moment to rate it. Thanks for your support!</string>
     <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : Download/Radio FM AM </string>
 
+    <string name="app_version_settings">Version : 0.1.05</string>
 
 
+    <string name="more_application">Découvrez nos applications</string>
 
 
     <string name="title_activity_radios">RadiosActivity</string>
@@ -17,11 +21,15 @@
     <string name="title_activity_search_results">SearchResultsActivity</string>
 
     <string name="Search">Search Stations</string>
+    <string name="Search_list">Search List</string>
+    <string name="Search_radio">Search Radio</string>
+    <string name="Search_favorite">Search Favorite</string>
     <string name="Reset">Reset</string>
     <string name="Start">Start</string>
     <string name="Start_alarm">Start Alarm</string>
     <string name="cancel_alarm">Cancel Current Alarm</string>
     <string name="Set_Alarm_at">Set Alarm at :</string>
+    <string name="Set_Alarm">Set Alarm</string>
 
     <string name="Deleted_All">Favorite Radio deleted</string>
     <string name="Cant_beEmpty">Field can\'t be empty!</string>
@@ -99,6 +107,10 @@
     <string name="deleteuserMSG">Do you really want to Delete user profile?</string>
     <string name="disclaimermessage">This app is a tool for playing online radio. It is not affiliated with any media or radio. We respect the copyright of the owner. Therefore, please do not use illegale content without the permission of the owner. </string>
 
+    <string name="licenses">Licences</string>
+    <string name="evaluez_application">Évaluez l\'application</string>
+    <string name="Qu_est_ce_que_application">C\'est quoi "Prix en Tunisie" ?</string>
+    <string name="Nous_Contacter">Nous Contacter</string>
 
     <string name="batterieoptimisationmessage">If you experience playback interruptions you have to disable battery optimization. Click on "GO" to open setting and search for this app. (there is some brand that require additional settings)  </string>
 
@@ -323,4 +335,115 @@
     <string name="alarm_fallback_info">System alarm adopted as selected radio station failed to load</string>
     <string name="alarm_back_desc">Alternative system alarm adopted when the radio station fails to load</string>
     <string name="action_alarm">Alarm</string>
+
+
+
+
+
+
+
+
+
+
+    <string name="progressFinish">Done!</string>
+    <string name="progressInit">Initialize Local Database</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="alarm">Alarm name</string>
+    <string name="alarmSet_AM">AM</string>
+    <string name="alarmSet_PM">PM</string>
+    <string name="save">Save</string>
+    <string name="update">Update</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+    <string name="ten_minutes_later">10minutes</string>
+    <string name="time_split">:</string>
+    <string name="problem_plus">+</string>
+    <string name="problem_equal">=</string>
+
+    <!-- Calculator Text -->
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+    <string name="six">6</string>
+    <string name="seven">7</string>
+    <string name="eight">8</string>
+    <string name="nine">9</string>
+    <string name="zero">0</string>
+
+    <!-- error message -->
+    <string name="on_alarm_error">Error!!: Could not read alarm data</string>
+    <string name="some_error">Error is occurred. \n please try again.</string>
+
+    <!-- Weekend -->
+    <string name="monday_short">M</string>
+    <string name="tuesday_short">T</string>
+    <string name="wednesday_short">W</string>
+    <string name="thursday_short">T</string>
+    <string name="friday_short">F</string>
+    <string name="saturday_short">S</string>
+    <string name="sunday_short">S</string>
+
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+
+    <!-- Alarm Set -->
+    <string name="alarmSet_selectBell">Alarm Bell</string>
+    <string name="alarmSet_selectMode">Alarm Mode</string>
+    <string name="alarmSet_selectBellTextTitle">Current Bell</string>
+    <string name="alarmSet_selectModeTextTitle">Current Mode</string>
+    <string name="alarmSet_Toast_week">Please set week</string>
+    <string name="alarmSet_selectBellDialogTitle">Select Alarm Mode</string>
+    <string name="alarmSet_alarmModeItem1">Normal</string>
+    <string name="alarmSet_alarmModeItem2">Calculator</string>
+    <string name="alarmSet_calRepeat">Calculate Repeat</string>
+    <string name="alarmSet_simpleAlarmSubText">later alarm will go off</string>
+    <string name="alarmSet_60minButton">+60min</string>
+    <string name="alarmSet_30minButton">+30min</string>
+    <string name="alarmSet_15minButton">+15min</string>
+    <string name="alarmSet_10minButton">+10min</string>
+    <string name="alarmSet_5minButton">+5min</string>
+    <string name="alarmSet_1minButton">+1min</string>
+    <string name="alarmSet_default_time">00</string>
+
+    <!-- about Dialog -->
+    <string name="dialog_permission_title">Permission</string>
+    <string name="dialog_overlay_message">Overlay permission is necessary to show alarm on the background</string>
+    <string name="dialog_notification_permission_message">Notification is essential to use QuickAlarm</string>
+    <string name="dialog_bell_set_title">Bell Select</string>
+    <string name="dialog_delete_title">Delete Alarm</string>
+    <string name="dialog_delete_content">Do you want to delete this alarm?</string>
+    <string name="dialog_permission_overlay_no">Need overlay permission to use this app</string>
+
+    <!-- bell type-->
+    <string name="bellType_Normal_Walking">Walking</string>
+    <string name="bellType_Normal_PianoMan">PianoMan</string>
+    <string name="bellType_Normal_Happy">HappyTown</string>
+    <string name="bellType_Normal_Lonely">Lonely</string>
+
+    <!-- notification -->
+    <string name="alarm_notification_channel_id">alarmChanel</string>
+    <string name="alarm_notification_channel_name">Next Alarm</string>
+    <string name="weather_notification_channel_id">alarmChanel</string>
+    <string name="weather_notification_channel_name">Weather Alarm</string>
+    <string name="alarm_notification_title">Next alarm</string>
+    <string name="actionButton1">+5 Min</string>
+    <string name="actionButton2">+15 Min</string>
+    <string name="actionButton3">+30 Min</string>
+
+    <!-- Toast -->
+    <string name="toast_set_minimum_time">Please set at least one minute</string>
+    <string name="toast_ten_minute_later">Alarm goes off 10minutes later</string>
+    <string name="toast_get_dataStore_error">Fail to get data from dataStore</string>
+    <string name="toast_correct_calculator_answer">Correct answer!!</string>
+    <string name="toast_wrong_calculator_answer">Wrong answer. Please put again.</string>
 </resources>

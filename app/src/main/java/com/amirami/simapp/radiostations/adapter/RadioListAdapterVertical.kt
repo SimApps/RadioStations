@@ -46,8 +46,8 @@ class RadioListAdapterVertical(private val listener: OnItemClickListener) :
         fun bind(radioVariables: RadioEntity) {
             binding.apply {
                 ExpandImageView.visibility = View.GONE
-                RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
+                favListIcon.visibility = View.GONE
+
 
                 if (radioVariables.ip != "" && radioVariables.name == RadioFunction.countryCodeToName(radioVariables.name)) {
                     val globalserversJson = arrayOfNulls<String>(items.size + 1)
@@ -87,7 +87,7 @@ class RadioListAdapterVertical(private val listener: OnItemClickListener) :
                             mainTxVw.text = RadioFunction.countryCodeToName(radioVariables.name)
                             RadioFunction.loadImageString(
                                 root.context,
-                                COUNTRY_FLAGS_BASE_URL + radioVariables.name.lowercase(Locale.ROOT),
+                                COUNTRY_FLAGS_BASE_URL + radioVariables.name.lowercase(Locale.ROOT)+".svg",
                                 MainActivity.imagedefaulterrorurl,
                                 ImageView,
                                 Constatnts.CORNER_RADIUS_8F

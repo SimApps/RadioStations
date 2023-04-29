@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="showCalculatorProblem"
+            type="Boolean" />
+
+        <variable
+            name="calculatorProblem"
+            type="com.amirami.simapp.radiostations.pairalarm.model.CalculatorProblem" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        tools:context=".ui.activity.OnAlarmActivity">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/timer_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5">
+
+            <TextView
+                android:id="@+id/alarm_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alarm name"
+                android:textSize="@dimen/text_p1"
+                app:layout_constraintBottom_toTopOf="@id/min"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.yy.mobile.rollingtextview.RollingTextView
+                android:id="@+id/min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nanumgothicextrabold"
+                android:text="@string/alarmSet_default_time"
+                android:textSize="@dimen/text_h1"
+                android:textStyle="bold"
+                app:duration="500"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/pointer_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nanumgothicextrabold"
+                android:text="@string/time_split"
+                android:textSize="@dimen/text_h1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <com.yy.mobile.rollingtextview.RollingTextView
+                android:id="@+id/hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nanumgothicextrabold"
+                android:text="@string/alarmSet_default_time"
+                android:textSize="@dimen/text_h1"
+                android:textStyle="bold"
+                app:duration="500"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/calculator_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:visibility="@{showCalculatorProblem ? View.VISIBLE : View.GONE}"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/element_spacing_xxxlarge"
+            android:paddingTop="@dimen/element_spacing_xsmall">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/element_spacing_xxlarge"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/problem_number1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/element_spacing_small"
+                    android:text="@{Integer.valueOf(calculatorProblem.number1).toString()}"
+                    android:textSize="@dimen/text_h4"
+                    android:textStyle="bold"
+                    tools:text="30" />
+
+                <TextView
+                    android:id="@+id/problem_plus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/element_spacing_small"
+                    android:text="@string/problem_plus"
+                    android:textSize="@dimen/text_h4"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/problem_number2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/element_spacing_small"
+                    android:text="@{Integer.valueOf(calculatorProblem.number2).toString()}"
+                    android:textSize="@dimen/text_h4"
+                    android:textStyle="bold"
+                    tools:text="33" />
+
+                <TextView
+                    android:id="@+id/problem_equal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/element_spacing_small"
+                    android:text="@string/problem_equal"
+                    android:textSize="@dimen/text_h3"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/problem_answer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/element_spacing_small"
+                    android:textSize="@dimen/text_h3"
+                    tools:text="1234" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/element_spacing_small"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/one_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/one"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/two_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/two"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/three_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/three"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/element_spacing_small"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/four_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/four"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/five_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/five"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/six_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/six"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/element_spacing_small"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/seven_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/seven"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/eight_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/eight"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/nine_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/nine"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal" />
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/element_spacing_small"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/delete_button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_arrow_back"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toEndOf="@id/guideline1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.34" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zero_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/zero"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_p3"
+                    android:textStyle="bold"
+                    app:cornerRadius="@dimen/element_spacing_normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/guideline2"
+                    app:layout_constraintStart_toStartOf="@id/guideline1"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.67" />
+
+                <ImageView
+                    android:id="@+id/reset_button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/element_spacing_ultra_large"
+                    android:src="@drawable/ic_refresh_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/guideline2"
+                    app:layout_constraintTop_toTopOf="parent"
+                     />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/button_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:paddingTop="@dimen/element_spacing_xnormal"
+            app:setMarginTop="@{showCalculatorProblem ? @dimen/element_spacing_none : @dimen/element_spacing_super_ultra_large}">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/ten_minutes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/element_spacing_xlarge"
+                android:text="@string/ten_minutes_later"
+                android:textAllCaps="false"
+                android:textSize="@dimen/text_p3"
+                app:cornerRadius="@dimen/element_spacing_xlarge"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.172"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.45" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/element_spacing_xlarge"
+                android:text="@string/ok"
+                android:textAllCaps="false"
+                android:textSize="@dimen/text_p3"
+                android:visibility="@{!showCalculatorProblem ? View.VISIBLE : View.INVISIBLE}"
+                app:cornerRadius="@dimen/element_spacing_xlarge"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.82"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.45" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</layout>

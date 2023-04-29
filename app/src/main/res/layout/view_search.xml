@@ -5,7 +5,6 @@
     android:id="@+id/searchcardview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/orange"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp">
 
@@ -58,7 +57,6 @@
             android:gravity="center_horizontal"
             android:text=""
             android:textAlignment="center"
-            android:textColor="#A1887F"
             android:textSize="18sp" />
 
 
@@ -73,13 +71,11 @@
             android:layout_marginEnd="6dp"
             android:layout_toStartOf="@+id/add_alarm_button"
             android:layout_toEndOf="@+id/openclose_search_button"
-            android:focusable="true"
+
             android:gravity="center_horizontal"
             android:hint="@string/Search"
-            android:textColorHint="@color/orange_darck"
             app:endIconMode="clear_text"
-            app:endIconTint="@color/defaultcolor"
-            app:hintTextColor="@color/defaultcolor"
+
 
             app:iconifiedByDefault="false"
             app:queryBackground="@null"

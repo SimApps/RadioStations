@@ -1,29 +1,33 @@
 package com.amirami.simapp.radiostations
 
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.PendingIntent
-import android.content.*
-import android.graphics.Paint
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.TransitionDrawable
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.os.Environment.*
+import android.os.Environment.DIRECTORY_DOWNLOADS
+import android.os.Environment.getExternalStoragePublicDirectory
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import android.widget.*
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.SwitchCompat
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.RatingBar
+import android.widget.TextView
 import androidx.core.graphics.toColorInt
-import androidx.core.widget.NestedScrollView
+import androidx.core.os.bundleOf
+import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.Navigation
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -31,21 +35,22 @@ import coil.decode.SvgDecoder
 import coil.load
 import coil.request.CachePolicy
 import coil.transform.RoundedCornersTransformation
-import com.amirami.simapp.radiostations.MainActivity.Companion.color1
-import com.amirami.simapp.radiostations.MainActivity.Companion.color2
-import com.amirami.simapp.radiostations.MainActivity.Companion.color3
-import com.amirami.simapp.radiostations.MainActivity.Companion.color4
 import com.amirami.simapp.radiostations.MainActivity.Companion.currentNativeAd
-import com.amirami.simapp.radiostations.MainActivity.Companion.darkTheme
-import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
-import com.amirami.simapp.radiostations.MainActivity.Companion.is_playing_recorded_file
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
+import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
+import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioEntity
-import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.utils.Constatnts.RECORDS_FILE_NAME
-import com.google.android.gms.ads.*
+import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
@@ -53,40 +58,32 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import java.io.File
-import java.lang.reflect.Field
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 @UnstableApi object RadioFunction {
-    val immutableFlag = if (Build.VERSION.SDK_INT >= 23) /*PendingIntent.FLAG_IMMUTABLE*/ PendingIntent.FLAG_MUTABLE else 0
 
     fun getCurrentDate(): Long {
         return System.currentTimeMillis() // DateFormat.getDateTimeInstance().format(currentDate) // formated
     }
-    fun shortformateDate(Date: Long): String {
-        // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
-        // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
-        return SimpleDateFormat("MMM d''yy HH:mm", Locale.getDefault()).format(Date)
-    }
+
 
     fun shortformateDate(Date: String): String {
-        // SimpleDateFormat("d/MM/yyyy", Locale.getDefault()).format(Date())
-        // SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(Date())
 
         return if (isNumber(Date)) SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(
             Date.toLong()
         )
         else Date
     }
-    fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     fun shareRadio(
         context: Context,
         radio: RadioEntity,
-        icy : String
+        icy : String,
+        isRec : Boolean
     ) {
         if (radio.name != "") {
-            if (is_playing_recorded_file) {
+            if (isRec) {
                 try {
                     val intent = Intent(Intent.ACTION_SEND)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -570,10 +567,10 @@ import java.util.*
         }
     }
 
-    fun getRecordedFiles(context: Context): ArrayList<RecordInfo> {
-        val RcordInfo = ArrayList<RecordInfo>()
+    fun getRecordedFiles(context: Context): ArrayList<RadioEntity> {
+        val RcordInfo = ArrayList<RadioEntity>()
         // TARGET FOLDER
-        var s: RecordInfo
+        var s: RadioEntity
         if (getDownloadDir().exists()) {
             // GET ALL FILES IN DOWNLOAD FOLDER
             val files = getDownloadDir().listFiles()
@@ -582,9 +579,9 @@ import java.util.*
                     // LOOP THRU THOSE FILES GETTING NAME AND URI
                     for (i in files.indices) {
                         val file = files[i]
-                        s = RecordInfo()
+                        s = RadioEntity()
                         s.name = file.name
-                        s.uri = Uri.fromFile(file)
+                        s.streamurl = file.toString()//Uri.fromFile(file)
                         RcordInfo.add(s)
                     }
                 }
@@ -651,7 +648,12 @@ import java.util.*
             Log.d("TAG", "The interstitial ad wasn't ready yet.")
         }
     }
-
+    fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
+        } else {
+            @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
+        }
     fun loadImageString(
         context: Context,
         mainiconSting: String,
@@ -659,6 +661,7 @@ import java.util.*
         imageview: ImageView,
         cornerRadius: Float
     ) {
+        Log.d("nndhsnsn",mainiconSting)
         if (!MainActivity.saveData || mainiconSting.contains(COUNTRY_FLAGS_BASE_URL)) {
             val imageLoader = ImageLoader.Builder(context)
                 .components {
@@ -675,7 +678,7 @@ import java.util.*
                 error(erroricon)
                 diskCachePolicy(CachePolicy.ENABLED)
                 memoryCachePolicy(CachePolicy.ENABLED)
-                placeholder(erroricon) // image shown when loading image
+           //     placeholder(erroricon) // image shown when loading image
             }
         }
     }
@@ -690,449 +693,14 @@ import java.util.*
         }
     }
 
-    fun switchColor(switch: SwitchCompat, theme: Boolean) {
-        if (theme) {
-            switch.setTextColor(parseColor("#FFFFFF"))
-        } else {
-            switch.setTextColor(parseColor("#000000"))
-        }
-    }
-
-    fun maintextviewColor(textcolor: TextView, theme: Boolean) {
-        if (theme) textcolor.setTextColor(parseColor("#FFFFFF"))
-        else textcolor.setTextColor(parseColor("#000000"))
-    }
-
-    fun secondarytextviewColor(textcolor: TextView, theme: Boolean) {
-        if (theme) textcolor.setTextColor(parseColor("#BABABA"))
-        else textcolor.setTextColor(parseColor("#0E0E0E"))
-    }
-
-    @SuppressLint("SoonBlockedPrivateApi")
-    fun setNumberPickerTextColor(numberPicker: NumberPicker, theme: Boolean) {
-        try {
-            val selectorWheelPaintField: Field = numberPicker.javaClass
-                .getDeclaredField("mSelectorWheelPaint")
-            selectorWheelPaintField.isAccessible = true
-            (selectorWheelPaintField.get(numberPicker) as Paint).color = if (theme) {
-                parseColor("#BABABA") } else parseColor("#000000")
-        } catch (e: NoSuchFieldException) {
-            Log.w("setNumberPickerTxtColor", e)
-        } catch (e: IllegalAccessException) {
-            Log.w("setNumberPickerTxtColor", e)
-        } catch (e: IllegalArgumentException) {
-            Log.w("setNumberPickerTxtColor", e)
-        }
-        val count = numberPicker.childCount
-        for (i in 0 until count) {
-            val child = numberPicker.getChildAt(i)
-            if (child is EditText) child.setTextColor(
-                if (theme) {
-                    parseColor("#BABABA") } else parseColor("#000000")
-            )
-        }
-        numberPicker.invalidate()
-    }
-
-    fun nativeadstexViewColor(
-        textcolor1: TextView,
-        textcolor2: TextView,
-        textcolor3: TextView,
-        textcolor4: TextView,
-        textcolor5: TextView,
-        theme: Boolean
-    ) {
-        if (theme) {
-            textcolor1.setTextColor(parseColor("#BABABA"))
-            textcolor2.setTextColor(parseColor("#BABABA"))
-            textcolor3.setTextColor(parseColor("#BABABA"))
-            textcolor4.setTextColor(parseColor("#BABABA"))
-            textcolor5.setTextColor(parseColor("#BABABA"))
-        } else {
-            textcolor1.setTextColor(parseColor("#000000"))
-            textcolor2.setTextColor(parseColor("#000000"))
-            textcolor3.setTextColor(parseColor("#000000"))
-            textcolor4.setTextColor(parseColor("#000000"))
-            textcolor5.setTextColor(parseColor("#000000"))
-        }
-    }
-
-    fun buttonColor(buttoncolor: Button, theme: Boolean) {
-        if (theme) buttoncolor.setTextColor(parseColor("#FFFFFF"))
-        else buttoncolor.setTextColor(parseColor("#000000"))
-    }
-
-    fun cardViewColor(cardView: CardView, theme: Boolean) {
-        if (theme) cardView.setCardBackgroundColor(parseColor("#26CAEEFF"))
-        else cardView.setCardBackgroundColor(parseColor("#f8f9fa"))
-    }
-
-    fun textcolorSearchviewTransition(
-        container: SearchView,
-        theme: Boolean
-    ) {
-        if (!theme) {
-            color1 = parseColor("#000000") // -256
-            color2 = parseColor("#000000") // -65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#FFFFFF")
-            color2 = parseColor("#FFFFFF")
-            color3 = parseColor("#FFFFFF")
-            color4 = parseColor("#FFFFFF")
-        }
-
-        // val searchView = findViewById(R.id.search) as SearchView
-        val searchEditText = container.findViewById(R.id.search_src_text) as EditText
-        searchEditText.setTextColor(color1)
-        searchEditText.setHintTextColor(color1)
-    }
-
-    fun gradiancolorNestedScrollViewTransitionseconcolor(
-        container: NestedScrollView,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#070326") // -256
-            color2 = parseColor("#070326") // -65536
-            color3 = parseColor("#070326")
-            color4 = parseColor("#070326")
-        } else {
-            color1 = parseColor("#F0FFFF")
-            color2 = parseColor("#F0FFFF")
-            color3 = parseColor("#F0FFFF")
-            color4 = parseColor("#F0FFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorNestedScrollViewTransition(
-        container: NestedScrollView,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#000000") // -256
-            color2 = parseColor("#000000") // -65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#FFFFFF")
-            color2 = parseColor("#FFFFFF")
-            color3 = parseColor("#FFFFFF")
-            color4 = parseColor("#FFFFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorTransition(container: RelativeLayout, duration: Int, theme: Boolean) {
-        if (theme) {
-            color1 = parseColor("#000000") // -256
-            color2 = parseColor("#000000") // -65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#FFFFFF")
-            color2 = parseColor("#FFFFFF")
-            color3 = parseColor("#FFFFFF")
-            color4 = parseColor("#FFFFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorTransitionBottomSheet(
-        container: RelativeLayout,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#070326") // -256
-            color2 = parseColor("#070326") // -65536
-            color3 = parseColor("#070326")
-            color4 = parseColor("#070326")
-        } else {
-            color1 = parseColor("#F0FFFF")
-            color2 = parseColor("#F0FFFF")
-            color3 = parseColor("#F0FFFF")
-            color4 = parseColor("#F0FFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorConstraintBottomSheet(
-        container: ConstraintLayout,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#070326") // -256
-            color2 = parseColor("#070326") // -65536
-            color3 = parseColor("#070326")
-            color4 = parseColor("#070326")
-        } else {
-            color1 = parseColor("#F0FFFF")
-            color2 = parseColor("#F0FFFF")
-            color3 = parseColor("#F0FFFF")
-            color4 = parseColor("#F0FFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorTransitionConstraint(
-        container: ConstraintLayout,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#000000") // -256
-            color2 = parseColor("#000000") // -65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#FFFFFF")
-            color2 = parseColor("#FFFFFF")
-            color3 = parseColor("#FFFFFF")
-            color4 = parseColor("#FFFFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorLinearlayoutTransitionBottomSheet(
-        container: LinearLayout,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#070326") // -256
-            color2 = parseColor("#070326") // -65536
-            color3 = parseColor("#070326")
-            color4 = parseColor("#070326")
-        } else {
-            color1 = parseColor("#F0FFFF")
-            color2 = parseColor("#F0FFFF")
-            color3 = parseColor("#F0FFFF")
-            color4 = parseColor("#F0FFFF")
-        }
-        val gd1 = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color1, color2)
-        )
-        gd1.cornerRadius = 0f
-
-        val gd = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(color3, color4)
-        )
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorLinearlayoutTransition(container: LinearLayout, duration: Int, theme: Boolean) {
-        if (theme) {
-            color1 = parseColor("#000000") // -256
-            color2 = parseColor("#000000") // -65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#BABABA")
-            color2 = parseColor("#BABABA")
-            color3 = parseColor("#BABABA")
-            color4 = parseColor("#BABABA")
-        }
-        val gd1 =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
-        gd1.cornerRadius = 0f
-
-        val gd =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorConstraintLayoutTransitionBottomsheet(
-        container: ConstraintLayout,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#070326") // -256
-            color2 = parseColor("#070326") // -65536
-            color3 = parseColor("#070326")
-            color4 = parseColor("#070326")
-        } else {
-            color1 = parseColor("#F0FFFF")
-            color2 = parseColor("#F0FFFF")
-            color3 = parseColor("#F0FFFF")
-            color4 = parseColor("#F0FFFF")
-        }
-        val gd1 =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
-        gd1.cornerRadius = 0f
-
-        val gd =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorConstraintLayoutTransition(
-        container: ConstraintLayout,
-        duration: Int,
-        theme: Boolean
-    ) {
-        if (theme) {
-            color1 = parseColor("#000000") // -256
-            color2 = parseColor("#000000") // -65536
-            color3 = parseColor("#000000")
-            color4 = parseColor("#000000")
-        } else {
-            color1 = parseColor("#FFFFFF")
-            color2 = parseColor("#FFFFFF")
-            color3 = parseColor("#FFFFFF")
-            color4 = parseColor("#FFFFFF")
-        }
-        val gd1 =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
-        gd1.cornerRadius = 0f
-
-        val gd =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
-    fun gradiancolorNativeAdslayout(container: FrameLayout, duration: Int) {
-        color1 = parseColor("#00000000")
-        color2 = parseColor("#00000000")
-        color3 = parseColor("#00000000")
-        color4 = parseColor("#00000000")
-        val gd1 =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color1, color2))
-        gd1.cornerRadius = 0f
-
-        val gd =
-            GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color3, color4))
-        gd.cornerRadius = 0f
-
-        val color = arrayOf(gd, gd1)
-        val trans = TransitionDrawable(color)
-        container.background = trans
-        trans.startTransition(duration)
-    }
-
     fun parseColor(colorString: String): Int {
         return colorString.toColorInt()
     }
 
-    fun nativeSmallAds(context: Context, ad_frame: FrameLayout, adView: NativeAdView) {
+    fun nativeSmallAds(context: Context,
+                       ad_frame: FrameLayout,
+                       adView: NativeAdView,
+                       darkTheme : Boolean) {
         fun populateUnifiedNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.
@@ -1154,14 +722,7 @@ import java.util.*
             adView.advertiserView = adView.findViewById(R.id.ad_advertiser)
 
             if (adView.headlineView != null) {
-                nativeadstexViewColor(
-                    adView.headlineView as TextView,
-                    adView.advertiserView as TextView,
-                    adView.bodyView as TextView,
-                    adView.priceView as TextView,
-                    adView.storeView as TextView,
-                    darkTheme
-                )
+
 
                 // The headline is guaranteed to be in every UnifiedNativeAd.
                 (adView.headlineView as TextView).text = nativeAd.headline
@@ -1384,12 +945,7 @@ import java.util.*
         setOnClickListener(safeClickListener)
     }
 
-    fun icyandStateWhenPlayRecordFiles(icyandStates: String, downloadRecInfo: String): String {
-        if (is_playing_recorded_file) icyandState = downloadRecInfo
-        else icyandState = icyandStates
-        //  MainActivity.icyandState
-        return if (is_playing_recorded_file) downloadRecInfo else icyandStates
-    }
+
 
     fun getuserid(): String {
         return if (userRecord.uid != null) userRecord.uid!!
@@ -1397,7 +953,7 @@ import java.util.*
     }
 
     fun errorToast(context: Context, message: String) {
-        DynamicToast.make(context, message, 9).show()
+        DynamicToast.make(context, message, 19).show()
     }
 
     fun succesToast(context: Context, message: String) {
@@ -1411,4 +967,119 @@ import java.util.*
     fun dynamicToast(context: Context, message: String) {
         DynamicToast.make(context, message, 9).show()
     }
+
+
+    fun ImageView.setFavIcon(isFav : Boolean){
+
+        if (isFav)
+            this.setImageResource(R.drawable.ic_liked)
+        else
+            this.setImageResource(R.drawable.ic_like)
+
+
+    }
+    fun   moveItemToFirst(array: MutableList<RadioEntity>, item: RadioEntity) : List<RadioEntity> {
+        val index = array.indexOf(item)
+        for (i in index downTo 1) {
+            array[i] = array[i - 1]
+        }
+        array[0] = item
+
+        return array.toList()
+    }
+
+
+  /*  private fun handleFavClick(context: Context,radioVar : RadioEntity, isRec: Boolean){
+        if (!isRec) {
+            val isFav = infoViewModel.isFavRadio(radioVar)
+            if (!isFav && radioVar.stationuuid != "") {
+                addFavoriteRadioIdInArrayFirestore(radioVar.stationuuid)
+            } else if (isFav) {
+                deleteFavoriteRadioFromArrayinfirestore(radioVar.stationuuid)
+            }
+
+            infoViewModel.setFavRadio(radioVar)
+            binding.radioplayer.likeImageViewPlayermain.setFavIcon(!isFav)
+            binding.radioplayer.likeImageView.setFavIcon(!isFav)
+            //  simpleMediaViewModel.setRadioVar(radioVar)
+
+
+        } else {
+            if (MainActivity.firstTimeopenRecordfolder) {
+                MainActivity.firstTimeopenRecordfolder = false
+                if (!isFinishing) {
+                    val navController = Navigation.findNavController(
+                        this@MainActivity,
+                        R.id.fragment_container
+                    )
+                    navController.navigateUp()
+                    val bundle = bundleOf(
+                        "title" to getString(R.string.Keep_in_mind),
+                        "msg" to getString(R.string.recordmessage)
+                    )
+                    navController.navigate(R.id.infoBottomSheetFragment, bundle)
+                }
+                dataViewModel.saveFirstTimeopenRecordFolder(MainActivity.firstTimeopenRecordfolder)
+
+            }
+            RadioFunction.openRecordFolder(this@MainActivity)
+        }
+    }
+    private fun addFavoriteRadioIdInArrayFirestore(context: Context,
+                                                   lifecycleOwner : LifecycleOwner,
+                                                   radioUid: String,favoriteFirestoreViewModel: FavoriteFirestoreViewModel) {
+        val addFavoritRadioIdInArrayFirestore =
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(
+                radioUid,
+                getCurrentDate()
+            )
+        addFavoritRadioIdInArrayFirestore.observe(lifecycleOwner) {
+            // if (it != null)  if (it.data!!)  prod name array updated
+            RadioFunction.interatialadsShow(context)
+            if (it.e != null) {
+                // prod bame array not updated
+                errorToast(context, it.e!!)
+
+                if(it.e!!.contains( "NOT_FOUND") ){
+                    val isProductAddLiveData = favoriteFirestoreViewModel.addUserDocumentInFirestore(
+                        FavoriteFirestore()
+                    )
+
+                    isProductAddLiveData.observe(lifecycleOwner) { dataOrException ->
+                        val isProductAdded = dataOrException.data
+                        if (isProductAdded != null) {
+                            //   hideProgressBar()
+
+                        }
+                        if (dataOrException.e != null) {
+                            errorToast(context,dataOrException.e!!)
+                            /*   if(dataOrException.e=="getRadioUID"){
+
+                               }*/
+
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun deleteFavoriteRadioFromArrayinfirestore(context: Context,
+                                                        lifecycleOwner : LifecycleOwner,
+                                                        radioUid: String,
+                                                        favoriteFirestoreViewModel: FavoriteFirestoreViewModel) {
+        val deleteFavoriteRadiofromArrayInFirestore =
+            favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
+        deleteFavoriteRadiofromArrayInFirestore.observe(lifecycleOwner) {
+            RadioFunction.interatialadsShow(context)
+            // if (it != null)  if (it.data!!)  prod name array updated
+            if (it.e != null) {
+                // prod bame array not updated
+                RadioFunction.dynamicToast(context, it.e!!)
+            }
+        }
+    }
+*/
+
 }

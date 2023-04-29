@@ -3,14 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/orange"
     android:orientation="horizontal"
     app:cardCornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/orange"
         android:padding="9dp">
 
 
@@ -33,7 +31,6 @@
             android:gravity="center"
             android:text="Failed to connect"
             android:textAlignment="center"
-            android:textColor="@color/defaultcolor"
             android:textSize="16sp" />
 
         <Button
@@ -41,7 +38,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="@color/defaultcolor"
             android:text="Retry" />
     </LinearLayout>
 

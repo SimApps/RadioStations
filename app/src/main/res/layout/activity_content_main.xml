@@ -33,7 +33,6 @@
             android:layout_below="@id/searchView"
             android:layout_marginTop="66dp"
             android:layout_marginBottom="70dp"
-            android:background="@color/transparents"
             app:defaultNavHost="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"

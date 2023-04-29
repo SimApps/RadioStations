@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#090412"
-    tools:context="alarm.n.ui.splash.SplashFragment">
+    >
 
 
     <ImageView
@@ -21,7 +20,6 @@
         app:layout_constraintTop_toBottomOf="@id/splash_img"
         android:text="MOMENTIX"
         android:textSize="26sp"
-        android:textColor="@color/white"
         android:gravity="center"
         android:textStyle="bold"
         />

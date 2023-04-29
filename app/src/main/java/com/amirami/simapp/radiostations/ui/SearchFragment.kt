@@ -1,53 +1,55 @@
 package com.amirami.simapp.radiostations.ui
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
 import com.amirami.simapp.radiostations.adapter.RadioAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentSearchBinding
+import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
+import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.amirami.simapp.radiostations.viewmodel.UIEvent
-import com.asmtunis.player_service.service.SimpleMediaServiceHandler
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.text.FieldPosition
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.OnItemClickListener {
-
+   lateinit var filteredList: MutableList<RadioEntity>
     private lateinit var binding: FragmentSearchBinding
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
     private lateinit var radioAdapterHorizantal: RadioAdapterVertical
+    private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorTransitionConstraint(binding.containerseach, 0, it)
-                }
-            }
-        }
+
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -57,7 +59,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                     binding.itemErrorMessage.btnRetry.setOnClickListener {
                         if (query != "") {
                             retrofitRadioViewModel.changeBseUrl()
-                            infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+                            infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
                             retrofitRadioViewModel.getRadiosByName(query)
                         } else {
                             binding.itemErrorMessage.root.visibility = View.INVISIBLE
@@ -77,12 +79,35 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                     when (response.status) {
                         Status.SUCCESS -> {
                             if (response.data != null) {
+
                                 hideProgressBar()
                                 binding.itemErrorMessage.root.visibility = View.INVISIBLE
                                 // radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
                                 setupRadioLisRV()
                                 // DynamicToast.makeError(requireContext(), "query" , 3).show()
-                                radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                        infoViewModel.favList.collectLatest { favList ->
+                                             filteredList = response.data as MutableList<RadioEntity>
+
+                                            if(favList.isNotEmpty()){
+                                                val favlist = favList as ArrayList<RadioEntity>
+
+
+
+                                                for ((index, value) in filteredList.withIndex()) {
+
+                                                    if(favlist.any { it.stationuuid == value.stationuuid })
+                                                        filteredList[index].fav = true
+
+                                                }
+                                            }
+
+                                            radioAdapterHorizantal.setItems(filteredList)
+
+                                        }
+                                    }
+                                }
                             } else showErrorConnection(response.message!!)
                         }
                         Status.ERROR -> {
@@ -167,8 +192,8 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
 
     override fun onItemClick(radio: RadioEntity) {
         try {
-            simpleMediaViewModel.loadData(radio)
-
+            simpleMediaViewModel.loadData(listOf(radio)as MutableList<RadioEntity>)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
             // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
             //   startServices(context)
         } catch (e: IOException) {
@@ -184,16 +209,90 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
     }
 
     override fun onMoreItemClick(radio: RadioEntity) {
+        Log.d("jjdnsqq","ss"+radio.toString())
+
         infoViewModel.putRadioInfo(radio)
         this@SearchFragment.findNavController().navigate(R.id.action_searchFragment_to_moreBottomSheetFragment) //     NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_searchFragment_to_moreBottomSheetFragment)
     }
 
-/*
-    fun <T> Fragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
+    override fun onFavClick(radio: RadioEntity) {
+        handleFavClick(radio)
+    }
+    private fun handleFavClick(radioVar : RadioEntity){
+
+            val isFav = infoViewModel.isFavRadio(radioVar)
+
+            if (!isFav && radioVar.stationuuid != "") {
+                addFavoriteRadioIdInArrayFirestore(radioVar.stationuuid)
+            } else if (isFav) {
+                deleteFavoriteRadioFromArrayinfirestore(radioVar.stationuuid)
+            }
+
+            infoViewModel.setFavRadio(radioVar)
+
+
+            //  simpleMediaViewModel.setRadioVar(radioVar)
+
+
+
+    }
+    private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
+        val addFavoritRadioIdInArrayFirestore =
+            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(
+                radioUid,
+                RadioFunction.getCurrentDate()
+            )
+        addFavoritRadioIdInArrayFirestore.observe(this) {
+            // if (it != null)  if (it.data!!)  prod name array updated
+            RadioFunction.interatialadsShow(requireContext())
+            if (it.e != null) {
+                // prod bame array not updated
+                RadioFunction.errorToast(requireContext(), it.e!!)
+
+                if(it.e!!.contains( "NOT_FOUND") ){
+                    val isProductAddLiveData = favoriteFirestoreViewModel.addUserDocumentInFirestore(
+                        FavoriteFirestore()
+                    )
+
+                    isProductAddLiveData.observe(this) { dataOrException ->
+                        val isProductAdded = dataOrException.data
+                        if (isProductAdded != null) {
+                            //   hideProgressBar()
+
+                        }
+                        if (dataOrException.e != null) {
+                            RadioFunction.errorToast(requireContext(), dataOrException.e!!)
+                            /*   if(dataOrException.e=="getRadioUID"){
+
+                               }*/
+
+                        }
+                    }
+                }
+
             }
         }
-    }*/
+    }
+
+    private fun deleteFavoriteRadioFromArrayinfirestore(radioUid: String) {
+        val deleteFavoriteRadiofromArrayInFirestore =
+            favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
+        deleteFavoriteRadiofromArrayInFirestore.observe(this) {
+            RadioFunction.interatialadsShow(requireContext())
+            // if (it != null)  if (it.data!!)  prod name array updated
+            if (it.e != null) {
+                // prod bame array not updated
+                RadioFunction.dynamicToast(requireContext(), it.e!!)
+            }
+        }
+    }
+
+    /*
+        fun <T> Fragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    flow.collectLatest(collect)
+                }
+            }
+        }*/
 }

@@ -5,6 +5,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.R
@@ -23,7 +25,7 @@ import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentFavoriteBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
-import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
+import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import com.google.android.play.core.appupdate.AppUpdateInfo
@@ -39,14 +41,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class FavoriteRadioFragment :
     Fragment(R.layout.fragment_favorite),
     RadioFavoriteAdapterVertical.OnItemClickListener {
     //  private var currentNativeAdFavori:  NativeAd? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
+    private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
 
     private val radioRoom: MutableList<RadioEntity> = mutableListOf()
     private lateinit var binding: FragmentFavoriteBinding
@@ -55,6 +57,8 @@ class FavoriteRadioFragment :
     lateinit var appUpdateManager: AppUpdateManager
     private val REQUEST_APP_UPDATE = 560
     private var installStateUpdatedListener: InstallStateUpdatedListener? = null
+
+    lateinit var filterredList: MutableList<RadioEntity>
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
 
@@ -78,10 +82,9 @@ class FavoriteRadioFragment :
 
         appUpdateManager = AppUpdateManagerFactory.create(requireContext())
 
-        setTheme()
         infoViewModel.putTitleText(getString(R.string.Favoris))
         setupRadioLisRV()
-        getFavRadioRoom()
+
 
         //  setContentView(R.layout.activity_favorite_main_activity)
 
@@ -89,17 +92,16 @@ class FavoriteRadioFragment :
             val action = FavoriteRadioFragmentDirections.actionFavoriteRadioFragmentToAddDialogueBottomSheetFragment(false)
             this@FavoriteRadioFragment.findNavController().navigate(action) //      NavHostFragment.findNavController(requireParentFragment()).navigate(action)
         }
-    }
 
-    private fun setTheme() {
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorTransitionConstraint(binding.containerfav, 0, it)
-                }
-            }
-        }
+                retrofitRadioViewModel.queryString.collectLatest { queryString ->
+                    getFavRadioRoom(queryString)
+                }}}
     }
+
+
 
     private fun setupRadioLisRV() {
         radioFavoriteAdapterVertical = RadioFavoriteAdapterVertical(this)
@@ -111,18 +113,21 @@ class FavoriteRadioFragment :
         }
     }
 
-    private fun getFavRadioRoom() {
+    private fun getFavRadioRoom(queryString : String?) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                radioRoomViewModel.favList.collectLatest { list ->
+                infoViewModel.favList.collectLatest { list ->
                     //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
-                    if (list.isNotEmpty()) {
+                     filterredList = (list.filter { it.name.contains(queryString.toString() ,
+                       ignoreCase = true) }as MutableList<RadioEntity>)
+
+                    if (filterredList.isNotEmpty()) {
                         radioRoom.clear()
-                        radioRoom.addAll(list)
+                        radioRoom.addAll(filterredList)
 
                         //    DynamicToast.makeError(requireContext(), list.size.toString(), 3).show()
-                        populateRecyclerView(radioRoom)
+                        populateRecyclerView(filterredList)
                         binding.whenemptyfavImage.visibility = View.GONE
                         binding.rv.visibility = View.VISIBLE
                     } else {
@@ -146,24 +151,12 @@ class FavoriteRadioFragment :
 
     override fun onItemClick(radioRoom: RadioEntity) {
         try {
-
-            simpleMediaViewModel.loadData(radioRoom)
-          //  simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
-
-            val radioVariables = RadioEntity()
-            radioVariables.apply {
-                name = radioRoom.name
-                bitrate = radioRoom.bitrate
-                country = radioRoom.country
-                stationuuid = radioRoom.stationuuid
-                favicon = radioRoom.favicon
-                language = radioRoom.language
-                state = radioRoom.state
-                streamurl = radioRoom.streamurl
-                homepage = radioRoom.homepage
-                tags = radioRoom.tags
-            }
-
+            val list = RadioFunction.moveItemToFirst(
+                array = filterredList,
+                item = radioRoom
+            )
+            simpleMediaViewModel.loadData(list)
+             simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
         } catch (e: IOException) {
@@ -179,19 +172,9 @@ class FavoriteRadioFragment :
     }
 
     override fun onMoreItemClick(radio: RadioEntity) {
-        val radioVariables = RadioEntity()
+        Log.d("jjdnsqq","ff"+radio.toString())
 
-        radioVariables.name = radio.name
-        radioVariables.bitrate = radio.bitrate
-        radioVariables.country = radio.country
-        radioVariables.stationuuid = radio.stationuuid
-        radioVariables.favicon = radio.favicon
-        radioVariables.language = radio.language
-        radioVariables.state = radio.state
-        radioVariables.streamurl = radio.streamurl
-        radioVariables.homepage = radio.homepage
-        radioVariables.tags = radio.tags
-        infoViewModel.putRadioInfo(radioVariables)
+        infoViewModel.putRadioInfo(radio)
         this@FavoriteRadioFragment.findNavController().navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment) //      NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment)
     }
 

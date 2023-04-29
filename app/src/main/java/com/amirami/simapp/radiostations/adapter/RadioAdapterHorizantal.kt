@@ -2,12 +2,15 @@ package com.amirami.simapp.radiostations.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.viewModels
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
+import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
@@ -16,8 +19,9 @@ import java.util.*
 
 // class RadioAdapterHorizantal (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterHorizantal.MyViewHolder>() {
 
-class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
+@UnstableApi class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
     ListAdapter<RadioEntity, RadioAdapterHorizantal.MyViewHolder>(DiffCallback()) {
+
 
     private val items = ArrayList<RadioEntity>()
     fun setItems(items: MutableList<RadioEntity>) {
@@ -25,7 +29,7 @@ class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
         this.items.addAll(items)
         notifyDataSetChanged()
     }
-    inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) :
+    @UnstableApi inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -42,10 +46,7 @@ class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
 
         fun bind(currentTvShow: RadioEntity) {
             binding.apply {
-                RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxV, MainActivity.darkTheme)
 
-                //  holder.CountriesTxV.text = GlobalCountriesJson[position]
                 descriptionTxV.text = currentTvShow.stationcount // globalStationcountsJson[position]
 
                 mainTxV.text = RadioFunction.countryCodeToName(currentTvShow.name)
@@ -63,7 +64,7 @@ class RadioAdapterHorizantal(private val listener: OnItemClickListener) :
                     } else {
                         RadioFunction.loadImageString(
                             root.context,
-                            COUNTRY_FLAGS_BASE_URL + currentTvShow.name.lowercase(Locale.ROOT),
+                            COUNTRY_FLAGS_BASE_URL + currentTvShow.name.lowercase(Locale.ROOT)+".svg",
 
                             MainActivity.imagedefaulterrorurl,
 

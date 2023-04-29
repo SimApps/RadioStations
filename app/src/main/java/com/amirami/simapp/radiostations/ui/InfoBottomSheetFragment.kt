@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.navArgs
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
@@ -30,7 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class InfoBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: YesNoDialogueBinding? = null
     override fun onCreateView(
@@ -52,14 +53,7 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
 
         var go = resources.getString(R.string.GO)
 
-        collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorLinearlayoutTransitionBottomSheet(
-                binding.infobtmsheetlayout,
-                0,
-                it
-            )
-            RadioFunction.maintextviewColor(binding.messageTxtVw, it)
-        }
+
 
         when (argsFrom.title) {
             getString(R.string.discaimertitle), getString(R.string.Keep_in_mind) -> {
@@ -70,7 +64,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     messageTxtVw.text = argsFrom.msg
                     // binding.btnNon.text = getString(R.string.Exit)
                     yesnoDivider.visibility = View.GONE
-                    verticalDividerDialogue.visibility = View.GONE
                     btnOui.visibility = View.GONE
                     btnNon.visibility = View.GONE
                 }
@@ -87,7 +80,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                         go = resources.getString(R.string.Exit)
                         binding.btnOui.visibility = View.GONE
                         binding.yesnoDivider.visibility = View.GONE
-                        binding.verticalDividerDialogue.visibility = View.GONE
                     }
                 } else {
                     binding.messageTxtVw.text = resources.getString(R.string.nobatterieoptimisationmessageso)
@@ -95,7 +87,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.btnOui.text = go
                 binding.TitleTxtVw.visibility = View.GONE
-                binding.verticalDividerDialogue.visibility = View.GONE
                 binding.btnNon.visibility = View.GONE
 
                 binding.apply {
@@ -112,7 +103,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     messageTxtVw.text = argsFrom.recordname
                     // binding.btnNon.text = getString(R.string.Exit)
                     yesnoDivider.visibility = View.VISIBLE
-                    verticalDividerDialogue.visibility = View.VISIBLE
                     btnOui.visibility = View.VISIBLE
                     btnNon.visibility = View.VISIBLE
                 }
@@ -125,7 +115,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     btnOui.visibility = View.VISIBLE
                     btnNon.visibility = View.VISIBLE
                     yesnoDivider.visibility = View.VISIBLE
-                    verticalDividerDialogue.visibility = View.VISIBLE
                     TitleTxtVw.text = getString(R.string.DisconnectMsg)
                 }
             }
@@ -139,7 +128,6 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
                     btnOui.visibility = View.VISIBLE
                     btnNon.visibility = View.VISIBLE
                     yesnoDivider.visibility = View.VISIBLE
-                    verticalDividerDialogue.visibility = View.VISIBLE
                     TitleTxtVw.text = getString(R.string.deleteuserMSG)
                 }
             }
@@ -153,14 +141,12 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
             if (argsFrom.title == "BatterieOptimisation") {
                 // Do something when user press the positive button
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (go == resources.getString(R.string.Exit)) {
-                        dismiss()
-                    } else {
-                        requestMultiplePermissions.launch(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-                        //    startActivityForResult(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS), 0)
-                        dismiss()
-                    }
+                if (go == resources.getString(R.string.Exit)) {
+                    dismiss()
+                } else {
+                    requestMultiplePermissions.launch(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    //    startActivityForResult(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS), 0)
+                    dismiss()
                 }
             } else if (argsFrom.title == getString(R.string.Recordings)) {
                 if (RadioFunction.getRecordedFiles(requireContext()).size > 0 && argsFrom.msg.toInt() != -2) {

@@ -6,7 +6,6 @@ import com.amirami.simapp.downloader.core.database.DownloaderDatabase
 import com.amirami.simapp.downloader.helper.ConnectionHelper
 import android.Manifest
 import android.content.Context
-import android.os.AsyncTask
 import android.util.Log
 import androidx.annotation.CheckResult
 import androidx.annotation.RequiresPermission

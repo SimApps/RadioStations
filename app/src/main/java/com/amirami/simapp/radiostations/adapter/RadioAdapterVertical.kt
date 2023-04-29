@@ -1,13 +1,16 @@
 package com.amirami.simapp.radiostations.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
@@ -17,16 +20,17 @@ import java.util.*
 
 // class RadioAdapterVertical (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
-class RadioAdapterVertical(private val listener: OnItemClickListener) :
+@UnstableApi class RadioAdapterVertical(private val listener: OnItemClickListener) :
     ListAdapter<RadioEntity, RadioAdapterVertical.MyViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
     private val items = ArrayList<RadioEntity>()
     fun setItems(items: MutableList<RadioEntity>) {
         this.items.clear()
         this.items.addAll(items)
+
         notifyDataSetChanged()
     }
-    inner class MyViewHolder(val binding: RadioTiketMainBinding) :
+    @UnstableApi inner class MyViewHolder(val binding: RadioTiketMainBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -43,46 +47,39 @@ class RadioAdapterVertical(private val listener: OnItemClickListener) :
                         listener.onMoreItemClick(items[bindingAdapterPosition])
                     }
                 }
+                favListIcon.setSafeOnClickListener {
+                    if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                     //   favListIcon.setFavIcon(!items[bindingAdapterPosition].fav)
+                        Log.d("jjhnbv","nn "+items[bindingAdapterPosition].fav.toString())
+                        listener.onFavClick(items[bindingAdapterPosition])
+                        Log.d("jjhnbv",items[bindingAdapterPosition].fav.toString())
+                    }
+                }
+                Log.d("iikjnhb","xx")
             }
         }
 
-        fun bind(currentTvShow: RadioEntity) {
+        fun bind(radioEntity: RadioEntity) {
             binding.apply {
-                RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
 
-                RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
+Log.d("iikjnhb","aa")
+                if (bindingAdapterPosition != RecyclerView.NO_POSITION)
+                    favListIcon.setFavIcon(items[bindingAdapterPosition].fav)
 
-                mainTxVw.text = currentTvShow.name
+
+                mainTxVw.text = radioEntity.name
                 descriptionTxVw.text = root.context.getString(
                     R.string.stationinfo,
-                    if (currentTvShow.bitrate != "")currentTvShow.bitrate + if (currentTvShow.language != "" || currentTvShow.language != "")" kbps, " else " kbps " else "",
-                    if (currentTvShow.country != "")currentTvShow.country + if (currentTvShow.language != "")", " else "" else "",
-                    if (currentTvShow.language != "")currentTvShow.language else ""
+                    if (radioEntity.bitrate != "")radioEntity.bitrate + if (radioEntity.language != "")" kbps, " else " kbps " else "",
+                    if (radioEntity.country != "")radioEntity.country + if (radioEntity.language != "")", " else "" else "",
+                    if (radioEntity.language != "")radioEntity.language else ""
                 )
 
-                    /*    fun stationInfo():String{
-                 return if (currentTvShow.bitrate!=""&&currentTvShow.country!= "" && currentTvShow.language!= "")
-                     currentTvShow.bitrate + "kbps, " + currentTvShow.country+ ", " + currentTvShow.language
-                   else if (currentTvShow.bitrate != "" && currentTvShow.country != "" && currentTvShow.language == "")
-                     currentTvShow.bitrate + "kbps, " + currentTvShow.country
-                   else if (currentTvShow.bitrate!= "" && currentTvShow.country=="" && currentTvShow.language != "")
-                     currentTvShow.bitrate +"kbps, "+ currentTvShow.language!=""
-                   else if (currentTvShow.bitrate==""&&currentTvShow.country!="" &&currentTvShow.language!="")
-                     currentTvShow.country+ ", "+currentTvShow.language
-                   else if (currentTvShow.bitrate!=""&&currentTvShow.country==""&& currentTvShow.language=="")
-                     currentTvShow.bitrate +"kbps"
-                   else if(currentTvShow.bitrate==""&&currentTvShow.country!=""&& currentTvShow.language=="")
-                     currentTvShow.country
-                   else if (currentTvShow.bitrate==""&&currentTvShow.country==""&& currentTvShow.language!="")
-                     currentTvShow.language
-                   else ""
-               }*/
+
 
                 RadioFunction.loadImageString(
                     root.context,
-                    currentTvShow.favicon,
+                    radioEntity.favicon,
                     MainActivity.imagedefaulterrorurl,
                     ImageView,
                     Constatnts.CORNER_RADIUS_8F
@@ -133,11 +130,13 @@ class RadioAdapterVertical(private val listener: OnItemClickListener) :
     interface OnItemClickListener {
         fun onItemClick(radio: RadioEntity)
         fun onMoreItemClick(radio: RadioEntity)
+
+        fun onFavClick(radio: RadioEntity)
     }
 
     override fun onBindViewHolder(holder: RadioAdapterVertical.MyViewHolder, position: Int) {
-        val currentTvShow = items[position] // radiodiffer[position]
-        holder.bind(currentTvShow)
+
+        holder.bind(items[position])
     }
 
     override fun getSectionName(position: Int): String {

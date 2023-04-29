@@ -22,7 +22,6 @@ class TagsAdapterHorizantal(private val item: ArrayList<String>, private val ima
 
         fun bind(position: Int) {
             binding.apply {
-                RadioFunction.maintextviewColor(mainTxV, MainActivity.darkTheme)
                 //   RadioFunction.secondarytextviewColor(NbrradioStationTxV)
                 mainTxV.text = item[position].replaceFirstChar { it.uppercase() }
 

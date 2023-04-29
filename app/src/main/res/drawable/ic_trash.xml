@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+  <path
+      android:pathData="M33,28C34.1046,28 35,28.8955 35,30V58C35,59.1046 34.1046,60 33,60C31.8954,60 31,59.1046 31,58V30C31,28.8955 31.8954,28 33,28Z"
+      android:fillColor="#F2C94C"/>
+  <path
+      android:pathData="M49,30C49,28.8955 48.1046,28 47,28C45.8954,28 45,28.8955 45,30V58C45,59.1046 45.8954,60 47,60C48.1046,60 49,59.1046 49,58V30Z"
+      android:fillColor="#F2C94C"/>
+  <path
+      android:pathData="M33.9256,10.3865C33.317,10.3865 32.7415,10.6636 32.362,11.1395L26.8909,18H15C13.8954,18 13,18.8955 13,20C13,21.1046 13.8954,22 15,22H17V64C17,67.3137 19.6863,70 23,70H57C60.3137,70 63,67.3137 63,64V22H65C66.1046,22 67,21.1046 67,20C67,18.8955 66.1046,18 65,18H53.1091L47.638,11.1395C47.2585,10.6636 46.683,10.3865 46.0744,10.3865H33.9256ZM32.0082,17.9986L34.8888,14.3865H45.1112L47.9918,17.9986H32.0082ZM21,64V22H59V64C59,65.1046 58.1046,66 57,66H23C21.8954,66 21,65.1046 21,64Z"
+      android:fillColor="#F2C94C"
+      android:fillType="evenOdd"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M33,28C34.1046,28 35,28.8955 35,30V58C35,59.1046 34.1046,60 33,60C31.8954,60 31,59.1046 31,58V30C31,28.8955 31.8954,28 33,28Z"
+      android:strokeLineJoin="round"
+      android:fillColor="#00000000"
+      android:strokeColor="#F2C94C"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M49,30C49,28.8955 48.1046,28 47,28C45.8954,28 45,28.8955 45,30V58C45,59.1046 45.8954,60 47,60C48.1046,60 49,59.1046 49,58V30Z"
+      android:strokeLineJoin="round"
+      android:fillColor="#00000000"
+      android:strokeColor="#F2C94C"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M33.9256,10.3865C33.317,10.3865 32.7415,10.6636 32.362,11.1395L26.8909,18H15C13.8954,18 13,18.8955 13,20C13,21.1046 13.8954,22 15,22H17V64C17,67.3137 19.6863,70 23,70H57C60.3137,70 63,67.3137 63,64V22H65C66.1046,22 67,21.1046 67,20C67,18.8955 66.1046,18 65,18H53.1091L47.638,11.1395C47.2585,10.6636 46.683,10.3865 46.0744,10.3865H33.9256ZM32.0082,17.9986L34.8888,14.3865H45.1112L47.9918,17.9986H32.0082ZM21,64V22H59V64C59,65.1046 58.1046,66 57,66H23C21.8954,66 21,65.1046 21,64Z"
+      android:strokeLineJoin="round"
+      android:fillColor="#00000000"
+      android:fillType="evenOdd"
+      android:strokeColor="#F2C94C"
+      android:strokeLineCap="round"/>
+</vector>

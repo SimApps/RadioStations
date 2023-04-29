@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- for Common view Size -->
+    <dimen name="element_spacing_super_ultra_large">120dp</dimen>
+    <dimen name="element_spacing_ultra_large">56dp</dimen>
+    <dimen name="element_spacing_super_large">40dp</dimen>
+    <dimen name="element_spcaing_xxxxlarge">36dp</dimen>
+    <dimen name="element_spacing_xxxlarge">32dp</dimen>
+    <dimen name="element_spacing_xxlarge">24dp</dimen>
+    <dimen name="element_spacing_xlarge">20dp</dimen>
+    <dimen name="element_spacing_large">16dp</dimen>
+    <dimen name="element_spacing_xnormal">12dp</dimen>
+    <dimen name="element_spacing_normal">8dp</dimen>
+    <dimen name="element_spacing_xsmall">6dp</dimen>
+    <dimen name="element_spacing_small">4dp</dimen>
+    <dimen name="element_spacing_tiny">2dp</dimen>
+    <dimen name="element_spacing_none">0dp</dimen>
+
+    <!-- for TextSize -->
+    <dimen name="text_h1">76sp</dimen>
+    <dimen name="text_h2">64sp</dimen>
+    <dimen name="text_h3">52sp</dimen>
+    <dimen name="text_h4">48sp</dimen>
+    <dimen name="text_p1">28sp</dimen>
+    <dimen name="text_p2">24sp</dimen>
+    <dimen name="text_p3">20sp</dimen>
+    <dimen name="text_p4">18sp</dimen>
+    <dimen name="text_p5">16sp</dimen>
+
+    <!-- size for background corner -->
+    <dimen name="item_rounded_corner">40dp</dimen>
+    <dimen name="sub_item_rounded_corner">20dp</dimen>
+
+    <!-- size for check button -->
+    <dimen name="check_button_head_diameter">24dp</dimen>
+    <dimen name="check_button_radius">16dp</dimen>
+    <dimen name="check_button_width">76dp</dimen>
+    <dimen name="check_button_height">24dp</dimen>
+    <dimen name="check_button_stroke">2dp</dimen>
+
+    <!-- size for alarSet-->
+    <dimen name="alarmSet_button_corner_radius">20dp</dimen>
+    <dimen name="alarmSet_button_width">120dp</dimen>
+    <dimen name="alarmSet_image_width">36dp</dimen>
+    <dimen name="alarmSet_image_height">56dp</dimen>
+    <dimen name="alarmSet_refresh_diameter">32dp</dimen>
+
+    <!-- size for Fit button (button with image)-->
+    <dimen name="fibButton_icon_margin_start">8dp</dimen>
+    <dimen name="fitButton_icon_margin_end">4dp</dimen>
+    <dimen name="fitButton_corner_radius">8dp</dimen>
+    <dimen name="fitButton_div_width">1dp</dimen>
+    <dimen name="fitButton_div_height">40dp</dimen>
+    <dimen name="fitButton_icon_width">28dp</dimen>
+    <dimen name="fitButton_icon_height">28dp</dimen>
+
+    <!-- size for week button -->
+    <dimen name="week_button_width">48dp</dimen>
+    <dimen name="week_button_height">56dp</dimen>
+    <dimen name="week_button_corner_radius">60dp</dimen>
+    <dimen name="week_button_stroke">2dp</dimen>
+
+    <!-- size for splash layout -->
+    <dimen name="splash_animation_diagram">270dp</dimen>
+    <dimen name="splash_progressbar_thickness">12dp</dimen>
+    <dimen name="splash_progressbar_radius">2dp</dimen>
+
+    <!-- size for alarm item -->
+    <dimen name="alarm_item_width">168dp</dimen>
+
+    <!-- size for custom dialog -->
+    <dimen name="custom_dialog_width">320dp</dimen>
+
+</resources>

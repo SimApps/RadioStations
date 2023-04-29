@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="alarmData"
+            type="com.amirami.simapp.radiostations.pairalarm.database.table.AlarmData" />
+
+        <variable
+            name="weekend"
+            type="com.amirami.simapp.radiostations.pairalarm.database.table.Weekend" />
+
+        <variable
+            name="manualChangeForHour"
+            type="Boolean" />
+    </data>
+
+    <ScrollView
+        android:id="@+id/scrollLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.easyo.pairalarm.ui.activity.NormalAlarmSetActivity">
+
+        <LinearLayout
+            android:id="@+id/rootLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/element_spacing_large"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/element_spacing_xxxlarge">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/alarmName_editTextLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/alarm"
+                app:startIconDrawable="@drawable/ic_clock"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/alarmName_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:text="@{alarmData.name}"
+                     />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/radioNameTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/element_spacing_xlarge"
+                android:layout_marginBottom="@dimen/element_spacing_small"
+                android:background="@drawable/item_stroke_rounded_corner_clear"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <NumberPicker
+                    android:id="@+id/numberPickerAMPM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/element_spacing_xxlarge"
+
+                    app:hourForAMPM="@{alarmData.hour}"
+                    app:manualChange="@{manualChangeForHour}"
+                    app:minForAMPM="@{alarmData.minute}" />
+
+                <NumberPicker
+                    android:id="@+id/numberPickerHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/element_spacing_normal"
+
+                    app:hour="@{alarmData.hour}" />
+
+                <TextView
+                    android:id="@+id/textView_nothing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/naver_bold"
+                    android:text="@string/time_split"
+                    android:textSize="@dimen/text_p1" />
+
+                <NumberPicker
+                    android:id="@+id/numberPickerMin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/element_spacing_normal"
+
+                    android:value="@{alarmData.minute}" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/element_spacing_xnormal"
+                android:background="@drawable/item_stroke_rounded_corner_clear"
+                android:orientation="horizontal"
+                android:padding="@dimen/element_spacing_tiny">
+
+                <!-- 요일 시작-->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/monButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/monday_short"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeWidth="@dimen/element_spacing_tiny"
+                    app:week="@{weekend.WEEK}"
+                    app:weekClicked="@{alarmData.mon}" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tueButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/tuesday_short"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeWidth="@dimen/element_spacing_tiny"
+                    app:week="@{weekend.WEEK}"
+                    app:weekClicked="@{alarmData.tue}" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/wedButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/wednesday_short"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeWidth="@dimen/element_spacing_tiny"
+                    app:week="@{weekend.WEEK}"
+                    app:weekClicked="@{alarmData.wed}" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/thurButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/thursday_short"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeWidth="2dp"
+                    app:week="@{weekend.WEEK}"
+                    app:weekClicked="@{alarmData.thu}" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/friButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/friday_short"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeWidth="@dimen/element_spacing_tiny"
+                    app:week="@{weekend.WEEK}"
+                    app:weekClicked="@{alarmData.fri}" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/satButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/saturday_short"
+                    android:textColor="@color/main_deepBlue"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeColor="@color/background"
+                    app:strokeWidth="@dimen/element_spacing_tiny"
+                    app:week="@{weekend.SAT}"
+                    app:weekClicked="@{alarmData.sat}" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sunButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/week_button_width"
+                    android:layout_height="@dimen/week_button_height"
+                    android:layout_margin="@dimen/element_spacing_small"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/naver_bold"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="@string/sunday_short"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_p3"
+                    app:cornerRadius="@dimen/week_button_corner_radius"
+                    app:strokeWidth="@dimen/element_spacing_tiny"
+                    app:week="@{weekend.SUN}"
+                    app:weekClicked="@{alarmData.sun}" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/image_vibration"
+                    android:layout_width="@dimen/alarmSet_image_width"
+                    android:layout_height="@dimen/alarmSet_image_height"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_no_vib"
+                    app:vibrateMode="@{alarmData.vibration}" />
+
+                <ImageView
+                    android:id="@+id/image_volume"
+                    android:layout_width="@dimen/alarmSet_image_width"
+                    android:layout_height="@dimen/alarmSet_image_height"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/volume_icon"
+                    app:volume="@{alarmData.volume}" />
+
+                <SeekBar
+                    android:id="@+id/volumeSeekBar"
+                    style="@android:style/Widget.DeviceDefault.Light.SeekBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:max="100"
+                    android:min="0"
+                    android:progress="@{alarmData.volume}"
+                    android:theme="@style/seekbarTheme"
+                    android:thumb="?android:attr/textSelectHandle" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/element_spacing_xnormal">
+
+                <com.github.nikartm.button.FitButton
+                    android:id="@+id/selectMode_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/element_spacing_xnormal"
+                    android:layout_weight="1"
+                    android:enabled="true"
+                    android:gravity="center_vertical"
+                    app:fb_backgroundColor="@color/mainColor"
+                    app:fb_cornerRadius="@dimen/fitButton_corner_radius"
+                    app:fb_divColor="#fff"
+                    app:fb_divHeight="@dimen/fitButton_div_height"
+                    app:fb_divWidth="@dimen/fitButton_div_width"
+                    app:fb_icon="@drawable/calculator"
+                    app:fb_iconColor="#FFF"
+                    app:fb_iconHeight="@dimen/fitButton_icon_height"
+                    app:fb_iconMarginEnd="@dimen/fitButton_icon_margin_end"
+                    app:fb_iconMarginStart="@dimen/fibButton_icon_margin_start"
+                    app:fb_iconPosition="left"
+                    app:fb_iconWidth="@dimen/fitButton_icon_width"
+                    app:fb_rippleColor="#FBE9E7"
+                    app:fb_shape="rectangle"
+                    app:fb_text="@string/alarmSet_selectMode"
+                    app:fb_textColor="#FFF"
+                    app:fb_textPaddingEnd="@dimen/element_spacing_xnormal"
+                    app:fb_textPaddingStart="@dimen/element_spacing_xnormal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/element_spacing_xsmall"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/nanumgothicextrabold"
+                    android:gravity="center"
+                    android:text="@string/alarmSet_selectModeTextTitle"
+                     />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/element_spacing_xnormal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/text_currentMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/nanumgothicbold"
+                    android:gravity="center"
+                    android:text="@string/alarmSet_selectModeTextTitle"
+                    android:textSize="@dimen/text_p5"
+                    app:alarmMode="@{alarmData.mode}" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/cancelButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/alarmSet_button_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/element_spacing_xlarge"
+                    android:layout_marginRight="@dimen/element_spacing_xlarge"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:padding="@dimen/element_spacing_xnormal"
+                    android:text="@string/cancel"
+                    app:cornerRadius="@dimen/alarmSet_button_corner_radius" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/saveButton"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="@dimen/alarmSet_button_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/element_spacing_xlarge"
+                    android:layout_marginRight="@dimen/element_spacing_xlarge"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:padding="@dimen/element_spacing_xnormal"
+                    android:text="@string/update"
+                    app:alarmCode="@{alarmData.alarmCode}"
+                    app:cornerRadius="@dimen/alarmSet_button_corner_radius" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+</layout>

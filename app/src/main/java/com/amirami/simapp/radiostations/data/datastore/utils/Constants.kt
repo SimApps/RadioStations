@@ -11,8 +11,6 @@ const val DARK_THEME_KEY = "dark_theme"
 
 const val FIRST_TIMEOPEN_RECORD_FOLDER_KEY = "first_timeopen_record_folder"
 
-const val SYSTEM_THEME_KEY = "system_theme"
-const val SWITCH_TIMER_DATA_KEY = "switch_timer_data"
 const val SAVE_DATA_KEY = "save_data"
 
 const val DEFAULT_COUNTRY_KEY = "default_country"

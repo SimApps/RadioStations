@@ -1,11 +1,14 @@
 package com.amirami.simapp.radiostations.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.* // ktlint-disable no-wildcard-imports
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
@@ -13,7 +16,7 @@ import com.amirami.simapp.radiostations.utils.Constatnts
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
-class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
+@UnstableApi class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
     ListAdapter<MutableList<RadioEntity>, RadioFavoriteAdapterVertical.FavViewHolder>(DiffCallback()),
     FastScrollRecyclerView.SectionedAdapter {
     // class RadioFavoriteAdapter (private val listener: OnItemClickListener): RecyclerView.Adapter<RadioFavoriteAdapter.FavViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
@@ -41,7 +44,7 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
 
     override fun getItemCount(): Int = items.size // differ.currentList.size     //fidCardDBList.size
 
-    inner class FavViewHolder(private val binding: RadioTiketMainBinding) :
+    @UnstableApi inner class FavViewHolder(private val binding: RadioTiketMainBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -60,8 +63,8 @@ class RadioFavoriteAdapterVertical(private val listener: OnItemClickListener) :
 
         fun bind(radioRoom: RadioEntity) {
             binding.apply {
-                RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
+                binding.favListIcon.setFavIcon(radioRoom.fav)
+
                 mainTxVw.text = radioRoom.name
                 descriptionTxVw.text = root.context.getString(
                     R.string.stationinfo,

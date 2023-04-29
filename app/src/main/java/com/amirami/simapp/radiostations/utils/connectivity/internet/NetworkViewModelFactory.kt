@@ -1,4 +1,4 @@
-package com.asmtunis.asm.core.utils.connectivity.internet
+package com.amirami.asm.core.utils.connectivity.internet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

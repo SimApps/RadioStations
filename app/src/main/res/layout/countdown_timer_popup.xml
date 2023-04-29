@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/popupcountdown"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -24,15 +25,16 @@
 
             android:textSize="18sp" />
 
-        <androidx.appcompat.widget.SwitchCompat
+
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_tmer_data"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="0.45"
             android:text="Timer"
 
-            android:textSize="18sp"
-            android:theme="@style/SCBSwitch" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <TextView
@@ -63,6 +65,7 @@
             <NumberPicker
                 android:id="@+id/numberPickers"
                 android:layout_width="0dp"
+
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_weight="1" />
@@ -99,13 +102,18 @@
         android:layout_marginTop="12dp"
         android:layout_marginRight="3dp"
 
-        android:background="@color/defaultcolor" />
+         />
 
 
-    <TextView
+
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_start_pause"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+
+
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="20dp"
@@ -113,7 +121,31 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="@string/Start"
-        android:textColor="@color/defaultcolor"
         android:textSize="20sp" />
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/view5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:dividerInsetStart="16dp"
+        app:dividerInsetEnd="16dp"
+        />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addalarmimageView"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+
+
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="12dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/Set_Alarm"
+        android:textSize="20sp" />
+
 
 </LinearLayout>

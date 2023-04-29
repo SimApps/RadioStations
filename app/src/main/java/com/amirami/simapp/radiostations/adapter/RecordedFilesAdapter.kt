@@ -1,7 +1,9 @@
 package com.amirami.simapp.radiostations.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,17 +14,17 @@ import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioTiketMainBinding
-import com.amirami.simapp.radiostations.model.RecordInfo
+import com.amirami.simapp.radiostations.model.RadioEntity
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.ArrayList
 
 class RecordedFilesAdapter(private val listener: OnItemClickListener) :
-    ListAdapter<MutableList<RecordInfo>, RecordedFilesAdapter.RecViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
+    ListAdapter<MutableList<RadioEntity>, RecordedFilesAdapter.RecViewHolder>(DiffCallback()), FastScrollRecyclerView.SectionedAdapter {
 
-    private val items = ArrayList<RecordInfo>()
-    private lateinit var productShopingRoom: RecordInfo
+    private val items = ArrayList<RadioEntity>()
+    private lateinit var productShopingRoom: RadioEntity
 
-    fun setItems(items: MutableList<RecordInfo>) {
+    fun setItems(items: MutableList<RadioEntity>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -43,7 +45,7 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
         return items.size // fidCardDBList.size
     }
 
-    inner class RecViewHolder(private val binding: RadioTiketMainBinding) :
+    @UnstableApi inner class RecViewHolder(private val binding: RadioTiketMainBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -60,10 +62,10 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(recordInfo: RecordInfo) {
+        fun bind(recordInfo: RadioEntity) {
             binding.apply {
-                RadioFunction.maintextviewColor(mainTxVw, MainActivity.darkTheme)
-                RadioFunction.secondarytextviewColor(descriptionTxVw, MainActivity.darkTheme)
+
+                favListIcon.visibility = View.GONE
 
                 //   val scale: Float = root.context.resources.displayMetrics.density
                 //   val pixels = (32 * scale + 0.5f).toInt()
@@ -108,15 +110,15 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
 
     interface OnItemClickListener {
 
-        fun onRecItemClick(recordInfo: RecordInfo)
-        fun onRecMoreItemClick(recordInfo: RecordInfo, position: Int)
+        fun onRecItemClick(recordInfo: RadioEntity)
+        fun onRecMoreItemClick(recordInfo: RadioEntity, position: Int)
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<MutableList<RecordInfo>>() {
-        override fun areItemsTheSame(oldItem: MutableList<RecordInfo>, newItem: MutableList<RecordInfo>) =
+    class DiffCallback : DiffUtil.ItemCallback<MutableList<RadioEntity>>() {
+        override fun areItemsTheSame(oldItem: MutableList<RadioEntity>, newItem: MutableList<RadioEntity>) =
             oldItem[0].name == newItem[0].name
 
-        override fun areContentsTheSame(oldItem: MutableList<RecordInfo>, newItem: MutableList<RecordInfo>) =
+        override fun areContentsTheSame(oldItem: MutableList<RadioEntity>, newItem: MutableList<RadioEntity>) =
             oldItem == newItem
     }
 

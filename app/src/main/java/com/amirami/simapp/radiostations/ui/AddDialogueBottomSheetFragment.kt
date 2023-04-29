@@ -7,14 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.navArgs
-import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -23,24 +21,18 @@ import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.viewmodel.DownloaderViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
-import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.coroutines.CoroutineContext
 
 @UnstableApi @AndroidEntryPoint
 class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
     private val infoViewModel: InfoViewModel by activityViewModels()
     private var _binding: BottomsheetfragmentAdddialogueBinding? = null
-    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val downloaderViewModel: DownloaderViewModel by activityViewModels()
 
     val argsFrom: AddDialogueBottomSheetFragmentArgs by navArgs()
@@ -61,9 +53,7 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorTransitionBottomSheet(binding.containeraddoDialogue, 4, it)
-        }
+
 
         if (argsFrom.addDouwnload) {
             binding.RadioTagsTXviewaddLayout.visibility = View.GONE
@@ -110,7 +100,7 @@ class AddDialogueBottomSheetFragment : BottomSheetDialogFragment() {
 
                     )
 
-                    radioRoomViewModel.upsertRadio(radioroom, "Radio added")
+                    infoViewModel.upsertRadio(radioroom, "Radio added")
                     //  RadioFunction.recreateActivityCompat(RadioFunction.unwrap(requireContext()))
                     dismiss()
 

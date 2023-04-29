@@ -13,8 +13,8 @@ interface RadioRoomBaseRepository {
     // suspend fun  updateQuantity(quantity : Double,id:Long)
 
     // suspend fun  delete(customEntity : CustomEntity)
-    suspend fun delete(radioId: String?, fav: Boolean)
-    suspend fun updateFav(radioId: String?, fav: Boolean)
+    suspend fun delete(radioId: String?)
+
     suspend fun deleteAlarm(radioId: String?, isAlarm: Boolean)
 
     suspend fun deletelistened()

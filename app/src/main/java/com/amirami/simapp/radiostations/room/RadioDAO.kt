@@ -18,13 +18,13 @@ interface RadioDAO {
     //  @Query("DELETE FROM custom_table WHERE Id = :id")
     // fun delete(id : Int?)
 
-    @Query("DELETE FROM radio_table WHERE stationuuid = :radiouid and fav=:fav")
-    fun deleteFav(radiouid: String?, fav: Boolean)
+    @Query("DELETE FROM radio_table WHERE stationuuid = :radiouid")
+    fun deleteFav(radiouid: String?)
 
     @Query("UPDATE radio_table SET fav=:fav where stationuuid = :radiouid")
     fun UpdateFav(radiouid: String?, fav: Boolean)
 
-    @Query("DELETE FROM radio_table WHERE stationuuid = :radiouid and isAlarm=:isalarm")
+    @Query("DELETE FROM radio_table WHERE stationuuid = :radiouid and isAlarm!=:isalarm")
     fun deleteAlarm(radiouid: String?, isalarm: Boolean)
 
 

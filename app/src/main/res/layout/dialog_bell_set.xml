@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="@dimen/custom_dialog_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/element_spacing_super_large">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="@dimen/element_spacing_xlarge"
+            android:text="@string/dialog_bell_set_title"
+            android:textSize="@dimen/text_p3"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/RadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <RadioButton
+            android:id="@+id/radioButton_N1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nanumgothicbold"
+            android:textSize="@dimen/text_p5"
+            android:text="@string/bellType_Normal_Walking" />
+
+        <RadioButton
+            android:id="@+id/radioButton_N2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_p5"
+            android:fontFamily="@font/nanumgothicbold"
+            android:text="@string/bellType_Normal_PianoMan" />
+
+        <RadioButton
+            android:id="@+id/radioButton_N3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_p5"
+            android:fontFamily="@font/nanumgothicbold"
+            android:text="@string/bellType_Normal_Happy" />
+
+        <RadioButton
+            android:id="@+id/radioButton_N4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_p5"
+            android:fontFamily="@font/nanumgothicbold"
+            android:text="@string/bellType_Normal_Lonely" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/element_spacing_normal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/playButton"
+                android:layout_width="@dimen/alarmSet_button_width"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/element_spacing_normal"
+                app:cornerRadius="@dimen/element_spacing_xlarge"
+                android:layout_weight="1"
+                android:padding="@dimen/element_spacing_xnormal"
+                android:text="@string/play" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveButton"
+                android:layout_width="@dimen/alarmSet_button_width"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/element_spacing_normal"
+                app:cornerRadius="@dimen/element_spacing_xlarge"
+                android:layout_weight="1"
+                android:padding="@dimen/element_spacing_xnormal"
+                android:text="@string/save" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

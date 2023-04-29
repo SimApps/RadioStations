@@ -19,44 +19,6 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/toggleButtonGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/choosedefTitle"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:singleSelection="true">
-
-        <Button
-            android:id="@+id/btnDark"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Dark"
-            android:textAllCaps="false"
-            android:theme="@style/ThemeOverlay.Custom.Button" />
-
-        <Button
-            android:id="@+id/btnLight"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Light"
-            android:textAllCaps="false"
-            android:theme="@style/ThemeOverlay.Custom.Button" />
-
-        <Button
-            android:id="@+id/btnSysThme"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/setbysystem"
-            android:textAllCaps="false"
-            android:theme="@style/ThemeOverlay.Custom.Button" />
-
-    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <ProgressBar
         android:id="@+id/spin_kit_country_fav"

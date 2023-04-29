@@ -1,36 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorAccent">@color/dark_Primary_Backround</item>
+    <style name="Theme.MyApplication" parent="Theme.Material3.DynamicColors.DayNight">
 
-        <!-- NAV BAR. -->
-        <item name="colorPrimary">@color/dark_Primary_Backround</item>
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
 
-        <!-- TOOL BAR.  To CHEJ+K FOR NAV IMAGE BACKROUND -->
-        <item name="colorPrimaryDark">@color/dark_Primary_Backround</item>
+        <!--  <item name="android:colorAccent">?colorPrimary</item>-->
+        <!-- Preference switch -->
+        <!--  <item name="android:colorControlActivated">?colorPrimary</item>-->
 
-        <!-- nav bar text color. -->
-        <item name="android:textColorPrimary">@color/defaultcolor</item>
-
-        <!-- statut bar color. -->
-        <item name="android:colorPrimaryDark">@color/dark_Secondary_Backround</item>
-
-
-        <item name="android:textColorSecondary">@color/songTimerColor</item>
-
-        <item name="android:textColor">@color/defaultcolor</item>
-
-
-        <!-- NAV BAR. -->
-        <item name="android:navigationBarColor" >@color/darks_Search_Opened_backround</item>
-
-        <item name="android:textColorHint">@color/colorPrimaryWhite</item>
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-
-        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 
 
@@ -47,60 +27,14 @@
         <item name="android:height">15dp</item>
     </style>
 
-    <style name="Theme.MyApplication.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <!-- white theme. -->
-
-    <style name="whiteAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorAccent">@color/colorPrimaryWhite</item>
-
-        <!-- NAV BAR. -->
-        <item name="colorPrimary">@color/colorPrimaryWhite</item>
-
-        <!-- TOOL BAR.  To CHEJ+K FOR NAV IMAGE BACKROUND -->
-        <item name="colorPrimaryDark">@color/colorPrimaryWhite</item>
-
-        <!-- nav bar text color. -->
-        <item name="android:textColorPrimary">@color/holo_blue_dark</item>
-
-        <!-- statut bar color. -->
-        <item name="android:colorPrimaryDark">@color/gray</item>
 
 
-        <item name="android:textColorSecondary">@color/txtGray</item>
-
-        <item name="android:textColor">@color/holo_blue_dark</item>
-
-        <!-- NAV BAR. -->
-        <item name="android:navigationBarColor" >@color/gray</item>
-        <item name="android:textColorHint">@color/darks_Search_Opened_backround</item>
-    </style>
 
 
-    <style name="whiteAppTheme.AdAttribution">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">left</item>
-        <item name="android:textColor">@color/gray</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:text">@string/ad_attribution</item>
-        <item name="android:background">#FFCC66</item>
-        <item name="android:width">15dp</item>
-        <item name="android:height">15dp</item>
-    </style>
 
-    <style name="whiteAppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
+
+
+
 
     <style name="TrackSelectionDialogThemeOverlay" parent="ThemeOverlay.AppCompat.Dialog.Alert">
         <item name="windowNoTitle">false</item>
@@ -112,21 +46,9 @@
     </style>
 
 
-    <style name="SCBSwitch" parent="Theme.AppCompat.Light">
-        <!-- active thumb & track color (30% transparency) -->
-        <item name="colorControlActivated">#46bdbf</item>
 
-        <!-- inactive thumb color -->
-        <item name="colorSwitchThumbNormal">@color/defaultcolor</item>
 
-        <!-- inactive track color (30% transparency) -->
-        <item name="android:colorForeground">#42221f1f</item>
 
-    </style>
-
-    <style name="ThemeOverlay.Custom.Button" parent="">
-        <item name="colorPrimary">@color/orange</item>
-    </style>
 
 
     <style name="TextInputLayoutAppearance" parent="Widget.Design.TextInputLayout">
@@ -167,7 +89,5 @@
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
-    <style name="Button.Orange" parent="Theme.MyApplication">
-        <item name="colorPrimary">@color/orange</item>
-    </style>
+
 </resources>

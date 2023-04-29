@@ -1,14 +1,11 @@
 package com.amirami.simapp.radiostations.ui
 
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -17,7 +14,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.MainActivity.Companion.BASE_URL
-import com.amirami.simapp.radiostations.MainActivity.Companion.firstTimeopenRecordfolder
 import com.amirami.simapp.radiostations.MainActivity.Companion.saveData
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
 import com.amirami.simapp.radiostations.R
@@ -26,24 +22,20 @@ import com.amirami.simapp.radiostations.RadioFunction.countryCodeToName
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.getuserid
-import com.amirami.simapp.radiostations.RadioFunction.gradiancolorNestedScrollViewTransition
-import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.succesToast
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentSettingBinding
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
-import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
-import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
-import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -58,30 +50,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     private val dataViewModel: DataViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
-    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
 
-    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            // Successfully signed in
-            binding.signinOutItxVw.text = resources.getString(R.string.Déconnecter)
-            // _binding?.signinOutImVw?.setImageResource(R.drawable.ic_signout)
-            binding.signinOutItxVw.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_signout, 0, 0, 0)
-
-            succesToast(requireContext(), resources.getString(R.string.connectionsuccess))
-            // ...
-            getRadioUidListFromFirestoreAndITSaveInRoom(true)
-
-            userTxtVwVisibiity(true)
-        } else {
-            userTxtVwVisibiity(false)
-
-            errorToast(requireContext(), resources.getString(R.string.Échec_connexion))
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
-        }
-    }
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -91,6 +60,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
+
         if (result.resultCode == RESULT_OK) {
             // Successfully signed in
 
@@ -104,7 +74,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
             getRadioUidListFromFirestoreAndITSaveInRoom(true)
 
             userTxtVwVisibiity(true)
-        } else {
+        }
+        else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
@@ -132,13 +103,13 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 hideProgressBar()
                 /*  if (isProductAdded) {  }*/
             }
-            /* if (dataOrException.e != null) {
+             if (dataOrException.e != null) {
                  errorToast(requireContext(),dataOrException.e!!)
-                 if(dataOrException.e=="getRadioUID"){
+              /*   if(dataOrException.e=="getRadioUID"){
 
-                 }
+                 }*/
 
-             }*/
+             }
         }
     }
 
@@ -147,7 +118,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         binding = FragmentSettingBinding.bind(view)
         RadioFunction.interatialadsLoad(requireContext())
         infoViewModel.putTitleText(getString(R.string.Settings))
-        themeChange()
 
         conectDisconnectBtn()
     /*    if(getuserid()!="no_user"){
@@ -176,7 +146,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                         }
                         is InfoViewModel.ChooseDefBottomSheetEvents.PutDefThemeInfo -> {
                             run {
-                                themeChange()
                             }
                         }
 
@@ -222,7 +191,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
 
         binding.syncFavTxVw.setSafeOnClickListener {
-            radioRoomViewModel.deleteAll("")
+            infoViewModel.deleteAll("")
             getRadioUidListFromFirestoreAndITSaveInRoom(false)
         }
 
@@ -232,7 +201,11 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
 
         binding.LicencesTxtV.setSafeOnClickListener {
-            this@SettingFragment.findNavController().navigate(R.id.action_fragmentSetting_to_licencesBottomSheetFragment) //       NavHostFragment.findNavController(this).navigate(R.id.action_fragmentSetting_to_licencesBottomSheetFragment)
+          //  this@SettingFragment.findNavController().navigate(R.id.action_fragmentSetting_to_licencesBottomSheetFragment) //       NavHostFragment.findNavController(this).navigate(R.id.action_fragmentSetting_to_licencesBottomSheetFragment)
+
+            startActivity(Intent(requireActivity(), OssLicensesMenuActivity::class.java))
+
+
         }
 
         binding.ContactUsTxV.setSafeOnClickListener {
@@ -311,40 +284,12 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         // getuserid()!= "no_user"
         binding.signinOutItxVw.setSafeOnClickListener {
             if (binding.signinOutItxVw.text.toString() == resources.getString(R.string.Déconnecter)) {
-                goToLogInDialog()
+                goToLogOutDialog()
             } else createSignInIntent()
         }
     }
 
-    private fun themeChange() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putTheme.collectLatest {
-                    RadioFunction.switchColor(binding.saveData, it)
 
-                    gradiancolorNestedScrollViewTransition(binding.containerSetting, 4, it)
-                    maintextviewColor(binding.themeTxvw, it)
-                    maintextviewColor(binding.favCountryTxv, it)
-                    maintextviewColor(binding.radioServersTxv, it)
-                    maintextviewColor(binding.StaticsTxV, it)
-                    maintextviewColor(binding.textView19, it)
-                    maintextviewColor(binding.ContactUsTxV, it)
-                    maintextviewColor(binding.LicencesTxtV, it)
-                    maintextviewColor(binding.DisclaimerTxtV, it)
-                    maintextviewColor(binding.radioServersTxv, it)
-                    maintextviewColor(binding.batterisettings, it)
-                    maintextviewColor(binding.removeadsTxvw, it)
-                    maintextviewColor(binding.rateTxvw, it)
-                    maintextviewColor(binding.moreappsTxvw, it)
-                    maintextviewColor(binding.signinOutItxVw, it)
-                    maintextviewColor(binding.syncFavTxVw, it)
-                    maintextviewColor(binding.deleteAccountTxVw, it)
-                }
-            }
-        }
-
-        //   PreferenceManager.getDefaultSharedPreferences(this@Activity_Setting).edit().putBoolean("Theme switecher state", isChecked).apply()
-    }
 
     private fun moreApps() {
         val uri = Uri.parse("https://play.google.com/store/apps/developer?id=AmiRami")
@@ -401,7 +346,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
     }
 
-    private fun goToLogInDialog() {
+    private fun goToLogOutDialog() {
         val action = SettingFragmentDirections.actionFragmentSettingToInfoBottomSheetFragment("signinOut")
         this@SettingFragment.findNavController().navigate(action) //     NavHostFragment.findNavController(requireParentFragment()).navigate(action)
     }
@@ -435,14 +380,12 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 .build()
         )*/
 
-        val customLayout = AuthMethodPickerLayout.Builder(R.layout.activity_firebaseui_picker_login)
-            .setGoogleButtonId(R.id.btn_google_login)
-            .setEmailButtonId(R.id.email_button)
-            .build()
+
 
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
+            .enableAnonymousUsersAutoUpgrade()
             //  .setAuthMethodPickerLayout(customLayout)
             .setLogo(R.drawable.ic_radio_svg) // Set logo drawable
             .setTheme(R.style.FirebaseUI) // Set theme
@@ -483,13 +426,13 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 saveFaveRadioFromFirestoreToRoom()
                 for (i in 0 until productList[0].size) {
                     retrofitRadioViewModel.getRadiosByUId(productList[0][i])
-                    if (i == productList[0].size - 1 && saveRoomToFirestore) getFavRadioRoom()
+                    if (i == productList[0].size - 1 && saveRoomToFirestore) getFavRadioRoom(false)
                 }
                 hideProgressBar()
             }
 
             if (DataOrExceptionProdNames.e != null) {
-                if (saveRoomToFirestore) getFavRadioRoom()
+                if (saveRoomToFirestore) getFavRadioRoom(true)
                 hideProgressBar()
                 //  errorToast( requireContext(),DataOrExceptionProdNames.e.toString())
             }
@@ -507,7 +450,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                                 val radio = response.data[0]
 
                                 radio.fav = true
-                                radioRoomViewModel.upsertRadio(radio, "Radio added")
+                                infoViewModel.upsertRadio(radio, "Radio added")
                             }
                             // else showErrorConnection(response.message!!)
                         }
@@ -525,7 +468,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     }
 
     private fun displayProgressBar() {
-        binding.spinKitSetting.visibility = View.VISIBLE
+       binding.spinKitSetting.visibility = View.VISIBLE
     }
 
     private fun hideProgressBar() {
@@ -533,20 +476,20 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         RadioFunction.interatialadsShow(requireContext())
     }
 
-    private fun getFavRadioRoom() {
+    private fun getFavRadioRoom(createDocument : Boolean) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                radioRoomViewModel.favList.collectLatest { list ->
+                infoViewModel.favList.collectLatest { list ->
                     //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
                     if (list.isNotEmpty()) {
                         val favoriteFirestore = FavoriteFirestore(
-                            getuserid(),
-                            list.map { it.stationuuid } as ArrayList<String>,
-                            getCurrentDate()
+                            user_id = getuserid(),
+                            radio_favorites_list=  list.map { it.stationuuid } as ArrayList<String>,
+                            last_date_modified =  getCurrentDate()
                         )
-                        createUserDocument(favoriteFirestore)
-                    } else createUserDocument(FavoriteFirestore(getuserid(), ArrayList<String>(), getCurrentDate()))
+                     if(createDocument)   createUserDocument(favoriteFirestore)
+                    } else  if(createDocument)  createUserDocument(FavoriteFirestore(getuserid(), ArrayList<String>(), getCurrentDate()))
                 }
             }
         }
@@ -554,15 +497,5 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
     }
 
-    private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
-        val addFavoritRadioIdInArrayFirestore =
-            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(radioUid, getCurrentDate())
-        addFavoritRadioIdInArrayFirestore.observe(this) {
-            // if (it != null)  if (it.data!!)  prod name array updated
-            if (it.e != null) {
-                // prod bame array not updated
-                errorToast(requireContext(), it.e!!)
-            }
-        }
-    }
+
 }

@@ -32,41 +32,21 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/radioerror" />
 
-        <ImageView
-            android:id="@+id/likeImageView"
-            android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_marginTop="9dp"
-            android:layout_marginEnd="9dp"
-            android:src="@drawable/ic_like"
-            app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/VistitStationhomepageIm"
-            app:layout_constraintTop_toBottomOf="@id/Radio_image" />
+
 
         <ImageView
             android:id="@+id/VistitStationhomepageIm"
             android:layout_width="0dp"
             android:layout_height="35dp"
             android:layout_marginTop="9dp"
-            android:layout_marginEnd="38dp"
+
             android:src="@drawable/chrome"
             app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
-            app:layout_constraintEnd_toStartOf="@+id/likeImageView"
-            app:layout_constraintStart_toEndOf="@+id/gotorecordfilesImVw"
-            app:layout_constraintTop_toBottomOf="@id/Radio_image" />
-
-        <ImageView
-            android:id="@+id/gotorecordfilesImVw"
-            android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_marginTop="9dp"
-            android:layout_marginEnd="37dp"
-            android:src="@drawable/ic_recordings_folder"
-            app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
-            app:layout_constraintEnd_toStartOf="@+id/VistitStationhomepageIm"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/shareImageView"
             app:layout_constraintTop_toBottomOf="@id/Radio_image" />
+
+
 
         <ImageView
             android:id="@+id/shareImageView"
@@ -77,23 +57,10 @@
             android:contentDescription="TODO"
             android:src="@drawable/share"
             app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
-            app:layout_constraintEnd_toStartOf="@+id/gotorecordfilesImVw"
-            app:layout_constraintStart_toEndOf="@+id/addalarmimageView"
-            app:layout_constraintTop_toBottomOf="@id/Radio_image" />
+            app:layout_constraintEnd_toStartOf="@+id/VistitStationhomepageIm"
+            app:layout_constraintStart_toStartOf="parent"            app:layout_constraintTop_toBottomOf="@id/Radio_image" />
 
-        <ImageView
-            android:id="@+id/addalarmimageView"
-            android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_marginStart="9dp"
-            android:layout_marginTop="9dp"
-            android:layout_marginEnd="37dp"
-            android:contentDescription="TODO"
-            app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
-            app:layout_constraintEnd_toStartOf="@+id/shareImageView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/Radio_image"
-            app:srcCompat="@drawable/ic_add_alarm" />
+
 
         <TextView
             android:id="@+id/Radio_nameTXview"
@@ -107,7 +74,6 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:textColor="@android:color/white"
             app:layout_constraintBottom_toTopOf="@+id/Radio_HomepageTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -125,7 +91,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintBottom_toTopOf="@+id/Radio_StreamURLTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -144,7 +110,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintBottom_toTopOf="@+id/Radio_CountryTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -156,7 +122,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
             android:layout_marginBottom="18dp"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintBottom_toTopOf="@+id/Radio_StateTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -169,7 +135,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
             android:layout_marginBottom="18dp"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintBottom_toTopOf="@+id/Radio_LanguageTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -181,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
             android:layout_marginBottom="18dp"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintBottom_toTopOf="@+id/Radio_BitrateTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -193,7 +159,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
             android:layout_marginBottom="19dp"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintBottom_toTopOf="@+id/Radio_TagsTXview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -204,7 +170,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="9dp"
-            android:textColor="@android:color/white"
+            
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/Radio_BitrateTXview" />

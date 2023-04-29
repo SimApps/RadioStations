@@ -25,8 +25,8 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")        }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -35,11 +35,11 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -55,21 +55,21 @@ dependencies {
 
 
 
-    implementation("androidx.media3:media3-ui:1.0.0-rc01")
-    implementation("androidx.media3:media3-exoplayer:1.0.0-rc01")
+    implementation("androidx.media3:media3-ui:1.0.1")
+    implementation("androidx.media3:media3-exoplayer:1.0.1")
     // For DASH playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-dash:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.1")
     // For HLS playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-hls:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer-hls:1.0.1")
 // For RTSP playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.0-rc01")
+    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.1")
 // For exposing and controlling media sessions
-    implementation("androidx.media3:media3-session:1.0.0-rc01")
+    implementation("androidx.media3:media3-session:1.0.1")
 
 
 
     //COIL
-    implementation("io.coil-kt:coil:2.2.2")
+    implementation("io.coil-kt:coil:2.3.0")
 
 }
 

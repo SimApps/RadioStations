@@ -32,13 +32,10 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addname"
-                android:textColorHint="@color/defaultcolor"
 
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+              >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_nameTXviewadd"
@@ -46,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                   />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -57,13 +54,9 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addstreamurl"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_StreamlinkTXviewadd"
@@ -71,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -83,13 +76,9 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addhomepageurl"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_HomepageTXviewadd"
@@ -97,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -108,13 +97,9 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addimageurl"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_imagelinkTXviewadd"
@@ -122,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -133,13 +118,9 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addcountry"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_CountryTXviewadd"
@@ -147,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -158,13 +139,8 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addlanguage"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
-                android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_LanguageTXviewadd"
@@ -172,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -183,13 +159,8 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addbitrate"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
-                app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+                app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_BitrateTXviewadd"
@@ -197,7 +168,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                   />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -208,13 +179,9 @@
                 android:layout_marginTop="9dp"
                 android:layout_weight="1"
                 android:hint="@string/addtags"
-                android:textColorHint="@color/defaultcolor"
-                android:textCursorDrawable="@color/defaultcolor"
                 android:theme="@style/TextInputLayoutAppearance"
-                app:boxStrokeColor="@color/defaultcolor"
                 app:endIconMode="clear_text"
-                app:endIconTint="@color/defaultcolor"
-                app:hintTextColor="@color/defaultcolor">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Radio_TagsTXviewadd"
@@ -222,40 +189,39 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:textCursorDrawable="@color/defaultcolor" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
 
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/add_divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dividerInsetStart="16dp"
+                app:dividerInsetEnd="16dp" />
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/add_btn"
+                style="@style/Widget.Material3.Button.ElevatedButton"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="9dp"
+
+                android:foregroundGravity="center_horizontal"
+
+                android:gravity="center"
+                android:text="@string/add"
+                android:textSize="12sp" />
         </LinearLayout>
 
 
     </androidx.core.widget.NestedScrollView>
 
-    <View
-        android:id="@+id/add_divider"
-        android:layout_width="match_parent"
-        android:layout_height="0.1dp"
 
-        android:layout_below="@id/nestedscrollviewaddoDialogue"
-
-        android:layout_marginLeft="3dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="3dp"
-        android:background="@color/defaultcolor" />
-
-    <TextView
-        android:id="@+id/add_btn"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@id/add_divider"
-        android:layout_alignParentBottom="false"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="20dp"
-        android:foregroundGravity="center_horizontal"
-        android:gravity="center"
-        android:text="@string/add"
-        android:textColor="@color/defaultcolor"
-        android:textSize="18sp" />
 
 </RelativeLayout>

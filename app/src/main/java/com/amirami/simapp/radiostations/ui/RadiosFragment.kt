@@ -1,13 +1,14 @@
 package com.amirami.simapp.radiostations.ui
 
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.OnItemClickListener {
     private lateinit var binding: FragmentRadiosBinding
@@ -43,13 +44,19 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentRadiosBinding.bind(view)
 
-        setTheme()
         setupRadioLisRV()
-        setUpRv()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                retrofitRadioViewModel.queryString.collectLatest { queryString ->
+                    setUpRv(queryString)
+                }
+            }
+        }
+
         binding.itemErrorMessage.btnRetry.setSafeOnClickListener {
             if (argsFrom.msg != "Empty") {
                 retrofitRadioViewModel.changeBseUrl()
-                infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+                infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
                 retrofitRadioViewModel.getRadios(argsFrom.msg, argsFrom.secondmsg)
             } else binding.itemErrorMessage.root.visibility = View.INVISIBLE
         }
@@ -73,17 +80,9 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
      }
  */
 
-    private fun setTheme() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorTransitionConstraint(binding.contentradio, 0, it)
-                }
-            }
-        }
-    }
 
-    private fun setUpRv() {
+
+    private fun setUpRv(queryString : String?) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 retrofitRadioViewModel.responseRadio.collectLatest { response ->
@@ -91,7 +90,36 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
                         Status.SUCCESS -> {
                             if (response.data != null) {
                                 //     radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
-                                radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
+
+                                val list = response.data as MutableList<RadioEntity>
+
+
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                        infoViewModel.favList.collectLatest { favList ->
+                                            var filteredList = list.filter { it.name.contains(queryString.toString(),
+                                                ignoreCase = true) } as MutableList<RadioEntity>
+                                            if(favList.isNotEmpty()){
+                                                var   favlist = favList as ArrayList<RadioEntity>
+
+
+
+
+                                                for ((index, value) in filteredList.withIndex()) {
+
+                                                    if(favlist.any { it.stationuuid == value.stationuuid })
+                                                        filteredList[index].fav = true
+
+                                                }
+
+                                            }
+                                              radioAdapterHorizantal.setItems(items =filteredList)
+
+
+                                        }
+                                    }
+                                }
+
 
                                 hideProgressBar()
                                 binding.itemErrorMessage.root.visibility = View.INVISIBLE
@@ -109,7 +137,7 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
 
         //  DynamicToast.makeError(requireContext(),argsFrom.msg+" , "+argsFrom.secondmsg, 3).show()
     }
-    fun showErrorConnection(msg: String) {
+    private fun showErrorConnection(msg: String) {
         binding.itemErrorMessage.root.visibility = View.VISIBLE
         binding.itemErrorMessage.tvErrorMessage.text = msg
     }
@@ -134,7 +162,8 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
     }
     override fun onItemClick(radio: RadioEntity) {
         try {
-            simpleMediaViewModel.loadData(radio)
+            simpleMediaViewModel.loadData(listOf(radio)as MutableList<RadioEntity>)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
          // jsonCall=api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
 
             //   startServices(context)
@@ -153,5 +182,9 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
     override fun onMoreItemClick(radio: RadioEntity) {
         infoViewModel.putRadioInfo(radio)
         this@RadiosFragment.findNavController().navigate(R.id.action_radiosFragment_to_moreBottomSheetFragment) //   NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_radiosFragment_to_moreBottomSheetFragment)
+    }
+
+    override fun onFavClick(radio: RadioEntity) {
+        TODO("Not yet implemented")
     }
 }

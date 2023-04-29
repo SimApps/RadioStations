@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,15 +17,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
-import com.amirami.simapp.radiostations.RadioFunction.gradiancolorTransitionConstraint
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
+import com.amirami.simapp.radiostations.RadioFunction.moveItemToFirst
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.RadioFunction.shortformateDate
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
 import com.amirami.simapp.radiostations.adapter.RecordedFilesAdapter
 import com.amirami.simapp.radiostations.databinding.FragmentListradioBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
-import com.amirami.simapp.radiostations.model.RecordInfo
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.utils.ManagePermissions
 import com.amirami.simapp.radiostations.utils.exhaustive
@@ -34,6 +32,7 @@ import com.amirami.simapp.radiostations.viewmodel.DownloaderViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -97,7 +96,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
         binding.itemErrorMessage.btnRetry.setSafeOnClickListener {
             if (argsFrom.msg != "Empty") {
                 retrofitRadioViewModel.changeBseUrl()
-                infoViewModel.putPutDefServerInfo(MainActivity.BASE_URL)
+                infoViewModel.putDefServerInfo(MainActivity.BASE_URL)
 
                 //   retrofitRadioViewModel.getListRadios(argsFrom.msg)
                 retrofitRadioViewModel.getListCountrieRadios()
@@ -112,7 +111,12 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
 
         if (argsFrom.msg != resources.getString(R.string.Recordings)) {
             setupRadioLisRV()
-            setUpRv()
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    retrofitRadioViewModel.queryString.collectLatest { queryString ->
+                        setUpRv(queryString)
+                    }}}
+
             binding.floatingActionAddDownload.visibility = View.INVISIBLE
         } else if (argsFrom.msg == resources.getString(R.string.Recordings)) {
 
@@ -124,18 +128,12 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
             setUpRecord()
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putTheme.collectLatest {
-                    gradiancolorTransitionConstraint(binding.contentlistradio, 0, it)
-                }
-            }
-        }
+
     }
 
 
 
-    private fun setUpRv() {
+    private fun setUpRv(queryString : String?) {
         if (argsFrom.msg == getString(R.string.countries)) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -146,7 +144,15 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                                     hideProgressBar()
                                     binding.itemErrorMessage.root.visibility = View.INVISIBLE
                                     //     radioAdapterHorizantal.radioListdffer = response.data as List<RadioVariables>
-                                    radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
+
+
+
+                                                val countryList = response.data as MutableList<RadioEntity>
+                                                radioAdapterHorizantal.setItems(countryList.filter {
+                                                    RadioFunction.countryCodeToName(it.name).contains(queryString.toString() ,
+                                                    ignoreCase = true) }as MutableList<RadioEntity>)
+
+
                                 } else showErrorConnection(response.message!!)
                             }
                             Status.ERROR -> {
@@ -161,7 +167,8 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                     }
                 }
             }
-        } else {
+        }
+        else {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     retrofitRadioViewModel.responseRadioList.collectLatest { response ->
@@ -170,8 +177,11 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                                 if (response.data != null) {
                                     hideProgressBar()
                                     binding.itemErrorMessage.root.visibility = View.INVISIBLE
-                                    //     radioAdapterHorizantal.radioListdffer = response.data as List<RadioVariables>
-                                    radioAdapterHorizantal.setItems(response.data as MutableList<RadioEntity>)
+
+                                    val countryList = response.data as MutableList<RadioEntity>
+                                    radioAdapterHorizantal.setItems(countryList.filter { it.name.contains(queryString.toString(),
+                                        ignoreCase = true) }as MutableList<RadioEntity>)
+
                                 } else showErrorConnection(response.message!!)
                             }
                             Status.ERROR -> {
@@ -239,16 +249,10 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
         }
     }
 
-    override fun onRecItemClick(recordInfo: RecordInfo) {
-      /*  Exoplayer.initializePlayer(
-            requireContext(),
-            true,
-            recordInfo.uri!!
-            /* if(recordInfo.uri!=null) recordInfo.uri!! else Uri.parse("")*/
-        )*/
+    override fun onRecItemClick(recordInfo: RadioEntity) {
 
         val radioVariables = RadioEntity()
-        radioVariables.streamurl = recordInfo.uri.toString()
+        radioVariables.streamurl = recordInfo.streamurl
 
         if (recordInfo.name.contains("_ _", true) && recordInfo.name.contains("___", true)) {
             radioVariables.name = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
@@ -268,92 +272,62 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
             radioVariables.homepage = ""
         }
 
-        simpleMediaViewModel.loadData(radioVariables)
-
+        val list =  moveItemToFirst(
+            array = getRecordedFiles(requireContext()),
+            item = recordInfo
+        )
+        simpleMediaViewModel.loadData(radio = list, isRec = true)
+        simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
     }
 
-    override fun onRecMoreItemClick(recordInfo: RecordInfo, position: Int) {
+    override fun onRecMoreItemClick(recordInfo: RadioEntity, position: Int) {
         val action = ListRadioFragmentDirections.actionListRadioFragmentToInfoBottomSheetFragment(argsFrom.msg, position.toString(), recordInfo.name)
         NavHostFragment.findNavController(requireParentFragment()).navigate(action)
     }
 
     private fun setUpRecord() {
-       /* val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            listOf<String>(
-                Manifest.permission.READ_MEDIA_AUDIO,
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                //Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        } else {
-            listOf<String>(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        }*/
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            //  if (RadioFunction.allPermissionsGranted(requireContext())) {
-            Log.d("kksjq", "1")
-            if (getRecordedFiles(requireContext()).size == 0) {
-                binding.listViewCountriesLiradio.visibility = View.GONE
-                binding.whenemptyrecordImage.visibility = View.VISIBLE
-            } else {
-                setupRecordedFilesRV()
-                recordedFilesAdapter.setItems(getRecordedFiles(requireContext()))
-                binding.whenemptyrecordImage.visibility = View.GONE
-                binding.listViewCountriesLiradio.visibility = View.VISIBLE
-            }
-            /* } else {
-                 Log.d("kksjq", "2")
-                 requestMultiplePermissions.launch(
-                     arrayOf(
-                         Manifest.permission.READ_MEDIA_AUDIO,
-                         Manifest.permission.READ_MEDIA_IMAGES,
-                         Manifest.permission.READ_MEDIA_VIDEO,
-                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                         Manifest.permission.READ_EXTERNAL_STORAGE
-                     )
-                 )
-             }  */
-        } else {
-            val list=   listOf<String>(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                retrofitRadioViewModel.queryString.collectLatest { queryString ->
+                    val filterdRecordList = getRecordedFiles(requireContext()).filter { it.name.contains(queryString.toString(), ignoreCase = true) } as MutableList<RadioEntity>
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (filterdRecordList.size == 0) {
+                            binding.listViewCountriesLiradio.visibility = View.GONE
+                            binding.whenemptyrecordImage.visibility = View.VISIBLE
+                        } else {
+                            setupRecordedFilesRV()
+                            recordedFilesAdapter.setItems(filterdRecordList)
+                            binding.whenemptyrecordImage.visibility = View.GONE
+                            binding.listViewCountriesLiradio.visibility = View.VISIBLE
+                        }
 
-            // Initialize a new instance of ManagePermissions class
-            managePermissions = ManagePermissions(requireActivity(), list, PermissionsRequestCode)
+                    } else {
+                        val list=   listOf(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
 
-            if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
-                managePermissions.checkPermissions()
-            } else {
-                //  if (RadioFunction.allPermissionsGranted(requireContext())) {
-                Log.d("kksjq", "1")
-                if (getRecordedFiles(requireContext()).size == 0) {
-                    binding.listViewCountriesLiradio.visibility = View.GONE
-                    binding.whenemptyrecordImage.visibility = View.VISIBLE
-                } else {
-                    setupRecordedFilesRV()
-                    recordedFilesAdapter.setItems(getRecordedFiles(requireContext()))
-                    binding.whenemptyrecordImage.visibility = View.GONE
-                    binding.listViewCountriesLiradio.visibility = View.VISIBLE
-                }
-                /* } else {
-                     Log.d("kksjq", "2")
-                     requestMultiplePermissions.launch(
-                         arrayOf(
-                             Manifest.permission.READ_MEDIA_AUDIO,
-                             Manifest.permission.READ_MEDIA_IMAGES,
-                             Manifest.permission.READ_MEDIA_VIDEO,
-                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                             Manifest.permission.READ_EXTERNAL_STORAGE
-                         )
-                     )
-                 }  */
-            }
-        }
+                        // Initialize a new instance of ManagePermissions class
+                        managePermissions = ManagePermissions(requireActivity(), list, PermissionsRequestCode)
+
+                        if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
+                            managePermissions.checkPermissions()
+                        } else {
+                            //  if (RadioFunction.allPermissionsGranted(requireContext())) {
+                            if (filterdRecordList.size == 0) {
+                                binding.listViewCountriesLiradio.visibility = View.GONE
+                                binding.whenemptyrecordImage.visibility = View.VISIBLE
+                            } else {
+                                setupRecordedFilesRV()
+                                recordedFilesAdapter.setItems(filterdRecordList)
+                                binding.whenemptyrecordImage.visibility = View.GONE
+                                binding.listViewCountriesLiradio.visibility = View.VISIBLE
+                            }
+                        }
+                    }
+                }}}
+
 
 
     }

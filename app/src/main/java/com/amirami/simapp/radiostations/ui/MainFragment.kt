@@ -1,6 +1,5 @@
 package com.amirami.simapp.radiostations.ui
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -14,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
-import com.amirami.simapp.radiostations.MainActivity.Companion.darkTheme
 import com.amirami.simapp.radiostations.MainActivity.Companion.defaultCountry
 import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterrorurl
 import com.amirami.simapp.radiostations.RadioFunction.loadImageString
@@ -28,9 +26,9 @@ import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
-import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
+import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -59,7 +57,6 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private val popularImagetagList: ArrayList<Int> = ArrayList()
     private lateinit var binding: FragmentMainBinding
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
@@ -80,21 +77,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         setUpTagsRv()
         getRadioList()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putTheme.collectLatest {
-                    RadioFunction.gradiancolorNativeAdslayout(binding.adsFrame, 0)
-                    RadioFunction.gradiancolorNativeAdslayout(binding.adsFrames, 0)
-                    RadioFunction.gradiancolorConstraintLayoutTransition(binding.Radiomain, 4, it)
 
-                    // RadioFunction.maintextviewColor(binding.countryTxtVw,it)
-                    RadioFunction.maintextviewColor(binding.recentrecentlyplayedTxV, it)
-                    RadioFunction.maintextviewColor(binding.tagsTxtVw, it)
-                }
-            }
-
-
-        }
     }
     private fun setUpTagsRv() {
         if (popularTagList.size == 0 && popularImagetagList.size == 0) {
@@ -144,7 +127,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 //  retrofitRadioViewModel.getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
                 loadImageString(
                     requireContext(),
-                    COUNTRY_FLAGS_BASE_URL + dataViewModel.getDefaultCountr().lowercase(Locale.ROOT),
+                    COUNTRY_FLAGS_BASE_URL + dataViewModel.getDefaultCountr().lowercase(Locale.ROOT)+".svg",
                     imagedefaulterrorurl,
                     binding.localradiomview,
                     Constatnts.CORNER_RADIUS_32F
@@ -165,13 +148,12 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        setupTheme()
-    }
+
 
     private fun nativeAds1() {
-        fun populateUnifiedNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
+        fun populateUnifiedNativeAdView(nativeAd: NativeAd,
+                                        adView: NativeAdView,
+                                        darkTheme : Boolean) {
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.
             currentNativeAdActivityMain?.destroy()
@@ -192,14 +174,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             adView.advertiserView = adView.findViewById(R.id.ad_advertiser)
 
             if (adView.headlineView != null) {
-                RadioFunction.nativeadstexViewColor(
-                    adView.headlineView as TextView,
-                    adView.advertiserView as TextView,
-                    adView.bodyView as TextView,
-                    adView.priceView as TextView,
-                    adView.storeView as TextView,
-                    darkTheme
-                )
+
 
                 // The headline is guaranteed to be in every UnifiedNativeAd.
                 (adView.headlineView as TextView).text = nativeAd.headline
@@ -305,7 +280,11 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 // OnUnifiedNativeAdLoadedListener implementation.
                 //     val adView = layoutInflater.inflate(R.layout.ad_unified, null) as UnifiedNativeAdView
 
-                populateUnifiedNativeAdView(unifiedNativeAd, adViewBigActivityMain)
+                populateUnifiedNativeAdView(
+                    unifiedNativeAd,
+                    adViewBigActivityMain,
+                    dataViewModel.getDarkTheme()
+                )
 
                 binding.adsFrames.removeAllViews()
 
@@ -377,18 +356,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
             }
 
     }
-    private fun setupTheme() {
 
-
-
-        if (MainActivity.systemTheme) {
-            when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                Configuration.UI_MODE_NIGHT_YES -> darkTheme = true
-                Configuration.UI_MODE_NIGHT_NO -> darkTheme = false
-            }
-            dataViewModel.saveDarkTheme(darkTheme)
-        }
-    }
 
     private fun btnClick() {
         binding.btnAllcountry.setSafeOnClickListener {
@@ -459,7 +427,12 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         adViewBigActivityMain = View.inflate(requireContext(), R.layout.ads_big, null) as NativeAdView
 
         nativeAds1()
-        RadioFunction.nativeSmallAds(requireContext(), binding.adsFrame, adViewSmallActivitymain)
+        RadioFunction.nativeSmallAds(
+            requireContext(),
+            binding.adsFrame,
+            adViewSmallActivitymain,
+            dataViewModel.getDarkTheme()
+        )
     }
 
     override fun onItemClick(radio: RadioEntity) {
@@ -486,8 +459,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         } else {
             try {
 
-                simpleMediaViewModel.loadData(radio)
-               // simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+                simpleMediaViewModel.loadData(listOf(radio)as MutableList<RadioEntity>)
+                 simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
                 //    jsonLocalRadioCall = api.addclick(idListJson[holder.absoluteAdapterPosition]!!)
             } catch (e: IOException) {
@@ -537,8 +510,9 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     override fun onItemFavClick(radioRoom: RadioEntity) {
         try {
-            simpleMediaViewModel.loadData(radioRoom)
 
+            simpleMediaViewModel.loadData(listOf(radioRoom)as MutableList<RadioEntity>)
+            simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
 
 
             //   jsonCall=api.addclick(radioRoom[position].radiouid)
@@ -559,7 +533,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private fun getRadioList() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                radioRoomViewModel.radioList.collectLatest { list ->
+                infoViewModel.radioList.collectLatest { list ->
 
                     val ladtListned = list.filter { it.isLastListned }
                     if (ladtListned.isNotEmpty()) {

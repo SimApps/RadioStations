@@ -1,29 +1,28 @@
 package com.amirami.simapp.radiostations.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import com.amirami.player_service.service.PlayerEvent
+import com.amirami.player_service.service.SimpleMediaServiceHandler
+import com.amirami.player_service.service.SimpleMediaState
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.MainActivity.Companion.Globalurl
-import com.amirami.simapp.radiostations.MainActivity.Companion.icyandState
-import com.amirami.simapp.radiostations.MainActivity.Companion.is_playing_recorded_file
+import com.amirami.simapp.radiostations.model.GlobalState
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.repository.RadioRoomBaseRepository
 import com.amirami.simapp.radiostations.utils.Coroutines
-import com.asmtunis.player_service.service.PlayerEvent
-import com.asmtunis.player_service.service.SimpleMediaServiceHandler
-import com.asmtunis.player_service.service.SimpleMediaState
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -47,7 +46,7 @@ class SimpleMediaViewModel @Inject constructor(
 
 
 
-    fun getPlayer(): Player? {
+    fun getPlayer(): Player {
         return player
     }
 
@@ -66,25 +65,43 @@ class SimpleMediaViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
     val uiState = _uiState.asStateFlow()
 
-    private val _icyStreamInfoState = MutableStateFlow("")
-    val icyStreamInfoState = _icyStreamInfoState.asStateFlow()
 
 
     private val _radioState = MutableStateFlow(RadioEntity())
-    val radioState = _radioState.asStateFlow()
 
 
 
     private val _isRecFile = MutableStateFlow(false)
-    val isRecFile = _isRecFile.asStateFlow()
 
 
+
+    // Combining these states to form a LoginState
+    val state= combine(_isRecFile, _radioState,_isPlaying) { isRecFile,  radioState,isPlaying ->
+        GlobalState(
+            player = player,
+            isRecFile = isRecFile,
+            radioState= radioState,
+            isPlaying =isPlaying
+        )
+    }.stateIn(viewModelScope, WhileSubscribed(), initialValue = GlobalState())
     fun setRadioVar(radioVar : RadioEntity) {
         _radioState.value  = radioVar
+
     }
 
 
     init {
+        viewModelScope.launch {
+            simpleMediaServiceHandler.radioState.collect { icyStreamInfo ->
+
+                /*  if(isRec) _radioState.value = _radioState.value.copy(homepage = radio[0].homepage)
+                  else */  _radioState.value = _radioState.value.copy(
+                name = icyStreamInfo.name,
+                icyState = icyStreamInfo.icyState
+                  )
+            }
+        }
+
         viewModelScope.launch {
             simpleMediaServiceHandler.simpleMediaState.collect { mediaState ->
                 when (mediaState) {
@@ -103,13 +120,7 @@ class SimpleMediaViewModel @Inject constructor(
 
 
         }
-        viewModelScope.launch {
-            simpleMediaServiceHandler.icyState.collect { icyStreamInfo ->
-                icyandState = icyStreamInfo
-            _icyStreamInfoState.value = icyStreamInfo
 
-            }
-        }
 
 
 
@@ -172,48 +183,64 @@ class SimpleMediaViewModel @Inject constructor(
         }
     }
 
-    fun loadData(radio : RadioEntity, isRec : Boolean = false) {
+    fun loadData(radio: List<RadioEntity>, isRec: Boolean = false) {
+
+
+
+        setRadioVar(radio[0])
         _isRecFile.value = isRec
-        is_playing_recorded_file = isRec
+
+
      //   setRadioVar(radio)
 
-        Globalurl = radio.streamurl
-        MainActivity.GlobalRadioName = radio.name
+        Globalurl = radio[0].streamurl
+        MainActivity.GlobalRadioName = radio[0].name
 
-        radio.isLastListned = true
-          upsertRadio(radio)
+        radio[0].isLastListned = true
+        radio[0].timeStamp = System.currentTimeMillis()
+   /*  if(!isRec) {
+         upsertRadio(radio[0])
+         val mediaItem = MediaItem.Builder()
+             .setUri(radio[0].streamurl)
+             .setMediaMetadata(
+                 MediaMetadata.Builder()
+                     .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
+                     .setArtworkUri(Uri.parse(radio[0].favicon))
+
+                     // .setArtist(_icyStreamInfoState.value)
+                     .setAlbumTitle(radio[0].name)
+                   //  .setDisplayTitle(_icyStreamInfoState.value)
+                     .setDisplayTitle(_radioState.value.icyState)
+
+                     .build()
+             ).build()
+         simpleMediaServiceHandler.addMediaItem(mediaItem)
+     }
+        else {*/
+         val mediaItemList = mutableListOf<MediaItem>()
+         (radio.indices).forEach {
+             mediaItemList.add(
+                 MediaItem.Builder()
+                     .setUri(radio[it].streamurl)
+                     .setMediaMetadata(MediaMetadata.Builder()
+                         .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
+                         .setArtworkUri(Uri.parse(radio[it].favicon))
+                         .setAlbumTitle(radio[it].name)
+                         //  .setDisplayTitle(_icyStreamInfoState.value)
+                         .setDisplayTitle(_radioState.value.icyState)
+                         .build()
+                     ).build()
+             )
+         }
+
+
+          simpleMediaServiceHandler.addMediaItemList(mediaItemList)
+
+ //    }
        // deletelistened()
-        val mediaItem = MediaItem.Builder()
-            .setUri(radio.streamurl)
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
-                    .setArtworkUri(Uri.parse(radio.favicon))
-                    .setAlbumTitle(radio.name)
-                    .setDisplayTitle(_icyStreamInfoState.value)
-                    .build()
-            ).build()
 
-        //val mediaItemList = mutableListOf<MediaItem>()
-        //(1..17).forEach {
-        //    mediaItemList.add(
-        //        MediaItem.Builder()
-        //            .setUri("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-$it.mp3")
-        //            .setMediaMetadata(MediaMetadata.Builder()
-        //                .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
-        //                .setArtworkUri(Uri.parse("https://cdns-images.dzcdn.net/images/cover/1fddc1ab0535ee34189dc4c9f5f87bf9/264x264.jpg"))
-        //                .setAlbumTitle("SoundHelix")
-        //                .setDisplayTitle("Song $it")
-        //                .build()
-        //            ).build()
-        //    )
-        //}
 
-        simpleMediaServiceHandler.addMediaItem(mediaItem)
-        //simpleMediaServiceHandler.addMediaItemList(mediaItemList)
 
- //    if (playPause)   onUIEvent(UIEvent.PlayPause)
-   //     else onUIEvent(UIEvent.Stop)
 
     }
 
@@ -232,3 +259,24 @@ sealed class UIState {
     object Initial : UIState()
     object Ready : UIState()
 }
+
+fun com.amirami.player_service.RadioEntity.toEntity() =  RadioEntity(
+    stationuuid = stationuuid,
+ name = name,
+ bitrate = bitrate,
+ homepage = homepage,
+ favicon = favicon,
+ tags = tags,
+ country = country,
+ state = state,
+ language = language,
+ streamurl = streamurl,
+ fav = fav,
+ ip = ip,
+ stationcount = stationcount,
+ iso_639 = iso_639,
+ moreinfo = moreinfo,
+ isAlarm = isAlarm,
+ isLastListned = isLastListned,
+ timeStamp = timeStamp,
+ icyState = icyState)

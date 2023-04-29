@@ -3,7 +3,9 @@ package com.amirami.simapp.radiostations.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,14 +18,13 @@ import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.RadioFunction.dynamicToast
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
-import com.amirami.simapp.radiostations.RadioFunction.maintextviewColor
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.BottomsheetfragmentMoreBinding
+import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
-import com.amirami.simapp.radiostations.viewmodel.RadioRoomViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
@@ -36,10 +37,12 @@ import kotlinx.coroutines.launch
 class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomsheetfragmentMoreBinding? = null
     private val infoViewModel: InfoViewModel by activityViewModels()
-    private val radioRoomViewModel: RadioRoomViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
     private val radioRoom: MutableList<RadioEntity> = mutableListOf()
+
+
+    private lateinit var alarmActivityIntent: Intent
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,41 +58,26 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setTheme()
 
 
         collectLatestLifecycleFlow(infoViewModel.putRadioInfo) { radioVar ->
+
             setInfoRadio(radioVar)
             btnsVisibility(radioVar)
-            if (radioVar.fav) {
-                binding.likeImageView.setImageResource(R.drawable.ic_liked)
-            } else {
-                binding.likeImageView.setImageResource(R.drawable.ic_like)
-            }
 
 
-            binding.likeImageView.setSafeOnClickListener {
 
-                if (!radioVar.fav && radioVar.stationuuid != "") {
-                    binding.likeImageView.setImageResource(R.drawable.ic_liked)
-                    addFavoriteRadioIdInArrayFirestore(radioVar.stationuuid)
-                } else if (radioVar.fav) {
-                    binding.likeImageView.setImageResource(R.drawable.ic_like)
-                    deleteFavoriteRadioFromArrayinfirestore(radioVar.stationuuid)
-                }
-                radioRoomViewModel.setFavRadio(radioVar)
-
-            }
 
             binding.shareImageView.setSafeOnClickListener {
                 viewLifecycleOwner.lifecycleScope.launch {
                     viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        simpleMediaViewModel.icyStreamInfoState.collectLatest { icy ->
+                        simpleMediaViewModel.state.collectLatest { state ->
 
                             RadioFunction.shareRadio(
-                                requireContext(),
-                                radioVar,
-                                icy
+                                context =  requireContext(),
+                                radio = radioVar,
+                                icy = state.radioState.icyState?:"",// state.icyStreamInfoState,
+                                isRec = state.isRecFile
                             )
                         }
                     }
@@ -101,44 +89,17 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
 
-            binding.addalarmimageView.setSafeOnClickListener {
-                infoViewModel.putRadioalarmInfo(radioVar)
-                val action = MoreBottomSheetFragmentDirections.actionMoreBottomSheetFragmentToMainAlarmFragment()
-                this@MoreBottomSheetFragment.findNavController().navigate(action)
-                // Utils.cancelAlarm(requireActivity())
-                //   dismiss()
-            }
 
             binding.VistitStationhomepageIm.setSafeOnClickListener {
                 RadioFunction.homepageChrome(requireActivity(), radioVar.homepage)
                 dismiss()
             }
 
-            binding.gotorecordfilesImVw.setSafeOnClickListener {
-                if (RadioFunction.getRecordedFiles(requireContext()).size == 0) {
-                    DynamicToast.makeError(requireContext(), getString(R.string.Record_folder_empty), 3).show()
-                } else {
-                    if (MainActivity.firstTimeopenRecordfolder) {
-                        MainActivity.firstTimeopenRecordfolder = false
-                        if (!requireActivity().isFinishing) {
-                            val action = MoreBottomSheetFragmentDirections.actionMoreBottomSheetFragmentToInfoBottomSheetFragment(
-                                getString(R.string.Keep_in_mind),
-                                getString(R.string.recordmessage)
-                            )
-                            this@MoreBottomSheetFragment.findNavController().navigate(action) //    NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-                        }
-                    }
-// Request code for selecting a PDF document.
-
-                    RadioFunction.openRecordFolder(requireContext())
-                }
-            }
-        }
+         }
     }
 
     private fun btnsVisibility(radioVar: RadioEntity) {
-        if (radioVar.moreinfo == "fromplayer") binding.likeImageView.visibility = View.GONE
-        else binding.likeImageView.visibility = View.VISIBLE
+
 
         if (radioVar.stationuuid == "") {
             binding.shareImageView.visibility = View.GONE
@@ -151,46 +112,9 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
 
 
-    private fun addFavoriteRadioIdInArrayFirestore(radioUid: String) {
-        val addFavoritRadioIdInArrayFirestore =
-            favoriteFirestoreViewModel.addFavoriteRadioidinArrayFirestore(
-                radioUid,
-                RadioFunction.getCurrentDate()
-            )
-        addFavoritRadioIdInArrayFirestore.observe(viewLifecycleOwner) {
-            // if (it != null)  if (it.data!!)  prod name array updated
-            RadioFunction.interatialadsShow(requireContext())
-            if (it.e != null) {
-                // prod bame array not updated
-                errorToast(requireContext(), it.e!!)
-            }
-        }
-    }
 
-    private fun deleteFavoriteRadioFromArrayinfirestore(radioUid: String) {
-        val deleteFavoriteRadiofromArrayInFirestore = favoriteFirestoreViewModel.deleteFavoriteRadioFromArrayinFirestore(radioUid)
-        deleteFavoriteRadiofromArrayInFirestore.observe(viewLifecycleOwner) {
-            RadioFunction.interatialadsShow(requireContext())
-            // if (it != null)  if (it.data!!)  prod name array updated
-            if (it.e != null) {
-                // prod bame array not updated
-                dynamicToast(requireContext(), it.e!!)
-            }
-        }
-    }
 
-    private fun setTheme() {
-        collectLatestLifecycleFlow(infoViewModel.putTheme) {
-            RadioFunction.gradiancolorNestedScrollViewTransitionseconcolor(binding.linearLayoutHolder, 1, it)
-            maintextviewColor(binding.RadioNameTXview, it)
-            maintextviewColor(binding.RadioHomepageTXview, it)
-            maintextviewColor(binding.RadioStreamURLTXview, it)
-            maintextviewColor(binding.RadioCountryTXview, it)
-            maintextviewColor(binding.RadioLanguageTXview, it)
-            maintextviewColor(binding.RadioBitrateTXview, it)
-            maintextviewColor(binding.RadioTagsTXview, it)
-        }
-    }
+
 
     private fun setInfoRadio(radio: RadioEntity) {
         if (radio.stationuuid == "") {
@@ -265,11 +189,11 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-   /* fun <T> BottomSheetDialogFragment.collectLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collect(collect)
-            }
-        }
-    }*/
+
+
+
+
+
+
+
 }
