@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,7 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class AlarmFragment : Fragment(R.layout.fragment_alarm), AlarmItem.OnItemClickListener {
     private var binding: FragmentAlarmBinding by autoCleared()
      private lateinit var serviceIntent: Intent
@@ -182,8 +183,8 @@ class AlarmFragment : Fragment(R.layout.fragment_alarm), AlarmItem.OnItemClickLi
 
         }
 
-        binding.fabLayout.animationSize = interval
-
+      //  binding.fabLayout.animationSize = interval
+        binding.fabLayout.fabAnimateDuration = interval.toInt()
         // 일반 알람 설정
         binding.fab2.setOnSingleClickListener {
              val action = AlarmFragmentDirections.actionAlarmFragmentToNormalAlarmSetFragment()

@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.time
@@ -185,14 +186,17 @@ class SetTimerBottomSheetFragment :
         }
 
         binding.addalarmimageView.setSafeOnClickListener {
-
-            //  infoViewModel.putRadioalarmInfo(radioVar)
-            val action = SetTimerBottomSheetFragmentDirections.actionSetTimerBottomSheetFragmentToAlarmFragment()
-            this@SetTimerBottomSheetFragment.findNavController().navigate(action)
+            // val action = SetTimerBottomSheetFragmentDirections.actionSetTimerBottomSheetFragmentToAlarmFragment()
+         //   this@SetTimerBottomSheetFragment.findNavController().navigate(action)
 
 
 
-
+            if (canNavigate()) {
+                val action = SetTimerBottomSheetFragmentDirections.actionSetTimerBottomSheetFragmentToAlarmFragment()
+             //   findNavController().navigate(action) //
+                findNavController().navigate(R.id.alarmFragment) //
+            //NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
         }
 
 
@@ -241,4 +245,7 @@ class SetTimerBottomSheetFragment :
             }
         }
     }
+
+    private fun canNavigate() : Boolean = findNavController().currentDestination?.id == R.id.setTimerBottomSheetFragment
+
 }

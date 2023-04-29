@@ -77,7 +77,7 @@ dependencies {
     //implementation project(path:(":downloader"))
     implementation(project(":downloader"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
     implementation("androidx.hilt:hilt-work:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
@@ -185,8 +185,8 @@ dependencies {
 
 
     //dager hilt
-    implementation("com.google.dagger:hilt-android:2.45")
-    kapt("com.google.dagger:hilt-compiler:2.45")
+    implementation("com.google.dagger:hilt-android:2.46")
+    kapt("com.google.dagger:hilt-compiler:2.46")
 
     kapt("androidx.hilt:hilt-compiler:1.0.0")
     
@@ -234,7 +234,9 @@ dependencies {
     implementation ("io.github.nikartm:fit-button:2.0.0")
     implementation ("com.github.YvesCheung.RollingText:RollingText:1.2.11")
 
-    implementation(files("libs/customFloating-release.aar"))
+   // implementation(files("libs/customFloating-release.aar"))
+    implementation("com.robertlevonyan.view:CustomFloatingActionButton:3.1.4")
+
     // ALARM LIB
     //implementation ("com.github.ColdTea-Projects:SmplrAlarm:2.1.1")
   //  implementation ("com.carterchen247:alarm-scheduler:2.0.0") CURRENT ONE
@@ -243,7 +245,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.11")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.21-1.0.11")
 
 
 }
