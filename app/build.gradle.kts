@@ -243,7 +243,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.11")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.21-1.0.11")
 
 
 }
