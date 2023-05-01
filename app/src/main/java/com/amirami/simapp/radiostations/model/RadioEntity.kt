@@ -80,4 +80,7 @@ data class RadioEntity(
 
      @Transient
     var icyState : String? = "",
+
+    @Transient
+    var isRec : Boolean = false,
 )

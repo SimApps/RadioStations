@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.RadioFunction.dynamicToast
@@ -121,7 +122,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
             binding.RadioImage.setImageResource(R.drawable.rec_on)
             //  RadioFunction.loadImageInt(R.drawable.recordings, MainActivity.imagedefaulterrorurl, binding.RadioImage)
             binding.RadioNameTXview.text = getString(R.string.infoRadioname, radio.name)
-            binding.RadioHomepageTXview.text = getString(R.string.inforecord, /*MainActivity.icyandState*/radio.homepage)
+            binding.RadioHomepageTXview.text = getString(R.string.inforecord, /*MainActivity.icyandState*/radio.icyState)
 
             binding.RadioStreamURLTXview.visibility = View.INVISIBLE
             binding.RadioCountryTXview.visibility = View.INVISIBLE

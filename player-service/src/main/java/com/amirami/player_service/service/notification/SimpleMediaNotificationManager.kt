@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -13,6 +14,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionCommand
 import androidx.media3.ui.PlayerNotificationManager
 import com.asmtunis.player_service.R
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -61,7 +63,7 @@ class SimpleMediaNotificationManager @Inject constructor(
                 it.setUseFastForwardActionInCompactView(true)
                 it.setUseRewindActionInCompactView(true)
                 it.setUseNextActionInCompactView(false)
-                it.setPriority(NotificationCompat.PRIORITY_MAX)
+                it.setPriority(NotificationCompat.PRIORITY_LOW)
                 it.setUseStopAction(true)
 
                 it.setPlayer(player)
@@ -72,8 +74,8 @@ class SimpleMediaNotificationManager @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startForegroundNotification(mediaSessionService: MediaSessionService) {
         val notification = Notification.Builder(context, context.packageName+"ID")
-           // .setCategory(Notification.CATEGORY_SERVICE)
-            .setCategory(Notification.CATEGORY_EVENT)
+           .setCategory(Notification.CATEGORY_SERVICE)
+            // .setCategory(Notification.CATEGORY_EVENT)
             .build()
         mediaSessionService.startForeground(NOTIFICATION_ID, notification)
 
@@ -91,3 +93,4 @@ class SimpleMediaNotificationManager @Inject constructor(
         notificationManager.createNotificationChannel(channel)
     }
 }
+

@@ -76,31 +76,10 @@ class RecordedFilesAdapter(private val listener: OnItemClickListener) :
                 ExpandImageView.setImageResource(R.drawable.delete)
                 //  RadioFunction.loadImageInt(R.drawable.delete, imagedefaulterrorurl, ExpandImageView)
 
-                if (recordInfo.name.contains("_ _", true) && recordInfo.name.contains("___", true)) {
-                    if (mainTxVw.text.isNotEmpty()) {
-                        mainTxVw.text = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
-                    }
-                    if (descriptionTxVw.text.isNotEmpty()) {
-                        descriptionTxVw.text = recordInfo.name.substring(
-                            recordInfo.name.indexesOf("_ _", true)[0] + 3,
-                            recordInfo.name.indexesOf("___", true)[0]
-                        ) + " " +
-                            RadioFunction.shortformateDate(
-                                recordInfo.name.substring(
-                                    recordInfo.name.indexesOf("___", true)[0] + 3,
-                                    recordInfo.name.length - 4
-                                )
-                            ) + ".mp3"
-                            /*RadioFunction.removeWord(recordInfo.name
-                            .substring(recordInfo.name.indexesOf("_ _", true)[0] + 3,
-                                recordInfo.name.length),  ".mp3")*/
 
-                        // RadioFunction.shortformateDate()//s.name.substring(s.name.indexesOf("_ _", true)[0] + 2, s.name.length)
-                    }
-                } else {
                     mainTxVw.text = recordInfo.name
-                    descriptionTxVw.text = ""
-                }
+                    descriptionTxVw.text = recordInfo.icyState
+
 
                 //  faviconImageView.setImageResource(R.drawable.recordings)
                 RadioFunction.loadImageInt(R.drawable.rec_on, imagedefaulterrorurl, ImageView)

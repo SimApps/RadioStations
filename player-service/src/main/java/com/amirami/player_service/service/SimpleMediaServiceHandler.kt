@@ -54,27 +54,35 @@ class SimpleMediaServiceHandler @Inject constructor(
                 if (player.isPlaying) {
                     player.pause()
                     stopProgressUpdate()
+
+
+
                 } else {
                     //player.prepare()
                     player.play()
-                    _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = true)
                     startProgressUpdate()
+
                 }
             }
             is  PlayerEvent.Stop -> {
+                Log.d("jnppllk","cccc!")
+
                 stopProgressUpdate()
                 player.stop()
+
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
+
+
             }
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
         }
     }
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
-        Log.d("jnppllk","OoOps! Try another station!")
         player.stop()
         //player.release()
 
-        _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = false)
+        _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
 
         _radioState.value =    _radioState.value.copy(icyState="OoOps! Try another station!")
 
@@ -88,13 +96,14 @@ class SimpleMediaServiceHandler @Inject constructor(
             ExoPlayer.STATE_IDLE // The player does not have any media to play.
             -> {
                 Log.d("jnppllk","1")
-
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
                 if(_radioState.value.icyState !="OoOps! Try another station!")
                     _radioState.value =     _radioState.value.copy(icyState="")
 
             }
             ExoPlayer.STATE_BUFFERING // The player needs to load media before playing.
             -> {
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.BUFFERING)
                 Log.d("jnppllk","2")
                 _radioState.value =   _radioState.value.copy(icyState="Buffering")
 
@@ -103,6 +112,7 @@ class SimpleMediaServiceHandler @Inject constructor(
             }
             ExoPlayer.STATE_READY // The player is able to immediately play from its current position.
             -> {
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.PLAYING)
                 Log.d("jnppllk","3")
               //  _icyState.value = ""
                 if(_radioState.value.icyState =="Buffering")
@@ -111,11 +121,14 @@ class SimpleMediaServiceHandler @Inject constructor(
              }
             ExoPlayer.STATE_ENDED // The player has finished playing the media.
             -> {
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
                 Log.d("jnppllk","4")
                 _radioState.value =   _radioState.value.copy(icyState="")
 
             }
             else -> {
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
+
                 Log.d("jnppllk","5")
               //  MainActivity.GlobalstateString = "UNKNOWN_STATE"
                 _radioState.value =   _radioState.value.copy(icyState="")
@@ -125,45 +138,60 @@ class SimpleMediaServiceHandler @Inject constructor(
 
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
         super.onMediaMetadataChanged(mediaMetadata)
-        Log.d("jnppllk","cccc "+_radioState.value.icyState)
-        Log.d("jnppllk","cccccc "+mediaMetadata.title.toString())
-
-        if(mediaMetadata.title.toString()!= "null"){
-            Log.d("jnppllk","s "+mediaMetadata.title.toString())
-            Log.d("jnppllk","nn "+mediaMetadata.albumTitle.toString())
-            _radioState.value =   _radioState.value.copy(
-                name = mediaMetadata.albumTitle.toString(),
-                icyState=mediaMetadata.title.toString()
-            )
-        }
-
-
-
-
-        else /*if (_radioState.value.icyState == "Buffering")*/{
-            Log.d("jnppllk","sq "+mediaMetadata.title.toString())
-            Log.d("jnppllk","nnq "+mediaMetadata.albumTitle.toString())
-            _radioState.value =   _radioState.value.copy(
-                name = mediaMetadata.albumTitle.toString())
-        }
-
-
-
+        _radioState.value =   _radioState.value.copy(
+            favicon = mediaMetadata.artworkUri.toString(),
+            name = mediaMetadata.albumTitle.toString(),
+            icyState=mediaMetadata.title.toString()
+        )
     }
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onIsPlayingChanged(isPlaying: Boolean) {
-        _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = isPlaying)
+        Log.d("ikjnhbg"," vvvvv " +  simpleMediaState.value.toString())
+
         if (isPlaying) {
             GlobalScope.launch(Dispatchers.Main) {
+                _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.PLAYING)
+
                 startProgressUpdate()
             }
         } else {
+            _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.PAUSED)
+
             stopProgressUpdate()
         }
+        Log.d("ikjnhbg"," ing " +  _simpleMediaState.value.toString())
+
     }
 
 
+/*
+ override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
 
+            getIsPlaying = isPlaying
+            if (playWhenReady && isPlaying) {
+                if (is_playing_recorded_file) totalTime = player?.duration!!
+                else if (GlobalstateString == "UNKNOWN_STATE") {
+                    Observer.changeText("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+                    Observer.changeText("text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+                    Observer.changesubscribenotificztion("Main text view", icyandStateWhenPlayRecordFiles(icybackup, ""))
+                }
+
+                playPauseIcon = R.drawable.pause_2
+                GlobalstateString = "Player.STATE_READY"
+                changeImagePlayPause("Main image view", R.drawable.pause_2)
+                changeImagePlayPause("image view", R.drawable.pause_2)
+            } else if (playWhenReady && GlobalstateString != "Player.STATE_BUFFERING") {
+                playPauseIcon = R.drawable.play_2
+                GlobalstateString = "Player.STATE_PAUSED"
+                changeImagePlayPause("Main image view", R.drawable.play_2)
+                changeImagePlayPause("image view", R.drawable.play_2)
+            }
+
+            RadioFunction.startServices(ctx)
+        }
+ */
 
 
 
@@ -186,7 +214,6 @@ class SimpleMediaServiceHandler @Inject constructor(
 
     private fun stopProgressUpdate() {
         job?.cancel()
-      _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = false)
 
 
     }
@@ -207,5 +234,9 @@ sealed class SimpleMediaState {
     data class Ready(val duration: Long) : SimpleMediaState()
     data class Progress(val progress: Long) : SimpleMediaState()
     data class Buffering(val progress: Long) : SimpleMediaState()
-    data class Playing(val isPlaying: Boolean) : SimpleMediaState()
+    data class Playing(val isPlaying: PlayerState) : SimpleMediaState()
+ }
+
+enum class PlayerState {
+    PLAYING, STOPED, PAUSED, INITIANIAL, BUFFERING
 }

@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.amirami.player_service.service.PlayerState
 import com.amirami.player_service.service.SimpleMediaService
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
@@ -304,13 +305,14 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         collectLatestLifecycleFlow(simpleMediaViewModel.state) { state ->
 
 
+
             if (state.isRecFile) {
                 binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_recordings_folder)
                 binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_recordings_folder)
             }
 
 
-            if (state.isPlaying) {
+            if (state.playerState == PlayerState.PLAYING) {
                 binding.radioplayer.pauseplayButton.setImageResource(R.drawable.pause_2)
                 binding.radioplayer.pauseplayButtonMain.setImageResource(R.drawable.pause_2)
             } else {
@@ -323,6 +325,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
           val radioVar =  state.radioState
+            infoViewModel.putRadioInfo(radioVar)
+            simpleMediaViewModel.upsertRadio(radioVar)
 
             setPlayer(radioVar = radioVar, isRec = state.isRecFile)
 
@@ -343,14 +347,22 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             }
 
             binding.radioplayer.pauseplayButtonMain.setSafeOnClickListener {
-                if(!simpleMediaViewModel.getPlayer().isPlaying)
-                    simpleMediaViewModel.loadData(radio = listOf(radioVar), isRec = state.isRecFile)
+                Log.d("ikjnhbg", "isPlaying "+state.playerState.toString())
+
+                if(state.playerState == PlayerState.STOPED || state.playerState == PlayerState.INITIANIAL){
+                    simpleMediaViewModel.loadData(radio = listOf(radioVar))
+
+                }
                 simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
             }
             binding.radioplayer.pauseplayButton.setSafeOnClickListener {
-                if(!simpleMediaViewModel.getPlayer().isPlaying)
-                    simpleMediaViewModel.loadData(radio = listOf(radioVar)as MutableList<RadioEntity>, isRec = state.isRecFile)
+                Log.d("ikjnhbg", "isPlaying "+state.playerState.toString())
 
+                if(state.playerState == PlayerState.STOPED ||state.playerState == PlayerState.INITIANIAL){
+
+                    simpleMediaViewModel.loadData(radio = listOf(radioVar))
+
+                }
                 simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
             }
 
@@ -360,7 +372,8 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 if (binding.radioplayer.radioInfotxV.text.toString().isNotEmpty() &&
                     binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.playernullinfo) &&
                     binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.BUFFERING) &&
-                    binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.OoOps_Try_another_station)
+                    binding.radioplayer.radioInfotxV.text.toString() != getString(R.string.OoOps_Try_another_station)&&
+                    binding.radioplayer.radioInfotxV.text.toString()  != "null"
                 ) {
                     RadioFunction.copytext(
                         this@MainActivity,
@@ -374,7 +387,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             binding.radioplayer.moreButtons.setSafeOnClickListener {
                 //     val radioVars = radioVar
                 radioVar.moreinfo = FROM_PLAYER
-                infoViewModel.putRadioInfo(radioVar)
+               // infoViewModel.putRadioInfo(radioVar)
                 val navController =
                     Navigation.findNavController(this@MainActivity, R.id.fragment_container)
                 // navController.navigateUp()
@@ -407,30 +420,6 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         searchquerry()
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-
-                R.id.alarmFragment, R.id.settingAlarmFragment,
-                R.id.normalAlarmSetFragment, R.id.simpleAlarmSetFragment  -> {
-                    binding.searchView.settingButton.visibility = View.INVISIBLE
-                    binding.searchView.addAlarmButton.visibility = View.INVISIBLE
-                    binding.searchView.opencloseSearchButton.visibility = View.INVISIBLE
-                    infoViewModel.putTitleText("Alarms")
-                }
-                else -> {
-                    binding.searchView.settingButton.visibility = View.VISIBLE
-                    binding.searchView.addAlarmButton.visibility = View.VISIBLE
-                    binding.searchView.opencloseSearchButton.visibility = View.VISIBLE
-
-
-                }
-
-
-            }
-        }
 
 
         btnsClicks()
@@ -490,7 +479,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             infoViewModel.putTimer.collectLatest {
                 when (it) {
                     1 -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                        binding.searchView.addTimerButton.setImageResource(R.drawable.timeu)
 
                             downloaderViewModel.cancelDownloader()
 
@@ -500,11 +489,11 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                     }
 
                     -1 -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                        binding.searchView.addTimerButton.setImageResource(R.drawable.timeu)
                     }
 
                     else -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
+                        binding.searchView.addTimerButton.setImageResource(R.drawable.time_left)
                     }
                 }
             }
@@ -519,17 +508,17 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             infoViewModel.putDataConsumptionTimer.collectLatest {
                 when {
                     it == -1L -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                        binding.searchView.addTimerButton.setImageResource(R.drawable.timeu)
                     }
 
                     it < 0L -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.timeu)
+                        binding.searchView.addTimerButton.setImageResource(R.drawable.timeu)
                         infoViewModel.stopdatatimer(true)
                         //  Exoplayer.releasePlayer(this@MainActivity)
                     }
 
                     else -> {
-                        binding.searchView.addAlarmButton.setImageResource(R.drawable.time_left)
+                        binding.searchView.addTimerButton.setImageResource(R.drawable.time_left)
                     }
                 }
             }
@@ -573,8 +562,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         binding.radioplayer.RadioNameImVFrag.isSelected = true
         binding.radioplayer.RadioNameImVFrag.text = radioVar.name
       //  binding.radioplayer.RadioNameImVFrag.text = simpleMediaViewModel.getPlayer().mediaMetadata.albumTitle?:""
-        binding.radioplayer.radioInfotxV.text = radioVar.icyState
+        binding.radioplayer.radioInfotxV.text = if(radioVar.icyState== "null") "" else radioVar.icyState
         //   binding.radioplayer.radioInfotxV.text = simpleMediaViewModel.getPlayer().mediaMetadata.title ?: ""
+
 
 
         if (!isRec) {
@@ -602,9 +592,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
     private fun btnsClicks() {
-        binding.searchView.settingButton.setSafeOnClickListener {
-            opensettingfrag()
-        }
+
         binding.searchView.ActionBarTitle.setSafeOnClickListener {
             if (binding.searchView.searchInputText.isVisible) {
                 closeSearch()
@@ -617,9 +605,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
                 //closesearchfrag()
             } else openSearch()
         }
-
-        binding.searchView.addAlarmButton.setSafeOnClickListener {
+        binding.searchView.addTimerButton.setSafeOnClickListener {
             // showCountdownTimerPopup()
+
             openCountdownTimer()
         }
     }
@@ -1175,9 +1163,46 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
     override fun onResume() {
         super.onResume()
-      //  setupTheme()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+
+              R.id.alarmFragment, R.id.settingAlarmFragment,
+                R.id.normalAlarmSetFragment, R.id.simpleAlarmSetFragment  -> {
+                    binding.searchView.addTimerButton.visibility = View.INVISIBLE
+                    binding.searchView.opencloseSearchButton.visibility = View.INVISIBLE
+                    binding.searchView.ActionBarTitle.isEnabled=false
+                    infoViewModel.putTitleText("Alarms")
+                }
+                R.id.fragmentSetting -> {
+                    binding.searchView.opencloseSearchButton.visibility = View.INVISIBLE
+                    binding.searchView.ActionBarTitle.isEnabled=false
+                }
+                else -> {
+                    binding.searchView.ActionBarTitle.isEnabled=true
+                    binding.searchView.addTimerButton.visibility = View.VISIBLE
+                    binding.searchView.opencloseSearchButton.visibility = View.VISIBLE
+
+
+                }
+
+
+            }
+        }
+
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            stopService(Intent(this, SimpleMediaService::class.java))
+
+        }
+
+        isServiceRunning = false
+    }
 
     private fun startService() {
 

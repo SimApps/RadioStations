@@ -183,8 +183,8 @@ class AlarmFragment : Fragment(R.layout.fragment_alarm), AlarmItem.OnItemClickLi
 
         }
 
-      //  binding.fabLayout.animationSize = interval
-        binding.fabLayout.fabAnimateDuration = interval.toInt()
+            // binding.fabLayout.animationSize = interval
+        //   binding.fabLayout.fabAnimateDuration = interval.toInt()
         // 일반 알람 설정
         binding.fab2.setOnSingleClickListener {
              val action = AlarmFragmentDirections.actionAlarmFragmentToNormalAlarmSetFragment()

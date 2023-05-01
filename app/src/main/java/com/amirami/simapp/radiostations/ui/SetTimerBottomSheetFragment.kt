@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import com.amirami.player_service.service.PlayerState
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.time
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -131,10 +132,7 @@ class SetTimerBottomSheetFragment :
             }
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            binding.timerUnitTxvw.visibility = View.GONE
-            binding.switchTmerData.visibility = View.GONE
-        }
+
 
         val spinnerTimerArray = resources.getStringArray(R.array.spinnerTimerArray)
         binding.numberPickers.minValue = 0
@@ -185,24 +183,12 @@ class SetTimerBottomSheetFragment :
             //   DynamicToast.makeError(context, isChecked.toString(), 3).show()
         }
 
-        binding.addalarmimageView.setSafeOnClickListener {
-            // val action = SetTimerBottomSheetFragmentDirections.actionSetTimerBottomSheetFragmentToAlarmFragment()
-         //   this@SetTimerBottomSheetFragment.findNavController().navigate(action)
 
-
-
-            if (canNavigate()) {
-                val action = SetTimerBottomSheetFragmentDirections.actionSetTimerBottomSheetFragmentToAlarmFragment()
-             //   findNavController().navigate(action) //
-                findNavController().navigate(R.id.alarmFragment) //
-            //NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-            }
-        }
 
 
         binding.buttonStartPause.setSafeOnClickListener {
             collectLatestLifecycleFlow(simpleMediaViewModel.isPlaying) {
-                if (!it) {
+                if (it == PlayerState.INITIANIAL || it == PlayerState.STOPED) {
                     DynamicToast.makeError(requireContext(), getString(R.string.Radio_is_off), 3).show()
                 } else {
                     val input = spinnerTimerArray[binding.numberPickers.value]!!
@@ -246,6 +232,5 @@ class SetTimerBottomSheetFragment :
         }
     }
 
-    private fun canNavigate() : Boolean = findNavController().currentDestination?.id == R.id.setTimerBottomSheetFragment
 
 }

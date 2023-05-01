@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -20,19 +21,20 @@ class SimpleMediaNotificationAdapter(
 ) : PlayerNotificationManager.MediaDescriptionAdapter {
 
     override fun getCurrentContentTitle(player: Player): CharSequence =
-       player.mediaMetadata.albumTitle ?: ""
-
-    // player.mediaMetadata.displayTitle ?: ""
-
-    // "DDDDD"
-
+         player.mediaMetadata.albumTitle ?: ""
     override fun createCurrentContentIntent(player: Player): PendingIntent? =
         pendingIntent
 
-    override fun getCurrentContentText(player: Player): CharSequence =
-        //  player.mediaMetadata.displayTitle ?: ""
-          player.mediaMetadata.title ?: ""
+    override fun getCurrentContentText(player: Player): CharSequence
+     =   player.mediaMetadata.displayTitle ?:
+     player.mediaMetadata.albumTitle?:
+     player.mediaMetadata.station?:
+     player.mediaMetadata.genre?:""
 
+
+
+    override fun getCurrentSubText(player: Player): CharSequence   =
+        player.mediaMetadata.genre?:""
 
     override fun getCurrentLargeIcon(
         player: Player,

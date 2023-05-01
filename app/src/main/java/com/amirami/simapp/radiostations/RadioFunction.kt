@@ -38,6 +38,7 @@ import coil.transform.RoundedCornersTransformation
 import com.amirami.simapp.radiostations.MainActivity.Companion.currentNativeAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.mInterstitialAd
 import com.amirami.simapp.radiostations.MainActivity.Companion.userRecord
+import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioEntity
@@ -580,8 +581,32 @@ import java.util.Locale
                     for (i in files.indices) {
                         val file = files[i]
                         s = RadioEntity()
-                        s.name = file.name
+
+
+
+
+                        if (file.name.contains("_ _", true) && file.name.contains("___", true)) {
+                            s.name = file.name.substring(0, file.name.indexesOf("_ _", true)[0])
+
+                            s.icyState = file.name.substring(
+                                file.name.indexesOf("_ _", true)[0] + 3,
+                                file.name.indexesOf("___", true)[0]
+                            ) + " " +
+                                    shortformateDate(
+                                        file.name.substring(
+                                            file.name.indexesOf("___", true)[0] + 3,
+                                            file.name.length - 4
+                                        )
+                                    ) + ".mp3"
+                        } else {
+                            s.name = file.name
+                            s.icyState = ""
+                        }
+
+
+
                         s.streamurl = file.toString()//Uri.fromFile(file)
+                        s.isRec = true
                         RcordInfo.add(s)
                     }
                 }

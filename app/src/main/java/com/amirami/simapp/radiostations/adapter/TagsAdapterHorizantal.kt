@@ -2,20 +2,25 @@ package com.amirami.simapp.radiostations.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.RecyclerView
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.RadioFunction
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.RadioHorizontalrecyclervTiketBinding
 import java.util.*
+data class Tags(
+    val name : String,
+    val image: Int,
 
-class TagsAdapterHorizantal(private val item: ArrayList<String>, private val images: ArrayList<Int>, private val listener: OnItemClickListener) : RecyclerView.Adapter<TagsAdapterHorizantal.MyViewHolder>() {
+)
+@UnstableApi class TagsAdapterHorizantal(private val item: ArrayList<Tags>, private val listener: OnItemClickListener) : RecyclerView.Adapter<TagsAdapterHorizantal.MyViewHolder>() {
 
-    inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) : RecyclerView.ViewHolder(binding.root) {
+    @UnstableApi inner class MyViewHolder(val binding: RadioHorizontalrecyclervTiketBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.apply {
                 cardViewMainRadio.setSafeOnClickListener {
-                    if (bindingAdapterPosition != RecyclerView.NO_POSITION) listener.onItemTagsClick(item[bindingAdapterPosition], images[bindingAdapterPosition])
+                    if (bindingAdapterPosition != RecyclerView.NO_POSITION) listener.onItemTagsClick(item[bindingAdapterPosition])
                 }
             }
         }
@@ -23,10 +28,10 @@ class TagsAdapterHorizantal(private val item: ArrayList<String>, private val ima
         fun bind(position: Int) {
             binding.apply {
                 //   RadioFunction.secondarytextviewColor(NbrradioStationTxV)
-                mainTxV.text = item[position].replaceFirstChar { it.uppercase() }
+                mainTxV.text = item[position].name.replaceFirstChar { it.uppercase() }
 
                 // countryFlagImageView.setImageResource(images[position])
-                RadioFunction.loadImageInt(images[position], MainActivity.imagedefaulterrorurl, imageViewRv)
+                RadioFunction.loadImageInt(item[position].image, MainActivity.imagedefaulterrorurl, imageViewRv)
             }
         }
     }
@@ -48,6 +53,6 @@ class TagsAdapterHorizantal(private val item: ArrayList<String>, private val ima
     override fun getItemCount() = item.size
 
     interface OnItemClickListener {
-        fun onItemTagsClick(item: String, image: Int)
+        fun onItemTagsClick(item: Tags)
     }
 }

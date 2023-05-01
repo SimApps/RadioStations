@@ -235,7 +235,7 @@ dependencies {
     implementation ("com.github.YvesCheung.RollingText:RollingText:1.2.11")
 
    // implementation(files("libs/customFloating-release.aar"))
-    implementation("com.robertlevonyan.view:CustomFloatingActionButton:3.1.4")
+    implementation("com.robertlevonyan.view:CustomFloatingActionButton:3.1.5")
 
     // ALARM LIB
     //implementation ("com.github.ColdTea-Projects:SmplrAlarm:2.1.1")

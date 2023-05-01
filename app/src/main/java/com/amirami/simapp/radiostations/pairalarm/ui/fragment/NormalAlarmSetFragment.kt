@@ -63,7 +63,7 @@ class NormalAlarmSetFragment : Fragment(R.layout.fragment_normal_alarm) {
 //if(argsFrom.alarmCode!="Empty")
         lifecycleScope.launch {
             alarmViewModel.getAlarmData(argsFrom.alarmCode ).collect {
-             if(argsFrom.alarmCode!="Empty")   binding.radioNameTxt.text = it.radio!!.name
+             if(argsFrom.alarmCode!="Empty")   binding.radioNameTxt.text = it.radio.name
                 binding.alarmData = it
                 alarmViewModel.currentAlarmBell.value = it.bell
                 alarmViewModel.currentAlarmMode.value = it.mode

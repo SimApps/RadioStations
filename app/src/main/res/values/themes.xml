@@ -35,8 +35,8 @@
     </style>
 
     <style name="RatingBar" parent="Theme.AppCompat">
-        <item name="colorControlNormal">@color/dark_Primary_Ads_Backround</item>
-        <item name="colorControlActivated">@color/orange</item>
+        <item name="colorControlNormal">?colorAccent</item>
+        <item name="colorControlActivated">?colorPrimary</item>
     </style>
 
 

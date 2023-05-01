@@ -3,6 +3,7 @@ package com.amirami.player_service.service
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -14,8 +15,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SimpleMediaService : MediaSessionService() {
 
-    @Inject
-    lateinit var player: ExoPlayer
+  //  @Inject
+  //  lateinit var player: ExoPlayer
 
     @Inject
     lateinit var mediaSession: MediaSession
@@ -38,9 +39,11 @@ class SimpleMediaService : MediaSessionService() {
         super.onDestroy()
         mediaSession.run {
             release()
-           /* if (player.playbackState != Player.STATE_IDLE) {
-                player.release()
-            }*/
+            if (player.playbackState != Player.STATE_IDLE) {
+                player.seekTo(0)
+                player.playWhenReady = false
+                player.stop()
+            }
         }
     }
 

@@ -19,6 +19,7 @@ import com.amirami.simapp.radiostations.RadioFunction.loadImageString
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
+import com.amirami.simapp.radiostations.adapter.Tags
 import com.amirami.simapp.radiostations.adapter.TagsAdapterHorizantal
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentMainBinding
@@ -53,8 +54,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private lateinit var adViewBigActivityMain: NativeAdView
 
     // Initializing an empty ArrayList to be filled with animals
-    private val popularTagList: ArrayList<String> = ArrayList()
-    private val popularImagetagList: ArrayList<Int> = ArrayList()
+    private val tagList: ArrayList<Tags> = ArrayList()
     private lateinit var binding: FragmentMainBinding
     private val infoViewModel: InfoViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
@@ -80,11 +80,10 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     }
     private fun setUpTagsRv() {
-        if (popularTagList.size == 0 && popularImagetagList.size == 0) {
+        if (tagList.size == 0) {
             addtagpopulat()
-            addimagetagpopulat()
         }
-        tagsAdapterHorizantal = TagsAdapterHorizantal(popularTagList, popularImagetagList, this)
+        tagsAdapterHorizantal = TagsAdapterHorizantal(tagList, this)
 
         binding.localPopularTagsRecycleView.apply {
             adapter = tagsAdapterHorizantal
@@ -94,32 +93,68 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
     }
     private fun addtagpopulat() {
-        popularTagList.add(getString(R.string.Languages))
-        popularTagList.add(getString(R.string.News))
-        popularTagList.add(getString(R.string.Pop))
-        popularTagList.add(getString(R.string.Hits))
-        popularTagList.add(getString(R.string.Rock))
-        popularTagList.add(getString(R.string.Electronic))
-        popularTagList.add(getString(R.string.Country))
-        popularTagList.add(getString(R.string.Reggae))
-        popularTagList.add(getString(R.string.Latin))
-        popularTagList.add(getString(R.string.States))
-        popularTagList.add(getString(R.string.Codecs))
+
+        tagList.add(
+            Tags(name = getString(R.string.Languages),
+            image =R.drawable.languages)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.News),
+                image =R.drawable.news)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.Pop),
+                image =R.drawable.pop)
+        )
+
+
+        tagList.add(
+            Tags(name = getString(R.string.Hits),
+                image =R.drawable.hits)
+        )
+
+
+        tagList.add(
+            Tags(name = getString(R.string.Rock),
+                image =R.drawable.rock)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.Electronic),
+                image =R.drawable.electronic)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.Country),
+                image =R.drawable.country)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.Reggae),
+                image =R.drawable.reggae)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.Latin),
+                image =R.drawable.latin)
+        )
+        tagList.add(
+            Tags(name = getString(R.string.States),
+                image =R.drawable.states)
+        )
+
+        tagList.add(
+            Tags(name = getString(R.string.Codecs),
+                image =R.drawable.codec)
+        )
+
+
+
     }
 
-    private fun addimagetagpopulat() {
-        popularImagetagList.add(R.drawable.languages)
-        popularImagetagList.add(R.drawable.news)
-        popularImagetagList.add(R.drawable.pop)
-        popularImagetagList.add(R.drawable.hits)
-        popularImagetagList.add(R.drawable.rock)
-        popularImagetagList.add(R.drawable.electronic)
-        popularImagetagList.add(R.drawable.country)
-        popularImagetagList.add(R.drawable.reggae)
-        popularImagetagList.add(R.drawable.latin)
-        popularImagetagList.add(R.drawable.states)
-        popularImagetagList.add(R.drawable.codec)
-    }
+
 
     private fun getLocalcountryName() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -359,9 +394,25 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
 
     private fun btnClick() {
+        binding.btnAlarm.setSafeOnClickListener {
+            if (canNavigate()) {
+
+
+                val action = MainFragmentDirections.actionMainFragmentToAlarmFragment()
+                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+        }
+
+        binding.btnSetting.setSafeOnClickListener {
+            if (canNavigate()) {
+                val action = MainFragmentDirections.actionMainFragmentToFragmentSetting()
+                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+            }
+        }
+
         binding.btnAllcountry.setSafeOnClickListener {
             if (canNavigate()) {
-                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
+               val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
                 findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
             }
         }
@@ -476,11 +527,11 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
     }
 
-    override fun onItemTagsClick(item: String, image: Int) {
+    override fun onItemTagsClick(item: Tags) {
         //   val intentActivityRadio = Intent(context, RadiosFragment::class.java)
         // val intentActivityListRadio = Intent(context, ListRadioFragment::class.java)
         if (canNavigate()) {
-            when (item) {
+            when (item.name) {
                 getString(R.string.Languages) -> {
                     retrofitRadioViewModel.getListRadios(getString(R.string.languages))
                     val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.languages))
@@ -499,8 +550,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                 else -> {
                     //  intentActivityRadio.putExtra("TagName", items[position])
 
-                    retrofitRadioViewModel.getRadios(item, "Empty")
-                    val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(item)
+                    retrofitRadioViewModel.getRadios(item.name, "Empty")
+                    val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(item.name)
                     this@MainFragment.findNavController().navigate(action) //  findNavController().navigate(action)
                 }
             }

@@ -251,32 +251,13 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
 
     override fun onRecItemClick(recordInfo: RadioEntity) {
 
-        val radioVariables = RadioEntity()
-        radioVariables.streamurl = recordInfo.streamurl
 
-        if (recordInfo.name.contains("_ _", true) && recordInfo.name.contains("___", true)) {
-            radioVariables.name = recordInfo.name.substring(0, recordInfo.name.indexesOf("_ _", true)[0])
-
-            radioVariables.homepage = recordInfo.name.substring(
-                recordInfo.name.indexesOf("_ _", true)[0] + 3,
-                recordInfo.name.indexesOf("___", true)[0]
-            ) + " " +
-                shortformateDate(
-                    recordInfo.name.substring(
-                        recordInfo.name.indexesOf("___", true)[0] + 3,
-                        recordInfo.name.length - 4
-                    )
-                ) + ".mp3"
-        } else {
-            radioVariables.name = recordInfo.name
-            radioVariables.homepage = ""
-        }
 
         val list =  moveItemToFirst(
             array = getRecordedFiles(requireContext()),
             item = recordInfo
         )
-        simpleMediaViewModel.loadData(radio = list, isRec = true)
+        simpleMediaViewModel.loadData(radio = list)
         simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
     }
 

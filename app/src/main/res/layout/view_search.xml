@@ -17,30 +17,20 @@
 
 
         <ImageButton
-            android:id="@+id/add_alarm_button"
+            android:id="@+id/add_timer_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_alignParentTop="false"
             android:layout_alignParentBottom="false"
             android:layout_centerVertical="true"
             android:layout_marginEnd="12dp"
-            android:layout_toStartOf="@id/setting_button"
+            android:layout_alignParentEnd="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/timeu" />
 
-        <ImageView
-            android:id="@+id/setting_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentTop="false"
-            android:layout_alignParentEnd="true"
-            android:layout_centerHorizontal="false"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="7dp"
-            android:contentDescription="@string/todo"
-            app:srcCompat="@drawable/settings" />
+
 
         <TextView
             android:id="@+id/Action_bar_title"
@@ -52,7 +42,7 @@
             android:layout_marginTop="6dp"
 
             android:layout_marginEnd="6dp"
-            android:layout_toStartOf="@+id/add_alarm_button"
+            android:layout_toStartOf="@+id/add_timer_button"
             android:layout_toEndOf="@+id/openclose_search_button"
             android:gravity="center_horizontal"
             android:text=""
@@ -69,7 +59,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="6dp"
-            android:layout_toStartOf="@+id/add_alarm_button"
+            android:layout_toStartOf="@+id/add_timer_button"
             android:layout_toEndOf="@+id/openclose_search_button"
 
             android:gravity="center_horizontal"
