@@ -169,7 +169,9 @@
                     app:default_artwork="@drawable/radio"
                     app:show_timeout="3000"
                     app:use_artwork="true"
-                    app:use_controller="true" />
+                    app:use_controller="true"
+                    app:show_buffering="always"
+                    app:auto_show="true"/>
             </androidx.media3.ui.AspectRatioFrameLayout>
 
 

@@ -255,7 +255,7 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
 
         val list =  moveItemToFirst(
             array = getRecordedFiles(requireContext()),
-            item = recordInfo
+            item = recordInfo.copy(isRec = true)
         )
         simpleMediaViewModel.loadData(radio = list)
         simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)

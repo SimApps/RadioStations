@@ -11,8 +11,8 @@ buildscript {
 
 
     dependencies {
-        classpath ("com.android.tools.build:gradle:7.4.2")
-        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.0")
+        classpath ("com.android.tools.build:gradle:8.0.1")
+        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
         classpath ("com.google.gms:google-services:4.3.15")
        // classpath 'io.fabric.tools:gradle:1.31.0'  // Crashlytics plugin
 
@@ -25,13 +25,13 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 
-        classpath ("androidx.navigation:navigation-safe-args-gradle-plugin:2.6.0-alpha09")
+        classpath ("androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3")
 
 
         //Dager hilt
-        classpath ("com.google.dagger:hilt-android-gradle-plugin:2.45")
+        classpath ("com.google.dagger:hilt-android-gradle-plugin:2.46")
 
-        classpath ("org.jetbrains.kotlin:kotlin-serialization:1.8.10")
+        classpath ("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
 
 
         // licence info
@@ -45,7 +45,7 @@ buildscript {
 }
 
 plugins {
-    id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
+    id("com.google.devtools.ksp") version "1.8.21-1.0.11" apply false
 }
 
 allprojects {

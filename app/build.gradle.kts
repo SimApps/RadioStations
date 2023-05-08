@@ -44,12 +44,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.activity:activity-ktx:1.7.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
@@ -126,7 +126,7 @@ dependencies {
 
 
     // Import the BoM for the Firebase platform
-    implementation (platform("com.google.firebase:firebase-bom:31.5.0"))
+    implementation (platform("com.google.firebase:firebase-bom:32.0.0"))
 
     // Add the Firebase Crashlytics SDK.
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -171,7 +171,7 @@ dependencies {
 
 
     // this line below because a wierd warning about viewbinding
-    compileOnly("com.android.databinding:viewbinding:8.0.0")
+    compileOnly("com.android.databinding:viewbinding:8.0.1")
 
 // Navigation Component dependencies
     implementation("androidx.navigation:navigation-fragment-ktx:2.6.0-beta01")
@@ -198,7 +198,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     //kotlin caroutine
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.0")
 
 
     // - - Room Persistence Library

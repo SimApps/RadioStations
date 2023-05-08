@@ -304,12 +304,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
         collectLatestLifecycleFlow(simpleMediaViewModel.state) { state ->
 
+Log.d("iikjnhb",state.radioState.isRec.toString())
 
 
-            if (state.isRecFile) {
-                binding.radioplayer.likeImageView.setImageResource(R.drawable.ic_recordings_folder)
-                binding.radioplayer.likeImageViewPlayermain.setImageResource(R.drawable.ic_recordings_folder)
-            }
 
 
             if (state.playerState == PlayerState.PLAYING) {
@@ -328,7 +325,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
             infoViewModel.putRadioInfo(radioVar)
             simpleMediaViewModel.upsertRadio(radioVar)
 
-            setPlayer(radioVar = radioVar, isRec = state.isRecFile)
+            setPlayer(radioVar = radioVar)
 
 
             binding.radioplayer.likeImageViewPlayermain.setSafeOnClickListener {
@@ -555,7 +552,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
     }
 
 
-    private fun setPlayer(radioVar : RadioEntity,isRec : Boolean) {
+    private fun setPlayer(radioVar : RadioEntity) {
 
         vedeoisOnviews(radioVar.favicon)
 
@@ -566,8 +563,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         //   binding.radioplayer.radioInfotxV.text = simpleMediaViewModel.getPlayer().mediaMetadata.title ?: ""
 
 
-
-        if (!isRec) {
+        if (!radioVar.isRec) {
             val isFav = infoViewModel.isFavRadio(radioVar)
             binding.radioplayer.likeImageViewPlayermain.setFavIcon(isFav)
             binding.radioplayer.likeImageView.setFavIcon(isFav)
