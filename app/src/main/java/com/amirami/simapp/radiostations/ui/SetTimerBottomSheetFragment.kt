@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.amirami.player_service.service.PlayerState
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.time
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.databinding.CountdownTimerPopupBinding
 import com.amirami.simapp.radiostations.viewmodel.DownloaderViewModel
@@ -58,7 +59,7 @@ class SetTimerBottomSheetFragment :
 
 
 
-        collectLatestLifecycleFlow(infoViewModel.putTimer) {
+        collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putTimer) {
             if (binding.timerUnitTxvw.text == getString(R.string.Minute)) {
                 //     DynamicToast.makeError(requireContext(), it.toString(), 3).show()
                 val days = it / 86400
@@ -79,7 +80,7 @@ class SetTimerBottomSheetFragment :
                         binding.switchTmerData.visibility = View.VISIBLE
                         binding.numberpikerLl.visibility = View.VISIBLE
                         binding.textViewCountdown.visibility = View.GONE
-                        collectLatestLifecycleFlow(downloaderViewModel.downloadState) { downloadState ->
+                        collectLatestLifecycleFlow(lifecycleOwner = this,downloaderViewModel.downloadState) { downloadState ->
                             downloaderViewModel.cancelDownloader()
                         }
 
@@ -102,7 +103,7 @@ class SetTimerBottomSheetFragment :
             }
         }
 
-        collectLatestLifecycleFlow(infoViewModel.putDataConsumptionTimer) {
+        collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putDataConsumptionTimer) {
             //    DynamicToast.makeError(requireContext(), it.toString(), 3).show()
 
             if (binding.timerUnitTxvw.text == getString(R.string.MB)) {
@@ -187,7 +188,7 @@ class SetTimerBottomSheetFragment :
 
 
         binding.buttonStartPause.setSafeOnClickListener {
-            collectLatestLifecycleFlow(simpleMediaViewModel.isPlaying) {
+            collectLatestLifecycleFlow(lifecycleOwner = this,simpleMediaViewModel.isPlaying) {
                 if (it == PlayerState.INITIANIAL || it == PlayerState.STOPED) {
                     DynamicToast.makeError(requireContext(), getString(R.string.Radio_is_off), 3).show()
                 } else {
@@ -224,13 +225,7 @@ class SetTimerBottomSheetFragment :
         super.onDestroyView()
         _binding = null
     }
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 
 
 }

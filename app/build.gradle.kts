@@ -85,7 +85,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     // kotlin serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
 
     //reetrofit
@@ -185,8 +185,8 @@ dependencies {
 
 
     //dager hilt
-    implementation("com.google.dagger:hilt-android:2.46")
-    kapt("com.google.dagger:hilt-compiler:2.46")
+    implementation("com.google.dagger:hilt-android:2.46.1")
+    kapt("com.google.dagger:hilt-compiler:2.46.1")
 
     kapt("androidx.hilt:hilt-compiler:1.0.0")
     
@@ -198,7 +198,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     //kotlin caroutine
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
 
 
     // - - Room Persistence Library

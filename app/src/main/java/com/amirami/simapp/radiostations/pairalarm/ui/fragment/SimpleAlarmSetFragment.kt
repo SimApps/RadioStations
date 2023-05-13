@@ -12,8 +12,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.warningToast
 import com.amirami.simapp.radiostations.pairalarm.extensions.clearKeyBoardFocus
 import com.amirami.simapp.radiostations.pairalarm.extensions.setOnSingleClickListener
@@ -29,7 +31,7 @@ import kotlinx.coroutines.launch
 import com.amirami.simapp.radiostations.databinding.FargmentSimpleAlarmSetBinding
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class SimpleAlarmSetFragment : Fragment(R.layout.fargment_simple_alarm_set) {
     private lateinit var binding: FargmentSimpleAlarmSetBinding
     private val alarmViewModel: AlarmViewModel by activityViewModels()
@@ -190,7 +192,7 @@ class SimpleAlarmSetFragment : Fragment(R.layout.fargment_simple_alarm_set) {
         binding.cancelButton.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
-        collectLatestLifecycleFlow(infoViewModel.putRadioInfo) { radioVar ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putRadioInfo) { radioVar ->
 
             binding.radioNameNormalTxt.text = radioVar.name
             binding.saveButton.setOnSingleClickListener {
@@ -246,11 +248,5 @@ class SimpleAlarmSetFragment : Fragment(R.layout.fargment_simple_alarm_set) {
 
 
 
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        this.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 }

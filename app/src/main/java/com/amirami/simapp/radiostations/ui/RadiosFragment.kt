@@ -1,5 +1,7 @@
 package com.amirami.simapp.radiostations.ui
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -14,9 +16,11 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.countryCodeToName
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioAdapterVertical
+import com.amirami.simapp.radiostations.databinding.ActivityOnAlarmBinding
 import com.amirami.simapp.radiostations.databinding.FragmentRadiosBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.model.Status
@@ -25,6 +29,7 @@ import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -45,13 +50,12 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
         binding = FragmentRadiosBinding.bind(view)
 
         setupRadioLisRV()
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                retrofitRadioViewModel.queryString.collectLatest { queryString ->
-                    setUpRv(queryString)
-                }
-            }
-        }
+
+                    collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.queryString) { queryString ->
+                        setUpRv(queryString)
+                    }
+
+
 
         binding.itemErrorMessage.btnRetry.setSafeOnClickListener {
             if (argsFrom.msg != "Empty") {
@@ -83,57 +87,55 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
 
 
     private fun setUpRv(queryString : String?) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                retrofitRadioViewModel.responseRadio.collectLatest { response ->
-                    when (response.status) {
-                        Status.SUCCESS -> {
-                            if (response.data != null) {
-                                //     radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
 
-                                val list = response.data as MutableList<RadioEntity>
+                    collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.responseRadio) { response ->
+                        when (response.status) {
+                            Status.SUCCESS -> {
+                                if (response.data != null) {
+                                    //     radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
+
+                                    val list = response.data as MutableList<RadioEntity>
 
 
-                                viewLifecycleOwner.lifecycleScope.launch {
-                                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                                        infoViewModel.favList.collectLatest { favList ->
-                                            var filteredList = list.filter { it.name.contains(queryString.toString(),
-                                                ignoreCase = true) } as MutableList<RadioEntity>
-                                            if(favList.isNotEmpty()){
-                                                var   favlist = favList as ArrayList<RadioEntity>
+
+                                    collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.favList) {favList ->
+                                        val filteredList = list.filter { it.name.contains(queryString.toString(),
+                                            ignoreCase = true) } as MutableList<RadioEntity>
+                                        if(favList.isNotEmpty()){
+                                            val favlist = favList as ArrayList<RadioEntity>
 
 
 
 
-                                                for ((index, value) in filteredList.withIndex()) {
+                                            for ((index, value) in filteredList.withIndex()) {
 
-                                                    if(favlist.any { it.stationuuid == value.stationuuid })
-                                                        filteredList[index].fav = true
-
-                                                }
+                                                if(favlist.any { it.stationuuid == value.stationuuid })
+                                                    filteredList[index].fav = true
 
                                             }
-                                              radioAdapterHorizantal.setItems(items =filteredList)
-
 
                                         }
+                                        radioAdapterHorizantal.setItems(items =filteredList)
+
                                     }
-                                }
 
 
+
+
+
+                                    hideProgressBar()
+                                    binding.itemErrorMessage.root.visibility = View.INVISIBLE
+                                } else showErrorConnection(response.message!!)
+                            }
+                            Status.ERROR -> {
                                 hideProgressBar()
-                                binding.itemErrorMessage.root.visibility = View.INVISIBLE
-                            } else showErrorConnection(response.message!!)
+                                showErrorConnection(response.message!!)
+                            }
+                            Status.LOADING -> { displayProgressBar() }
                         }
-                        Status.ERROR -> {
-                            hideProgressBar()
-                            showErrorConnection(response.message!!)
-                        }
-                        Status.LOADING -> { displayProgressBar() }
+
                     }
-                }
-            }
-        }
+
 
         //  DynamicToast.makeError(requireContext(),argsFrom.msg+" , "+argsFrom.secondmsg, 3).show()
     }
@@ -187,4 +189,7 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
     override fun onFavClick(radio: RadioEntity) {
         TODO("Not yet implemented")
     }
+
+
+
 }

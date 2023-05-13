@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.MainActivity.Companion.defaultCountry
 import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterrorurl
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.loadImageString
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioAdapterHorizantal
@@ -38,6 +39,7 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -157,9 +159,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
 
     private fun getLocalcountryName() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                //  retrofitRadioViewModel.getLocalRadio(preferencesViewModel.preferencesFlow.first().default_country)
+
                 loadImageString(
                     requireContext(),
                     COUNTRY_FLAGS_BASE_URL + dataViewModel.getDefaultCountr().lowercase(Locale.ROOT)+".svg",
@@ -168,8 +168,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
                     Constatnts.CORNER_RADIUS_32F
                 )
             }
-        }
-    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -582,32 +581,36 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     override fun onMoreItemFavClick(radio: RadioEntity) = Unit
 
     private fun getRadioList() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.radioList.collectLatest { list ->
 
-                    val ladtListned = list.filter { it.isLastListned }
-                    if (ladtListned.isNotEmpty()) {
-                        radioAdapterLastPlayedRadioHorizantal = RadioFavoriteAdapterHorizantal(this@MainFragment)
-                        binding.lastPlayedRadioRv.apply {
-                            adapter = radioAdapterLastPlayedRadioHorizantal
-                            layoutManager = GridLayoutManager(requireContext(), 1, LinearLayoutManager.HORIZONTAL, false)
-                            setHasFixedSize(true)
+                    collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.radioList) { list ->
+                        val ladtListned = list.filter { it.isLastListned }
+                        if (ladtListned.isNotEmpty()) {
+                            radioAdapterLastPlayedRadioHorizantal = RadioFavoriteAdapterHorizantal(this@MainFragment)
+                            binding.lastPlayedRadioRv.apply {
+                                adapter = radioAdapterLastPlayedRadioHorizantal
+                                layoutManager = GridLayoutManager(requireContext(), 1, LinearLayoutManager.HORIZONTAL, false)
+                                setHasFixedSize(true)
+                            }
+                            radioAdapterLastPlayedRadioHorizantal.setItems(ladtListned)
+
+                            binding.lastPlayedRadioRv.visibility = View.VISIBLE
+                            binding.recentrecentlyplayedTxV.visibility = View.VISIBLE
+                        } else {
+                            binding.recentrecentlyplayedTxV.visibility = View.GONE
+                            binding.lastPlayedRadioRv.visibility = View.GONE
                         }
-                        radioAdapterLastPlayedRadioHorizantal.setItems(ladtListned)
-
-                        binding.lastPlayedRadioRv.visibility = View.VISIBLE
-                        binding.recentrecentlyplayedTxV.visibility = View.VISIBLE
-                    } else {
-                        binding.recentrecentlyplayedTxV.visibility = View.GONE
-                        binding.lastPlayedRadioRv.visibility = View.GONE
                     }
-                }
-            }
-        }
+
+
 
     }
 
 
     private fun canNavigate() : Boolean = findNavController().currentDestination?.id == R.id.mainFragment
+
+
+
+
+
+
 }

@@ -17,6 +17,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.amirami.simapp.radiostations.*
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.dynamicToast
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
@@ -61,7 +62,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
 
 
-        collectLatestLifecycleFlow(infoViewModel.putRadioInfo) { radioVar ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putRadioInfo) { radioVar ->
 
             setInfoRadio(radioVar)
             btnsVisibility(radioVar)
@@ -69,10 +70,8 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
 
 
-            binding.shareImageView.setSafeOnClickListener {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        simpleMediaViewModel.state.collectLatest { state ->
+
+                            collectLatestLifecycleFlow(lifecycleOwner = this,simpleMediaViewModel.state) { state ->
 
                             RadioFunction.shareRadio(
                                 context =  requireContext(),
@@ -80,9 +79,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                                 icy = state.radioState.icyState?:"",// state.icyStreamInfoState,
                                 isRec = state.isRecFile
                             )
-                        }
-                    }
-                }
+
 
 
 
@@ -182,13 +179,7 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
-    private fun <T> BottomSheetDialogFragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 
 
 

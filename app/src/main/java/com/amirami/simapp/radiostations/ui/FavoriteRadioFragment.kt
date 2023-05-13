@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterVertical
@@ -37,6 +38,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -94,11 +96,13 @@ class FavoriteRadioFragment :
         }
 
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                retrofitRadioViewModel.queryString.collectLatest { queryString ->
+
+
+                    collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.queryString) {queryString ->
+
+
                     getFavRadioRoom(queryString)
-                }}}
+                }
     }
 
 
@@ -115,28 +119,28 @@ class FavoriteRadioFragment :
 
     private fun getFavRadioRoom(queryString : String?) {
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.favList.collectLatest { list ->
-                    //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
-                     filterredList = (list.filter { it.name.contains(queryString.toString() ,
-                       ignoreCase = true) }as MutableList<RadioEntity>)
 
-                    if (filterredList.isNotEmpty()) {
-                        radioRoom.clear()
-                        radioRoom.addAll(filterredList)
+                    collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.favList) {list ->
+                        //    Log.d("MainFragment","ID ${list.map { it.id }}, Name ${list.map { it.name }}")
+                        filterredList = (list.filter { it.name.contains(queryString.toString() ,
+                            ignoreCase = true) }as MutableList<RadioEntity>)
 
-                        //    DynamicToast.makeError(requireContext(), list.size.toString(), 3).show()
-                        populateRecyclerView(filterredList)
-                        binding.whenemptyfavImage.visibility = View.GONE
-                        binding.rv.visibility = View.VISIBLE
-                    } else {
-                        binding.whenemptyfavImage.visibility = View.VISIBLE
-                        binding.rv.visibility = View.INVISIBLE
+                        if (filterredList.isNotEmpty()) {
+                            radioRoom.clear()
+                            radioRoom.addAll(filterredList)
+
+                            //    DynamicToast.makeError(requireContext(), list.size.toString(), 3).show()
+                            populateRecyclerView(filterredList)
+                            binding.whenemptyfavImage.visibility = View.GONE
+                            binding.rv.visibility = View.VISIBLE
+                        } else {
+                            binding.whenemptyfavImage.visibility = View.VISIBLE
+                            binding.rv.visibility = View.INVISIBLE
+                        }
                     }
-                }
-            }
-        }
+
+
+
 
     }
 
@@ -295,4 +299,7 @@ class FavoriteRadioFragment :
                     appUpdateManager.completeUpdate()                }
             }*/
     }
+
+
+
 }

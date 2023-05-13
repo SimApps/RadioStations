@@ -13,9 +13,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.navArgs
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.warningToast
 import com.amirami.simapp.radiostations.databinding.FragmentNormalAlarmBinding
@@ -32,7 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
+@UnstableApi @AndroidEntryPoint
 class NormalAlarmSetFragment : Fragment(R.layout.fragment_normal_alarm) {
     private lateinit var binding: FragmentNormalAlarmBinding
     private val alarmViewModel: AlarmViewModel by activityViewModels()
@@ -40,7 +42,7 @@ class NormalAlarmSetFragment : Fragment(R.layout.fragment_normal_alarm) {
 
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun   onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         DataBindingUtil.bind<FragmentNormalAlarmBinding>(view)?.let { binding = it } ?: return
@@ -145,7 +147,8 @@ class NormalAlarmSetFragment : Fragment(R.layout.fragment_normal_alarm) {
                 }
             )
         }
-        collectLatestLifecycleFlow(infoViewModel.putRadioInfo) {radioVar->
+
+        collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putRadioInfo) {radioVar->
             Log.d("yyhgth","kk " +radioVar.name)
 
             if(argsFrom.alarmCode=="Empty")       binding.radioNameTxt.text = radioVar.name
@@ -409,13 +412,7 @@ class NormalAlarmSetFragment : Fragment(R.layout.fragment_normal_alarm) {
         }
     }
 
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        this.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 
 
 }

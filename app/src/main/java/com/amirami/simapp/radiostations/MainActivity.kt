@@ -35,6 +35,7 @@ import coil.ImageLoader
 import coil.request.ImageRequest
 import com.amirami.player_service.service.PlayerState
 import com.amirami.player_service.service.SimpleMediaService
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.errorToast
 import com.amirami.simapp.radiostations.RadioFunction.getCurrentDate
 import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
@@ -191,7 +192,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
 
-        collectLatestLifecycleFlow(downloaderViewModel.downloadState) { downloadState ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,downloaderViewModel.downloadState) { downloadState ->
 
             binding.radioplayer.recordOffONButton.setSafeOnClickListener {
 
@@ -280,7 +281,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
 
-        collectLatestLifecycleFlow(simpleMediaViewModel.uiState) { uiState ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,simpleMediaViewModel.uiState) { uiState ->
             when (uiState) {
                 is UIState.Initial -> {
                     Log.d("eedrd", "Initial")
@@ -302,7 +303,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
 
 
 
-        collectLatestLifecycleFlow(simpleMediaViewModel.state) { state ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,simpleMediaViewModel.state) { state ->
 
 Log.d("iikjnhb",state.radioState.isRec.toString())
 
@@ -392,7 +393,7 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
             }
         }
 
-        collectLatestLifecycleFlow(infoViewModel.radioList) { list ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.radioList) { list ->
 
               favList = list.filter { it.fav }
             setupRadioLisRV()
@@ -553,7 +554,7 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
 
 
     private fun setPlayer(radioVar : RadioEntity) {
-
+Log.d("tfgvcfdx","frfgv")
         vedeoisOnviews(radioVar.favicon)
 
         binding.radioplayer.RadioNameImVFrag.isSelected = true
@@ -687,14 +688,15 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
     }
 
     private fun setDataConsumption() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putDataConsumption.collectLatest {
-                    if (it != "Not Suported") binding.radioplayer.datainfotxvw.text = it
-                    else binding.radioplayer.datainfotxvw.visibility = View.GONE
-                }
-            }
-        }
+
+                    collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putDataConsumption) {
+                        if (it != "Not Suported") binding.radioplayer.datainfotxvw.text = it
+                        else binding.radioplayer.datainfotxvw.visibility = View.GONE
+                    }
+
+
+
+
     }
 
     fun loadNativeAdPlayer() {
@@ -810,23 +812,23 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
     }
 
     private fun setTitleText() {
-        collectLatestLifecycleFlow(networkViewModel.isConnected) { isConnected ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,networkViewModel.isConnected) { isConnected ->
             if (isConnected) {
                 binding.searchView.opencloseSearchButton.visibility = View.VISIBLE
 
-                lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        infoViewModel.putTitleText.collectLatest { title ->
-                            binding.searchView.ActionBarTitle.text = title
+                            collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putTitleText) { title ->
+                                binding.searchView.ActionBarTitle.text = title
 
-                            if (title != getString(R.string.Search)) {
-                                // if (binding.searchView.searchOpenView.isAttachedToWindow) {
-                                closeSearch()
-                                //  }
+                                if (title != getString(R.string.Search)) {
+                                    // if (binding.searchView.searchOpenView.isAttachedToWindow) {
+                                    closeSearch()
+                                    //  }
+                                }
                             }
-                        }
-                    }
-                }
+
+
+
+
 
             } else {
 
@@ -1148,13 +1150,7 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
         }
     }
 
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        this.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 
 
     override fun onResume() {

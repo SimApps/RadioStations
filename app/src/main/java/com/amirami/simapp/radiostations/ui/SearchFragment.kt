@@ -10,6 +10,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
@@ -18,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.setFavIcon
 import com.amirami.simapp.radiostations.adapter.RadioAdapterVertical
 import com.amirami.simapp.radiostations.databinding.FragmentSearchBinding
@@ -30,6 +32,7 @@ import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -51,10 +54,9 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
 
 
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.putSearchQuery.collectLatest { query ->
+
                     //   DynamicToast.makeError(requireContext(), query , 3).show()
+                    collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.putSearchQuery) { query ->
 
                     binding.itemErrorMessage.btnRetry.setOnClickListener {
                         if (query != "") {
@@ -64,8 +66,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                         } else {
                             binding.itemErrorMessage.root.visibility = View.INVISIBLE
                         }
-                    }
-                }
+
             }
         }
 
@@ -73,9 +74,8 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
     }
 
     private fun setUpRv() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                retrofitRadioViewModel.responseRadioSreach.collectLatest { response ->
+
+                   collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.responseRadioSreach) { response ->
                     when (response.status) {
                         Status.SUCCESS -> {
                             if (response.data != null) {
@@ -84,30 +84,30 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                                 binding.itemErrorMessage.root.visibility = View.INVISIBLE
                                 // radioAdapterHorizantal.radiodiffer = response.data as List<RadioVariables>
                                 setupRadioLisRV()
-                                // DynamicToast.makeError(requireContext(), "query" , 3).show()
-                                viewLifecycleOwner.lifecycleScope.launch {
-                                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                                        infoViewModel.favList.collectLatest { favList ->
-                                             filteredList = response.data as MutableList<RadioEntity>
-
-                                            if(favList.isNotEmpty()){
-                                                val favlist = favList as ArrayList<RadioEntity>
 
 
+                                            collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.favList) { favList ->
 
-                                                for ((index, value) in filteredList.withIndex()) {
+                                                filteredList = response.data as MutableList<RadioEntity>
+                                                if(favList.isNotEmpty()){
+                                                    val favlist = favList as ArrayList<RadioEntity>
 
-                                                    if(favlist.any { it.stationuuid == value.stationuuid })
-                                                        filteredList[index].fav = true
 
+
+                                                    for ((index, value) in filteredList.withIndex()) {
+
+                                                        if(favlist.any { it.stationuuid == value.stationuuid })
+                                                            filteredList[index].fav = true
+
+                                                    }
                                                 }
+
+                                                radioAdapterHorizantal.setItems(filteredList)
+
                                             }
 
-                                            radioAdapterHorizantal.setItems(filteredList)
 
-                                        }
-                                    }
-                                }
+
                             } else showErrorConnection(response.message!!)
                         }
                         Status.ERROR -> {
@@ -118,8 +118,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
                             displayProgressBar()
                         }
                     }
-                }
-            }
+
         }
     }
     private fun showErrorConnection(msg: String) {
@@ -287,12 +286,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), RadioAdapterVertical.
         }
     }
 
-    /*
-        fun <T> Fragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    flow.collectLatest(collect)
-                }
-            }
-        }*/
+
 }
+
+

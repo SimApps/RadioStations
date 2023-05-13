@@ -12,6 +12,7 @@ import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiostations.MainActivity
 import com.amirami.simapp.radiostations.R
 import com.amirami.simapp.radiostations.RadioFunction
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.databinding.StatisticsDialogueBinding
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -53,7 +54,7 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
 
 
 
-        collectLatestLifecycleFlow(retrofitRadioViewModel.statsresponse) { response ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.statsresponse) { response ->
             when (response.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -103,11 +104,5 @@ class StatisticBottomSheetFragment : BottomSheetDialogFragment() {
         binding.spinKits.visibility = View.GONE
     }
 
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 }

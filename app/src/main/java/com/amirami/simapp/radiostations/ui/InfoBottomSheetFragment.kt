@@ -210,13 +210,7 @@ class InfoBottomSheetFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 
     fun setprogressbarVisible() {
         binding.spinKitYesNoDialog.visibility = View.VISIBLE

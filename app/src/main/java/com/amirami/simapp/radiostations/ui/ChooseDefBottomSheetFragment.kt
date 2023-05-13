@@ -13,6 +13,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
 import com.amirami.simapp.radiostations.adapter.RadioListAdapterVertical
 import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
@@ -133,7 +134,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
     }
 
     private fun setUpListCountryRv() {
-        collectLatestLifecycleFlow(retrofitRadioViewModel.responseListCountrieRadio) { response ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.responseListCountrieRadio) { response ->
             when (response.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -156,7 +157,7 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         }
     }
     private fun setUpRv() {
-        collectLatestLifecycleFlow(retrofitRadioViewModel.responseRadioList) { response ->
+        collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.responseRadioList) { response ->
             when (response.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -204,11 +205,5 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         super.onDestroyView()
         _binding = null
     }
-    private fun <T> collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow.collectLatest(collect)
-            }
-        }
-    }
+
 }

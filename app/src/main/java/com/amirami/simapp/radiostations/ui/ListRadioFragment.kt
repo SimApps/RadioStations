@@ -16,6 +16,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amirami.simapp.radiostations.*
 import com.amirami.simapp.radiostations.R
+import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.getRecordedFiles
 import com.amirami.simapp.radiostations.RadioFunction.indexesOf
 import com.amirami.simapp.radiostations.RadioFunction.moveItemToFirst
@@ -34,6 +35,7 @@ import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
 import com.amirami.simapp.radiostations.viewmodel.UIEvent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -56,41 +58,35 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentListradioBinding.bind(view)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                infoViewModel.recordEvents.collectLatest { event ->
-                    when (event) {
-                        is InfoViewModel.RecordInfoEvents.UpdateRecList -> {
-                            run {
-                                if (event.update) {
-                                    RadioFunction.deleteRecordedItem(event.position, requireContext())
-                                    setUpRecord()
+
+                    collectLatestLifecycleFlow(lifecycleOwner = this,infoViewModel.recordEvents) { event ->
+                        when (event) {
+                            is InfoViewModel.RecordInfoEvents.UpdateRecList -> {
+                                run {
+                                    if (event.update) {
+                                        RadioFunction.deleteRecordedItem(event.position, requireContext())
+                                        setUpRecord()
+                                    }
                                 }
                             }
-                        }
-                    }.exhaustive
-                }
-            }
-        }
-
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                downloaderViewModel.downloadState.collectLatest { downloadState ->
-                    if (argsFrom.msg == resources.getString(R.string.Recordings)) {
-                        binding.floatingActionAddDownload.setSafeOnClickListener {
-                            if (downloadState.isDownloading) {
-                                 downloaderViewModel.cancelDownloader()
-                            } else {
-                                val action = ListRadioFragmentDirections.actionListRadioFragmentToAddDialogueBottomSheetFragment(true)
-                                NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-
-                            }
-                        }
-
+                        }.exhaustive
                     }
-                }
-            }
+
+
+                    collectLatestLifecycleFlow(lifecycleOwner = this,downloaderViewModel.downloadState) { downloadState ->
+                        if (argsFrom.msg == resources.getString(R.string.Recordings)) {
+                            binding.floatingActionAddDownload.setSafeOnClickListener {
+                                if (downloadState.isDownloading) {
+                                    downloaderViewModel.cancelDownloader()
+                                } else {
+                                    val action = ListRadioFragmentDirections.actionListRadioFragmentToAddDialogueBottomSheetFragment(true)
+                                    NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+
+                                }
+                            }
+
+                        }
+
         }
 
         binding.itemErrorMessage.btnRetry.setSafeOnClickListener {
@@ -111,11 +107,12 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
 
         if (argsFrom.msg != resources.getString(R.string.Recordings)) {
             setupRadioLisRV()
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    retrofitRadioViewModel.queryString.collectLatest { queryString ->
-                        setUpRv(queryString)
-                    }}}
+
+                        collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.queryString) { queryString ->
+                            setUpRv(queryString)
+                        }
+
+
 
             binding.floatingActionAddDownload.visibility = View.INVISIBLE
         } else if (argsFrom.msg == resources.getString(R.string.Recordings)) {
@@ -135,68 +132,67 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
 
     private fun setUpRv(queryString : String?) {
         if (argsFrom.msg == getString(R.string.countries)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    retrofitRadioViewModel.responseListCountrieRadio.collectLatest { response ->
-                        when (response.status) {
-                            Status.SUCCESS -> {
-                                if (response.data != null) {
+
+                        collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.responseListCountrieRadio) { response ->
+                            when (response.status) {
+                                Status.SUCCESS -> {
+                                    if (response.data != null) {
+                                        hideProgressBar()
+                                        binding.itemErrorMessage.root.visibility = View.INVISIBLE
+                                        //     radioAdapterHorizantal.radioListdffer = response.data as List<RadioVariables>
+
+
+
+                                        val countryList = response.data as MutableList<RadioEntity>
+                                        radioAdapterHorizantal.setItems(countryList.filter {
+                                            RadioFunction.countryCodeToName(it.name).contains(queryString.toString() ,
+                                                ignoreCase = true) }as MutableList<RadioEntity>)
+
+
+                                    } else showErrorConnection(response.message!!)
+                                }
+                                Status.ERROR -> {
                                     hideProgressBar()
-                                    binding.itemErrorMessage.root.visibility = View.INVISIBLE
-                                    //     radioAdapterHorizantal.radioListdffer = response.data as List<RadioVariables>
-
-
-
-                                                val countryList = response.data as MutableList<RadioEntity>
-                                                radioAdapterHorizantal.setItems(countryList.filter {
-                                                    RadioFunction.countryCodeToName(it.name).contains(queryString.toString() ,
-                                                    ignoreCase = true) }as MutableList<RadioEntity>)
-
-
-                                } else showErrorConnection(response.message!!)
+                                    showErrorConnection(response.message!!)
+                                    binding.itemErrorMessage.root.visibility = View.VISIBLE
+                                }
+                                Status.LOADING -> {
+                                    displayProgressBar()
+                                }
                             }
-                            Status.ERROR -> {
-                                hideProgressBar()
-                                showErrorConnection(response.message!!)
-                                binding.itemErrorMessage.root.visibility = View.VISIBLE
-                            }
-                            Status.LOADING -> {
-                                displayProgressBar()
-                            }
+
                         }
-                    }
-                }
-            }
+
         }
         else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    retrofitRadioViewModel.responseRadioList.collectLatest { response ->
-                        when (response.status) {
-                            Status.SUCCESS -> {
-                                if (response.data != null) {
+
+
+                        collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.responseRadioList) { response ->
+                            when (response.status) {
+                                Status.SUCCESS -> {
+                                    if (response.data != null) {
+                                        hideProgressBar()
+                                        binding.itemErrorMessage.root.visibility = View.INVISIBLE
+
+                                        val countryList = response.data as MutableList<RadioEntity>
+                                        radioAdapterHorizantal.setItems(countryList.filter { it.name.contains(queryString.toString(),
+                                            ignoreCase = true) }as MutableList<RadioEntity>)
+
+                                    } else showErrorConnection(response.message!!)
+                                }
+                                Status.ERROR -> {
                                     hideProgressBar()
-                                    binding.itemErrorMessage.root.visibility = View.INVISIBLE
+                                    showErrorConnection(response.message!!)
+                                    binding.itemErrorMessage.root.visibility = View.VISIBLE
+                                }
+                                Status.LOADING -> {
+                                    displayProgressBar()
+                                }
+                            }
 
-                                    val countryList = response.data as MutableList<RadioEntity>
-                                    radioAdapterHorizantal.setItems(countryList.filter { it.name.contains(queryString.toString(),
-                                        ignoreCase = true) }as MutableList<RadioEntity>)
-
-                                } else showErrorConnection(response.message!!)
-                            }
-                            Status.ERROR -> {
-                                hideProgressBar()
-                                showErrorConnection(response.message!!)
-                                binding.itemErrorMessage.root.visibility = View.VISIBLE
-                            }
-                            Status.LOADING -> {
-                                displayProgressBar()
-                            }
                         }
                     }
-                }
-            }
-        }
+
     }
     fun showErrorConnection(msg: String) {
         binding.itemErrorMessage.root.visibility = View.VISIBLE
@@ -267,35 +263,9 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
     }
 
     private fun setUpRecord() {
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                retrofitRadioViewModel.queryString.collectLatest { queryString ->
-                    val filterdRecordList = getRecordedFiles(requireContext()).filter { it.name.contains(queryString.toString(), ignoreCase = true) } as MutableList<RadioEntity>
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (filterdRecordList.size == 0) {
-                            binding.listViewCountriesLiradio.visibility = View.GONE
-                            binding.whenemptyrecordImage.visibility = View.VISIBLE
-                        } else {
-                            setupRecordedFilesRV()
-                            recordedFilesAdapter.setItems(filterdRecordList)
-                            binding.whenemptyrecordImage.visibility = View.GONE
-                            binding.listViewCountriesLiradio.visibility = View.VISIBLE
-                        }
-
-                    } else {
-                        val list=   listOf(
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        )
-
-                        // Initialize a new instance of ManagePermissions class
-                        managePermissions = ManagePermissions(requireActivity(), list, PermissionsRequestCode)
-
-                        if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
-                            managePermissions.checkPermissions()
-                        } else {
-                            //  if (RadioFunction.allPermissionsGranted(requireContext())) {
+                    collectLatestLifecycleFlow(lifecycleOwner = this,retrofitRadioViewModel.queryString) { queryString ->
+                        val filterdRecordList = getRecordedFiles(requireContext()).filter { it.name.contains(queryString.toString(), ignoreCase = true) } as MutableList<RadioEntity>
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             if (filterdRecordList.size == 0) {
                                 binding.listViewCountriesLiradio.visibility = View.GONE
                                 binding.whenemptyrecordImage.visibility = View.VISIBLE
@@ -305,11 +275,39 @@ class ListRadioFragment : Fragment(R.layout.fragment_listradio), RadioListAdapte
                                 binding.whenemptyrecordImage.visibility = View.GONE
                                 binding.listViewCountriesLiradio.visibility = View.VISIBLE
                             }
+
+                        } else {
+                            val list=   listOf(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            )
+
+                            // Initialize a new instance of ManagePermissions class
+                            managePermissions = ManagePermissions(requireActivity(), list, PermissionsRequestCode)
+
+                            if (managePermissions.isPermissionsGranted() != PackageManager.PERMISSION_GRANTED) {
+                                managePermissions.checkPermissions()
+                            } else {
+                                //  if (RadioFunction.allPermissionsGranted(requireContext())) {
+                                if (filterdRecordList.size == 0) {
+                                    binding.listViewCountriesLiradio.visibility = View.GONE
+                                    binding.whenemptyrecordImage.visibility = View.VISIBLE
+                                } else {
+                                    setupRecordedFilesRV()
+                                    recordedFilesAdapter.setItems(filterdRecordList)
+                                    binding.whenemptyrecordImage.visibility = View.GONE
+                                    binding.listViewCountriesLiradio.visibility = View.VISIBLE
+                                }
+                            }
                         }
                     }
-                }}}
+
+
 
 
 
     }
+
+
+
 }

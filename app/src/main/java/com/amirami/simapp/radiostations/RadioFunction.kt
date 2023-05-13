@@ -25,7 +25,10 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.core.graphics.toColorInt
 import androidx.core.os.bundleOf
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.Navigation
 import coil.ImageLoader
@@ -58,6 +61,9 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -1013,7 +1019,13 @@ import java.util.Locale
         return array.toList()
     }
 
-
+     fun <T> collectLatestLifecycleFlow(lifecycleOwner : LifecycleOwner, flow: Flow<T>, collect: suspend (T) -> Unit) {
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                flow.collectLatest(collect)
+            }
+        }
+    }
   /*  private fun handleFavClick(context: Context,radioVar : RadioEntity, isRec: Boolean){
         if (!isRec) {
             val isFav = infoViewModel.isFavRadio(radioVar)
