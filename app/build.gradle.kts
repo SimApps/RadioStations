@@ -65,7 +65,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.activity:activity-ktx:1.7.1")
@@ -105,16 +105,16 @@ dependencies {
     implementation("io.coil-kt:coil-svg:2.3.0")
 
 
-    implementation("androidx.media3:media3-ui:1.0.1")
-    implementation("androidx.media3:media3-exoplayer:1.0.1")
+    implementation("androidx.media3:media3-ui:1.0.2")
+    implementation("androidx.media3:media3-exoplayer:1.0.2")
     // For DASH playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-dash:1.0.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.2")
     // For HLS playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-hls:1.0.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.0.2")
 // For RTSP playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.1")
+    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.2")
 // For exposing and controlling media sessions
-    implementation("androidx.media3:media3-session:1.0.1")
+    implementation("androidx.media3:media3-session:1.0.2")
 
 
 
@@ -174,8 +174,8 @@ dependencies {
     compileOnly("com.android.databinding:viewbinding:8.0.1")
 
 // Navigation Component dependencies
-    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0-beta01")
-    implementation("androidx.navigation:navigation-ui-ktx:2.6.0-beta01")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0-rc01")
+    implementation("androidx.navigation:navigation-ui-ktx:2.6.0-rc01")
 
     // Coroutine Lifecycle Scopes
     implementation("androidx.fragment:fragment-ktx:1.5.7")

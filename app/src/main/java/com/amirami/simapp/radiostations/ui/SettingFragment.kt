@@ -484,11 +484,11 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         displayProgressBar()
         favoriteFirestoreViewModel.getAllRadioFavoriteListFromFirestore.observe(viewLifecycleOwner) { DataOrExceptionProdNames ->
             val productList = DataOrExceptionProdNames.data
-            if (productList != null && productList.isNotEmpty()) {
+            if (!productList.isNullOrEmpty()) {
                 saveFaveRadioFromFirestoreToRoom()
-                for (i in 0 until productList[0].size) {
-                    retrofitRadioViewModel.getRadiosByUId(productList[0][i])
-                    if (i == productList[0].size - 1 && saveRoomToFirestore) getFavRadioRoom(false)
+                for (i in 0 until productList.first().size) {
+                    retrofitRadioViewModel.getRadiosByUId(productList.first()[i])
+                    if (i == productList.first().size - 1 && saveRoomToFirestore) getFavRadioRoom(false)
                 }
                 hideProgressBar()
             }
@@ -509,7 +509,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
                         hideProgressBar()
-                        val radio = response.data[0]
+                        val radio = response.data.first()
 
                         radio.fav = true
                         infoViewModel.upsertRadio(radio, "Radio added")

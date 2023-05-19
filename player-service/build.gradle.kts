@@ -35,7 +35,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -48,23 +48,23 @@ dependencies {
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
     //dager hilt
-    implementation("com.google.dagger:hilt-android:2.46")
-    kapt("com.google.dagger:hilt-compiler:2.46")
+    implementation("com.google.dagger:hilt-android:2.46.1")
+    kapt("com.google.dagger:hilt-compiler:2.46.1")
 
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
 
 
 
-    implementation("androidx.media3:media3-ui:1.0.1")
-    implementation("androidx.media3:media3-exoplayer:1.0.1")
+    implementation("androidx.media3:media3-ui:1.0.2")
+    implementation("androidx.media3:media3-exoplayer:1.0.2")
     // For DASH playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-dash:1.0.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.2")
     // For HLS playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-hls:1.0.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.0.2")
 // For RTSP playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.1")
+    implementation("androidx.media3:media3-exoplayer-rtsp:1.0.2")
 // For exposing and controlling media sessions
-    implementation("androidx.media3:media3-session:1.0.1")
+    implementation("androidx.media3:media3-session:1.0.2")
 
 
 

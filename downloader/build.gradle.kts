@@ -35,7 +35,7 @@ android {
 dependencies {
    // implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -51,7 +51,7 @@ dependencies {
 
 
     //kotlin caroutine
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
 
 }
 
