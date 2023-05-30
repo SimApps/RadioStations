@@ -32,7 +32,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/radioerror" />
 
+        <ImageView
+            android:id="@+id/add_alarm_btn"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="9dp"
 
+            android:src="@drawable/ic_add_alarm"
+            app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/VistitStationhomepageIm"
+            app:layout_constraintTop_toBottomOf="@id/Radio_image" />
 
         <ImageView
             android:id="@+id/VistitStationhomepageIm"
@@ -42,7 +52,7 @@
 
             android:src="@drawable/chrome"
             app:layout_constraintBottom_toTopOf="@id/Radio_nameTXview"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/add_alarm_btn"
             app:layout_constraintStart_toEndOf="@+id/shareImageView"
             app:layout_constraintTop_toBottomOf="@id/Radio_image" />
 

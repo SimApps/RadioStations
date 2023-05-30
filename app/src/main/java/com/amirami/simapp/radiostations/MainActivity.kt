@@ -7,6 +7,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.*
 import android.util.DisplayMetrics
 import android.util.Log
@@ -17,6 +18,7 @@ import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -27,6 +29,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -45,6 +48,7 @@ import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.ActivityContentMainBinding
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.RadioEntity
+import com.amirami.simapp.radiostations.model.ThemeMode
 import com.amirami.simapp.radiostations.utils.Constatnts.CORNER_RADIUS_8F
 import com.amirami.simapp.radiostations.utils.Constatnts.FROM_PLAYER
 import com.amirami.simapp.radiostations.utils.ManagePermissions
@@ -161,6 +165,9 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         binding = ActivityContentMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        updateUITheme()
+
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
 
@@ -323,6 +330,7 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
 
 
           val radioVar =  state.radioState
+
             infoViewModel.putRadioInfo(radioVar)
             simpleMediaViewModel.upsertRadio(radioVar)
 
@@ -390,6 +398,9 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
                     Navigation.findNavController(this@MainActivity, R.id.fragment_container)
                 // navController.navigateUp()
                 navController.navigate(R.id.moreBottomSheetFragment)
+
+
+
             }
         }
 
@@ -402,10 +413,14 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
             val lastListned = list.filter { it.isLastListned }
 
             if (lastListned.isNotEmpty()) {
-          //       setPlayer(lastListned[0])
+                //setPlayer(lastListned.first())
+               // simpleMediaViewModel.loadData(radio = listOf(lastListned.first()))
+               simpleMediaViewModel.setRadioVar(radioVar  = lastListned.first())
+                binding.radioplayer.moreButtons.visibility = View.VISIBLE
 
             }
             else {
+                binding.radioplayer.moreButtons.visibility = View.INVISIBLE
                 binding.radioplayer.RadioNameImVFrag.text = getString(R.string.click_to_expand)
                 binding.radioplayer.radioInfotxV.text = getString(R.string.playernullinfo)
                 binding.radioplayer.RadioImVFrag.setImageResource(R.drawable.radioerror)
@@ -414,9 +429,14 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
 
         loadBannerAD()
 
+
         setTitleText()
 
-        searchquerry()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+
+
+        searchquerry(navController = navController)
 
 
 
@@ -589,7 +609,9 @@ Log.d("tfgvcfdx","frfgv")
     }
 
     private fun btnsClicks() {
-
+        binding.searchView.settingButton.setSafeOnClickListener {
+            opensettingfrag()
+        }
         binding.searchView.ActionBarTitle.setSafeOnClickListener {
             if (binding.searchView.searchInputText.isVisible) {
                 closeSearch()
@@ -653,6 +675,8 @@ Log.d("tfgvcfdx","frfgv")
 
         var saveData = false
 
+
+
         var time = true
 
         var mInterstitialAd: InterstitialAd? = null
@@ -707,8 +731,7 @@ Log.d("tfgvcfdx","frfgv")
         RadioFunction.nativeSmallAds(
             this@MainActivity,
             binding.radioplayer.adsFrame,
-            adViewSmallActivityplayer,
-            dataViewModel.getDarkTheme()
+            adViewSmallActivityplayer
         )
         RadioFunction.interatialadsLoad(this@MainActivity)
     }
@@ -1028,13 +1051,13 @@ Log.d("tfgvcfdx","frfgv")
         //  navController.navigate(R.id.searchFragment)
     }
 
-    private fun searchquerry() {
+    private fun searchquerry(navController: NavController) {
+
        // val navController = Navigation.findNavController(this@MainActivity, R.id.fragment_container)
         binding.searchView.searchInputText.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-                val navController = navHostFragment.navController
+
 
                 navController.addOnDestinationChangedListener { _, destination, _ ->
                     when (destination.id) {
@@ -1081,8 +1104,7 @@ Log.d("tfgvcfdx","frfgv")
 
             override fun onQueryTextChange(p0: String?): Boolean {
                 // Start filtering the list as user start entering the characters
-                val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-                val navController = navHostFragment.navController
+
 
                 navController.addOnDestinationChangedListener { _, destination, _ ->
                     when (destination.id) {
@@ -1155,27 +1177,47 @@ Log.d("tfgvcfdx","frfgv")
 
     override fun onResume() {
         super.onResume()
+
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
 
-              R.id.alarmFragment, R.id.settingAlarmFragment,
-                R.id.normalAlarmSetFragment, R.id.simpleAlarmSetFragment  -> {
-                    binding.searchView.addTimerButton.visibility = View.INVISIBLE
-                    binding.searchView.opencloseSearchButton.visibility = View.INVISIBLE
-                    binding.searchView.ActionBarTitle.isEnabled=false
+              R.id.alarmFragment,
+              R.id.settingAlarmFragment,
+              R.id.normalAlarmSetFragment,
+              R.id.simpleAlarmSetFragment  -> {
+                  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                  binding.searchView.apply {
+                      settingButton.visibility = View.INVISIBLE
+                      addTimerButton.visibility = View.INVISIBLE
+                      opencloseSearchButton.visibility = View.INVISIBLE
+                      ActionBarTitle.isEnabled=false
+                  }
+
                     infoViewModel.putTitleText("Alarms")
                 }
-                R.id.fragmentSetting -> {
-                    binding.searchView.opencloseSearchButton.visibility = View.INVISIBLE
-                    binding.searchView.ActionBarTitle.isEnabled=false
+                R.id.fragmentSetting,
+                R.id.setTimerBottomSheetFragment,
+                R.id.chooseDefBottomSheetFragment,
+                R.id.infoBottomSheetFragment,
+                R.id.statisticBottomSheetFragment-> {
+                    binding.searchView.apply {
+                        settingButton.visibility = View.INVISIBLE
+                        opencloseSearchButton.visibility = View.INVISIBLE
+                        ActionBarTitle.isEnabled=false
+                    }
+
                 }
                 else -> {
-                    binding.searchView.ActionBarTitle.isEnabled=true
-                    binding.searchView.addTimerButton.visibility = View.VISIBLE
-                    binding.searchView.opencloseSearchButton.visibility = View.VISIBLE
+                    binding.searchView.apply {
+                        settingButton.visibility = View.VISIBLE
+                        ActionBarTitle.isEnabled=true
+                        addTimerButton.visibility = View.VISIBLE
+                        opencloseSearchButton.visibility = View.VISIBLE
+                    }
+
 
 
                 }
@@ -1205,5 +1247,23 @@ Log.d("tfgvcfdx","frfgv")
             }
             isServiceRunning = true
         }
+    }
+
+
+    private fun updateUITheme() {
+        if (dataViewModel.getDarkTheme()== ThemeMode.SYSTEM.theme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+         /*   val isNightTheme = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            when (isNightTheme) {
+                Configuration.UI_MODE_NIGHT_YES -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                Configuration.UI_MODE_NIGHT_NO ->  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }*/
+        }
+        else {
+            if (dataViewModel.getDarkTheme()== ThemeMode.DARK.theme) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
+
     }
 }

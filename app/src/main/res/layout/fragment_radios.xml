@@ -33,17 +33,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/spin_kitcontentradio"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_gravity="center"
-        android:indeterminateDrawable="@drawable/indeterminate_progress"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:indeterminate="true"
+        />
 
     <include
         android:id="@+id/itemErrorMessage"

@@ -26,18 +26,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
+
+
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/spin_kits"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-
         android:layout_marginTop="24dp"
-        android:indeterminateDrawable="@drawable/indeterminate_progress"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        android:indeterminate="true"
+        />
     <TextView
         android:id="@+id/StationNbr_TxV"
         android:layout_width="0dp"

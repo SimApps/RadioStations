@@ -20,15 +20,18 @@
         android:textStyle="bold" />
 
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/spin_kit_country_fav"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_below="@id/choosedefTitle"
         android:layout_centerInParent="true"
+
         android:layout_marginTop="12dp"
-        android:indeterminateDrawable="@drawable/indeterminate_progress"
-        android:visibility="invisible" />
+        android:indeterminate="true"
+        android:visibility="invisible"/>
+
+
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/listViewCountries"

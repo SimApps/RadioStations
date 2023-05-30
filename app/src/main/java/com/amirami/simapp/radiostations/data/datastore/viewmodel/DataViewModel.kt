@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.amirami.simapp.radiostations.IoDispatcher
 import com.amirami.simapp.radiostations.data.datastore.preferences.abstraction.DataStoreRepository
 import com.amirami.simapp.radiostations.data.datastore.utils.CHOOSEN_SERVER_KEY
-import com.amirami.simapp.radiostations.data.datastore.utils.DARK_THEME_KEY
+import com.amirami.simapp.radiostations.data.datastore.utils.THEME_KEY
 import com.amirami.simapp.radiostations.data.datastore.utils.DEFAULT_COUNTRY_KEY
 import com.amirami.simapp.radiostations.data.datastore.utils.FIRST_OPEN_KEY
 import com.amirami.simapp.radiostations.data.datastore.utils.FIRST_TIMEOPEN_RECORD_FOLDER_KEY
@@ -27,14 +27,10 @@ class DataViewModel @Inject constructor(
 
 init {
 
-    /*
-            val switch_Timer_Data = preferences[PreferencesKeys.SWITCH_TIMER_DATA] ?: true
- */
     if(getRadioUrl()=="") saveRadioUrl("http://91.132.145.114")
    if(getDefaultCountr()=="") saveDefaultCountry(Locale.getDefault().country)
     if(!getFirstTimeopenRecordFolder()) saveFirstTimeopenRecordFolder(true)
     if(!getFirstOpen()) saveFirstOpen(true)
-    if(!getDarkTheme()) saveDarkTheme(true)
 
 
 }
@@ -85,15 +81,16 @@ init {
     }
 
 
-    fun saveDarkTheme(value: Boolean) {
+    fun saveDarkTheme(value: String) {
         viewModelScope.launch(dispatcher) {
-            repository.putBoolean(DARK_THEME_KEY, value)
+            repository.putString(THEME_KEY, value)
         }
     }
 
-    fun getDarkTheme(): Boolean = runBlocking {
-        repository.getBoolean(DARK_THEME_KEY)
+    fun getDarkTheme(): String = runBlocking {
+        repository.getString(THEME_KEY)
     }
+
 
 
 

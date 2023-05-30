@@ -24,12 +24,6 @@
         <action
             android:id="@+id/action_mainFragment_to_infoBottomSheetFragment"
             app:destination="@id/infoBottomSheetFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_alarmFragment"
-            app:destination="@id/alarmFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_fragmentSetting"
-            app:destination="@id/fragmentSetting" />
     </fragment>
 
 
@@ -172,6 +166,9 @@
         <action
             android:id="@+id/action_moreBottomSheetFragment_to_infoBottomSheetFragment"
             app:destination="@id/infoBottomSheetFragment" />
+        <action
+            android:id="@+id/action_moreBottomSheetFragment_to_alarmFragment"
+            app:destination="@id/alarmFragment" />
 
 
     </dialog>

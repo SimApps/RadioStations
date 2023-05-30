@@ -77,15 +77,19 @@
     </com.google.android.material.textfield.TextInputLayout>
 
 
-    <ProgressBar
+
+
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/spin_kitYesNoDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
-        android:indeterminateDrawable="@drawable/indeterminate_progress"
-        android:visibility="gone" />
+        android:indeterminate="true"
+        android:visibility="gone"
+        />
 
     <View
         android:id="@+id/yesno_divider"

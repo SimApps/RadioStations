@@ -3,9 +3,14 @@ package com.amirami.simapp.radiostations.ui
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -29,6 +34,7 @@ import com.amirami.simapp.radiostations.data.datastore.viewmodel.DataViewModel
 import com.amirami.simapp.radiostations.databinding.FragmentSettingBinding
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.Status
+import com.amirami.simapp.radiostations.model.ThemeMode
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -131,6 +137,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         RadioFunction.interatialadsLoad(requireContext())
         infoViewModel.putTitleText(getString(R.string.Settings))
 
+
+
         conectDisconnectBtn()
         /*    if(getuserid()!="no_user"){
                 userTxtVwVisibiity(true)
@@ -204,6 +212,49 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                 saveData = false
             }
         }
+
+        if (dataViewModel.getDarkTheme()==ThemeMode.SYSTEM.theme) binding.selectThemetoggleButton.check(R.id.systemTheme_btn)
+        else {
+            if (dataViewModel.getDarkTheme()==ThemeMode.DARK.theme) binding.selectThemetoggleButton.check(R.id.dark_btn)
+            else binding.selectThemetoggleButton.check(R.id.light_btn)
+        }
+
+
+        binding.selectThemetoggleButton.addOnButtonCheckedListener { toggleButtonGroup, checkedId, isChecked ->
+
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.dark_btn -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        dataViewModel.saveDarkTheme(ThemeMode.DARK.theme)
+
+                    }
+                    R.id.light_btn -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+                        dataViewModel.saveDarkTheme(ThemeMode.LIGHT.theme)
+                    }
+                    R.id.systemTheme_btn -> {
+                        dataViewModel.saveDarkTheme(ThemeMode.SYSTEM.theme)
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                     /*   val isNightTheme = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                        when (isNightTheme) {
+                            Configuration.UI_MODE_NIGHT_YES -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                            Configuration.UI_MODE_NIGHT_NO ->  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        }*/
+                    }
+                }
+            } else {
+                if (toggleButtonGroup.checkedButtonId == View.NO_ID) {
+                    if (dataViewModel.getDarkTheme()==ThemeMode.SYSTEM.theme) toggleButtonGroup.check(R.id.systemTheme_btn)
+                    else {
+                        if (dataViewModel.getDarkTheme()==ThemeMode.DARK.theme) toggleButtonGroup.check(R.id.dark_btn)
+                        else toggleButtonGroup.check(R.id.light_btn)
+                    }
+                }
+            }
+        }
+
 
         binding.deleteAccountTxVw.setSafeOnClickListener {
             goToDeleteUserDialog()
@@ -562,6 +613,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
 
     }
+
+
 
 
 }

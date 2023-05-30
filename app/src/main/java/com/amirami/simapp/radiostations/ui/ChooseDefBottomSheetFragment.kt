@@ -67,15 +67,15 @@ class ChooseDefBottomSheetFragment : BottomSheetDialogFragment(), RadioListAdapt
         when (argsFrom.msg) {
             "defcountry" -> {
                 setUpListCountryRv()
-                binding.spinKitCountryFav.visibility = View.VISIBLE
-                binding.listViewCountries.visibility = View.VISIBLE
+               // binding.spinKitCountryFav.visibility = View.VISIBLE
+              //  binding.listViewCountries.visibility = View.VISIBLE
                 binding.choosedefTitle.text = getString(R.string.choose_countrie)
                 // retrofitRadioViewModel.getListCountrieRadios()
             }
             "defserver" -> {
                 setUpRv()
-                binding.spinKitCountryFav.visibility = View.VISIBLE
-                binding.listViewCountries.visibility = View.VISIBLE
+               // binding.spinKitCountryFav.visibility = View.VISIBLE
+              //  binding.listViewCountries.visibility = View.VISIBLE
                 binding.choosedefTitle.text = getString(R.string.choose_server)
                 retrofitRadioViewModel.getListservers()
             }

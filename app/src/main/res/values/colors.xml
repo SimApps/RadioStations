@@ -14,7 +14,7 @@
     <color name="primaryDark">#9E0C24</color>
     <color name="textPrimary">#000</color>
     <color name="blue">#02142B</color>
-    <color name="gray">#ABABAB</color>
+
     <color name="orange">#ffb067</color>
     <color name="orange_darck">#FFC0C0</color>
     <color name="orange_lighte">#ffefc1</color>
@@ -128,4 +128,14 @@
     <color name="main_deepPurple">#9900FF</color>
     <color name="main_deepBlue">#0066cc</color>
     <color name="main_orange">#FFC000</color>
-</resources>
+
+
+
+
+    <color name="blue_moon">#FF25316D</color>
+    <color name="blue_soft">#FF5F9DF7</color>
+    <color name="orange_sun">#FFFD841F</color>
+    <color name="yellow_soft">#FFFDFDBD</color>
+    <color name="gray">#FF8C8C8C</color>-->
+    <!--    <color name="gray">#ABABAB</color>-->
+   </resources>

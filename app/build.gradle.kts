@@ -68,7 +68,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
-    implementation("androidx.activity:activity-ktx:1.7.1")
+    implementation("androidx.activity:activity-ktx:1.7.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     //implementation (project(path:(":player-service"))
@@ -100,9 +100,9 @@ dependencies {
  //   implementation("com.google.android.play:app-update-ktx:2.0.0")
 
     //COIL
-    implementation("io.coil-kt:coil:2.3.0")
-    implementation("io.coil-kt:coil-gif:2.3.0")
-    implementation("io.coil-kt:coil-svg:2.3.0")
+    implementation("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil-gif:2.4.0")
+    implementation("io.coil-kt:coil-svg:2.4.0")
 
 
     implementation("androidx.media3:media3-ui:1.0.2")
@@ -126,7 +126,7 @@ dependencies {
 
 
     // Import the BoM for the Firebase platform
-    implementation (platform("com.google.firebase:firebase-bom:32.0.0"))
+    implementation (platform("com.google.firebase:firebase-bom:32.1.0"))
 
     // Add the Firebase Crashlytics SDK.
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -148,7 +148,7 @@ dependencies {
 
 
     //ads to remove in pro
-    implementation("com.google.android.gms:play-services-ads:22.0.0")
+    implementation("com.google.android.gms:play-services-ads:22.1.0")
 
 
     // When using the BoM, you don")t specify versions in Firebase library dependencies
@@ -171,11 +171,11 @@ dependencies {
 
 
     // this line below because a wierd warning about viewbinding
-    compileOnly("com.android.databinding:viewbinding:8.0.1")
+    compileOnly("com.android.databinding:viewbinding:8.0.2")
 
 // Navigation Component dependencies
-    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0-rc01")
-    implementation("androidx.navigation:navigation-ui-ktx:2.6.0-rc01")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.0-alpha01")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.0-alpha01")
 
     // Coroutine Lifecycle Scopes
     implementation("androidx.fragment:fragment-ktx:1.5.7")
@@ -230,7 +230,7 @@ dependencies {
     // Kotlin + coroutines
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
-    implementation ("androidx.viewpager2:viewpager2:1.1.0-beta01")
+    implementation ("androidx.viewpager2:viewpager2:1.1.0-beta02")
     implementation ("io.github.nikartm:fit-button:2.0.0")
     implementation ("com.github.YvesCheung.RollingText:RollingText:1.2.11")
 

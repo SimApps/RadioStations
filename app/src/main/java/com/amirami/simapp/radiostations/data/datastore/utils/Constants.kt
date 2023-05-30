@@ -1,13 +1,10 @@
 package com.amirami.simapp.radiostations.data.datastore.utils
 
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-
 const val RADIO_URL_KEY = "radioURL"
 const val TIME_IN_MILLIS_KEY = "timeInMilli"
 
 const val FIRST_OPEN_KEY = "first_open"
-const val DARK_THEME_KEY = "dark_theme"
+const val THEME_KEY = "theme_values"
 
 const val FIRST_TIMEOPEN_RECORD_FOLDER_KEY = "first_timeopen_record_folder"
 

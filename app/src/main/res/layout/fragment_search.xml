@@ -9,18 +9,19 @@
 
     <!--  This is your template view -->
 
-
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/spin_kitsearsh"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_gravity="center"
-        android:indeterminateDrawable="@drawable/indeterminate_progress"
         android:visibility="invisible"
+        android:indeterminate="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/ExpandablelistViewRadio_seach_activity"

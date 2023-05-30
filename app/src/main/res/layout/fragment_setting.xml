@@ -11,6 +11,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
+    android:paddingTop="12dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.SettingFragment">
 
@@ -23,15 +24,14 @@
         android:orientation="vertical">
 
 
-
-
-        <ProgressBar
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/spin_kitSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:indeterminateDrawable="@drawable/indeterminate_progress"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:indeterminate="true"/>
+
 
         <TextView
             android:id="@+id/signin_out_itxVw"
@@ -153,7 +153,7 @@
             android:visibility="gone"
             app:drawableStartCompat="@drawable/ic_theme" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/save_data"
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -265,15 +265,64 @@
             android:textSize="18sp"
             app:drawableStartCompat="@drawable/ic_disclaimer" />
 
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:dividerInsetEnd="16dp"
+            app:dividerInsetStart="16dp" />
 
-        <TextView
-            android:id="@+id/textView19"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="12dp"
-            android:text="@string/appversion"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="18sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/selectThemetoggleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:gravity="center"
+                app:singleSelection="true">
+
+                <Button
+                    android:id="@+id/dark_btn"
+                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_moon" />
+
+                <Button
+                    android:id="@+id/light_btn"
+                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_sunny"
+
+                    />
+
+
+                <Button
+                    android:id="@+id/systemTheme_btn"
+                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_auto_mode"
+
+                    />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <TextView
+                android:id="@+id/textView19"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginEnd="12dp"
+                android:gravity="center_vertical|end"
+                android:text="@string/appversion"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="18sp" />
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -74,7 +74,7 @@ class OnAlarmActivity : AppCompatActivity() {
             handler.post(handlerTask)
             lifecycleScope.launch {
                 goesOffAlarmData.first { alarmData ->
-                    simpleMediaViewModel.loadData(listOf(alarmData.radio)as MutableList<RadioEntity>)
+                    simpleMediaViewModel.loadData(listOf(alarmData.radio) as MutableList<RadioEntity>)
                     simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
                     binding.hour.setText(getCurrentHourDoubleDigitWithString())
                     binding.min.setText(getCurrentMinuteDoubleDigitWithString())

@@ -69,7 +69,7 @@ dependencies {
 
 
     //COIL
-    implementation("io.coil-kt:coil:2.3.0")
+    implementation("io.coil-kt:coil:2.4.0")
 
 }
 

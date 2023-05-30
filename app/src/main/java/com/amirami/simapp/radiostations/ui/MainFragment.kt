@@ -186,8 +186,8 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
     private fun nativeAds1() {
         fun populateUnifiedNativeAdView(nativeAd: NativeAd,
-                                        adView: NativeAdView,
-                                        darkTheme : Boolean) {
+                                        adView: NativeAdView
+        ) {
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.
             currentNativeAdActivityMain?.destroy()
@@ -316,8 +316,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
                 populateUnifiedNativeAdView(
                     unifiedNativeAd,
-                    adViewBigActivityMain,
-                    dataViewModel.getDarkTheme()
+                    adViewBigActivityMain
                 )
 
                 binding.adsFrames.removeAllViews()
@@ -393,21 +392,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
 
     private fun btnClick() {
-        binding.btnAlarm.setSafeOnClickListener {
-            if (canNavigate()) {
 
-
-                val action = MainFragmentDirections.actionMainFragmentToAlarmFragment()
-                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-            }
-        }
-
-        binding.btnSetting.setSafeOnClickListener {
-            if (canNavigate()) {
-                val action = MainFragmentDirections.actionMainFragmentToFragmentSetting()
-                findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
-            }
-        }
 
         binding.btnAllcountry.setSafeOnClickListener {
             if (canNavigate()) {
@@ -480,8 +465,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         RadioFunction.nativeSmallAds(
             requireContext(),
             binding.adsFrame,
-            adViewSmallActivitymain,
-            dataViewModel.getDarkTheme()
+            adViewSmallActivitymain
         )
     }
 

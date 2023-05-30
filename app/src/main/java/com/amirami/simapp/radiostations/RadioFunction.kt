@@ -730,8 +730,8 @@ import java.util.Locale
 
     fun nativeSmallAds(context: Context,
                        ad_frame: FrameLayout,
-                       adView: NativeAdView,
-                       darkTheme : Boolean) {
+                       adView: NativeAdView
+    ) {
         fun populateUnifiedNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.
@@ -1026,6 +1026,9 @@ import java.util.Locale
             }
         }
     }
+
+
+
   /*  private fun handleFavClick(context: Context,radioVar : RadioEntity, isRec: Boolean){
         if (!isRec) {
             val isFav = infoViewModel.isFavRadio(radioVar)

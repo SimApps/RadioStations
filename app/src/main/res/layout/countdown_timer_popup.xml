@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/transparents"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="9dp">
 
 
     <LinearLayout
@@ -23,18 +24,17 @@
             android:gravity="center"
             android:text="@string/shutdown"
 
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
 
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switch_tmer_data"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_weight="0.45"
+            android:layout_weight="0.5"
             android:text="Timer"
 
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <TextView
@@ -94,19 +94,6 @@
     </FrameLayout>
 
 
-    <View
-        android:id="@+id/yesno_divider"
-        android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="3dp"
-
-         />
-
-
-
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_start_pause"
         style="@style/Widget.Material3.Button.ElevatedButton"
@@ -122,15 +109,6 @@
         android:gravity="center"
         android:text="@string/Start"
         android:textSize="20sp" />
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/view5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        app:dividerInsetStart="16dp"
-        app:dividerInsetEnd="16dp"
-        />
 
 
 </LinearLayout>

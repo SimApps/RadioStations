@@ -73,18 +73,20 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
 
                             collectLatestLifecycleFlow(lifecycleOwner = this,simpleMediaViewModel.state) { state ->
 
-                            RadioFunction.shareRadio(
-                                context =  requireContext(),
-                                radio = radioVar,
-                                icy = state.radioState.icyState?:"",// state.icyStreamInfoState,
-                                isRec = state.isRecFile
-                            )
+                                binding.shareImageView.setSafeOnClickListener {
+                                    RadioFunction.shareRadio(
+                                        context =  requireContext(),
+                                        radio = radioVar,
+                                        icy = state.radioState.icyState?:"",// state.icyStreamInfoState,
+                                        isRec = state.isRecFile
+                                    )
+                                }
 
 
 
 
 
-                dismiss()
+               // dismiss()
             }
 
 
@@ -93,6 +95,15 @@ class MoreBottomSheetFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
 
+
+            binding.addAlarmBtn.setSafeOnClickListener {
+
+
+
+                    val action = MoreBottomSheetFragmentDirections.actionMoreBottomSheetFragmentToAlarmFragment()
+                    findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+                dismiss()
+            }
          }
     }
 

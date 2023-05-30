@@ -193,7 +193,7 @@ class SimpleMediaViewModel @Inject constructor(
 
 
 
-        setRadioVar(radio[0])
+        setRadioVar(radio.first())
 
 
      //   setRadioVar(radio)
