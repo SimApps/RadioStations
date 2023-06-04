@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity(), RadioFavoriteAdapterHorizantal.OnItemC
         dataConsuptionTimer()
 
 
-        setPlayerBottomSheet()
+
 
 
 
@@ -338,10 +338,12 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
 
 
             binding.radioplayer.likeImageViewPlayermain.setSafeOnClickListener {
+                if(binding.radioplayer.RadioNameImVFrag.text != getString(R.string.click_to_expand))
                 handleFavClick(radioVar = radioVar, isRec = state.isRecFile)
             }
 
             binding.radioplayer.likeImageView.setSafeOnClickListener {
+                if(binding.radioplayer.RadioNameImVFrag.text != getString(R.string.click_to_expand))
                 handleFavClick(radioVar = radioVar, isRec = state.isRecFile)
             }
 
@@ -355,7 +357,8 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
             binding.radioplayer.pauseplayButtonMain.setSafeOnClickListener {
                 Log.d("ikjnhbg", "isPlaying "+state.playerState.toString())
 
-                if(state.playerState == PlayerState.STOPED || state.playerState == PlayerState.INITIANIAL){
+                if((state.playerState == PlayerState.STOPED || state.playerState == PlayerState.INITIANIAL)&&
+                    binding.radioplayer.RadioNameImVFrag.text != getString(R.string.click_to_expand)){
                     simpleMediaViewModel.loadData(radio = listOf(radioVar))
 
                 }
@@ -364,7 +367,8 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
             binding.radioplayer.pauseplayButton.setSafeOnClickListener {
                 Log.d("ikjnhbg", "isPlaying "+state.playerState.toString())
 
-                if(state.playerState == PlayerState.STOPED ||state.playerState == PlayerState.INITIANIAL){
+                if((state.playerState == PlayerState.STOPED ||state.playerState == PlayerState.INITIANIAL)&&
+                    binding.radioplayer.RadioNameImVFrag.text != getString(R.string.click_to_expand)){
 
                     simpleMediaViewModel.loadData(radio = listOf(radioVar))
 
@@ -415,7 +419,7 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
             if (lastListned.isNotEmpty()) {
                 //setPlayer(lastListned.first())
                // simpleMediaViewModel.loadData(radio = listOf(lastListned.first()))
-               simpleMediaViewModel.setRadioVar(radioVar  = lastListned.first())
+            //   simpleMediaViewModel.setRadioVar(radioVar  = lastListned.first())
                 binding.radioplayer.moreButtons.visibility = View.VISIBLE
 
             }
@@ -435,17 +439,10 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
-
         searchquerry(navController = navController)
-
-
-
         btnsClicks()
 
-
         AppRater.applaunched(this@MainActivity)
-
-
     }
 
     private fun stopPlayer(){
@@ -574,14 +571,11 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
 
 
     private fun setPlayer(radioVar : RadioEntity) {
-Log.d("tfgvcfdx","frfgv")
         vedeoisOnviews(radioVar.favicon)
 
         binding.radioplayer.RadioNameImVFrag.isSelected = true
         binding.radioplayer.RadioNameImVFrag.text = radioVar.name
-      //  binding.radioplayer.RadioNameImVFrag.text = simpleMediaViewModel.getPlayer().mediaMetadata.albumTitle?:""
         binding.radioplayer.radioInfotxV.text = if(radioVar.icyState== "null") "" else radioVar.icyState
-        //   binding.radioplayer.radioInfotxV.text = simpleMediaViewModel.getPlayer().mediaMetadata.title ?: ""
 
 
         if (!radioVar.isRec) {
@@ -599,7 +593,6 @@ Log.d("tfgvcfdx","frfgv")
 
         } else {
             binding.radioplayer.apply {
-                //    RadioImVFragBig.setImageResource(R.drawable.rec_on)
                 RadioImVFrag.setImageResource(R.drawable.rec_on)
 
                 likeImageView.setImageResource(R.drawable.ic_recordings_folder)
@@ -615,18 +608,14 @@ Log.d("tfgvcfdx","frfgv")
         binding.searchView.ActionBarTitle.setSafeOnClickListener {
             if (binding.searchView.searchInputText.isVisible) {
                 closeSearch()
-                //closesearchfrag()
             } else openSearch()
         }
         binding.searchView.opencloseSearchButton.setSafeOnClickListener {
             if (binding.searchView.searchInputText.isVisible) {
                 closeSearch()
-                //closesearchfrag()
             } else openSearch()
         }
         binding.searchView.addTimerButton.setSafeOnClickListener {
-            // showCountdownTimerPopup()
-
             openCountdownTimer()
         }
     }
@@ -1177,6 +1166,8 @@ Log.d("tfgvcfdx","frfgv")
 
     override fun onResume() {
         super.onResume()
+        setPlayerBottomSheet()
+
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController

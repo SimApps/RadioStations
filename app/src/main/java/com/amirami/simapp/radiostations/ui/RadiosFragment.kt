@@ -125,7 +125,8 @@ class RadiosFragment : Fragment(R.layout.fragment_radios), RadioAdapterVertical.
 
                                     hideProgressBar()
                                     binding.itemErrorMessage.root.visibility = View.INVISIBLE
-                                } else showErrorConnection(response.message!!)
+                                }
+                                else showErrorConnection(response.message!!)
                             }
                             Status.ERROR -> {
                                 hideProgressBar()

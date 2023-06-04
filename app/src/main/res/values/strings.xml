@@ -42,8 +42,8 @@
     <string name="shutdown">Stop playing after : </string>
     <string name="fab_content_desc">Add custom stream.</string>
 
-    <string name="appversion">Version : 2.3.31</string>
-    <string name="version">2.3.31</string>
+    <string name="appversion">Version : 2.4.0</string>
+    <string name="version">2.4.0</string>
 
 
 
@@ -82,6 +82,7 @@
     <string name="playernullinfo">Click here to copy/search </string>
     <string name="BUFFERING">BUFFERING</string>
     <string name="OoOps_Try_another_station">OoOps! Try another station!</string>
+    <string name="verify_connection">Verify your connection !</string>
 
     <string name="Data">Data</string>
     <string name="MB">MB</string>

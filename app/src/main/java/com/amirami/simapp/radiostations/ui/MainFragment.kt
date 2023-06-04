@@ -3,6 +3,7 @@ package com.amirami.simapp.radiostations.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -18,6 +19,7 @@ import com.amirami.simapp.radiostations.MainActivity.Companion.imagedefaulterror
 import com.amirami.simapp.radiostations.RadioFunction.collectLatestLifecycleFlow
 import com.amirami.simapp.radiostations.RadioFunction.loadImageString
 import com.amirami.simapp.radiostations.RadioFunction.setSafeOnClickListener
+import com.amirami.simapp.radiostations.RadioFunction.warningToast
 import com.amirami.simapp.radiostations.adapter.RadioAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.RadioFavoriteAdapterHorizantal
 import com.amirami.simapp.radiostations.adapter.Tags
@@ -27,6 +29,7 @@ import com.amirami.simapp.radiostations.databinding.FragmentMainBinding
 import com.amirami.simapp.radiostations.model.RadioEntity
 import com.amirami.simapp.radiostations.utils.Constatnts
 import com.amirami.simapp.radiostations.utils.Constatnts.COUNTRY_FLAGS_BASE_URL
+import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
 import com.amirami.simapp.radiostations.viewmodel.RetrofitRadioViewModel
 import com.amirami.simapp.radiostations.viewmodel.SimpleMediaViewModel
@@ -62,6 +65,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by activityViewModels()
+    private val networkViewModel: NetworkViewModel by activityViewModels()
 
 
     private lateinit var radioAdapterLastPlayedRadioHorizantal: RadioFavoriteAdapterHorizantal
@@ -74,7 +78,10 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         getLocalcountryName()
         infoViewModel.putTitleText(getString(R.string.Radio))
 
-        btnClick()
+        collectLatestLifecycleFlow(lifecycleOwner = this,networkViewModel.isConnected) { isConnected ->
+            btnClick(isConnected)
+        }
+
         adsLooad()
         setUpTagsRv()
         getRadioList()
@@ -391,21 +398,29 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     }
 
 
-    private fun btnClick() {
+    private fun btnClick(isConnected : Boolean) {
 
 
         binding.btnAllcountry.setSafeOnClickListener {
-            if (canNavigate()) {
-               val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
+            if (!canNavigate())  return@setSafeOnClickListener
+
+            if(isConnected){
+                val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.countries))
                 findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
+
             }
+            else warningToast(requireContext(), getString(R.string.verify_connection))
+
         }
         binding.localradiomview.setSafeOnClickListener {
-            if (canNavigate()) {
+            if (!canNavigate())  return@setSafeOnClickListener
+
+            if(isConnected){
                 retrofitRadioViewModel.getRadios(defaultCountry, "Empty")
                 val action = MainFragmentDirections.actionMainFragmentToRadiosFragment(defaultCountry)
                 findNavController().navigate(action) // NavHostFragment.findNavController(requireParentFragment()).navigate(action)
             }
+            else warningToast(requireContext(), getString(R.string.verify_connection))
         }
 
         binding.viewAllFavRadio.setSafeOnClickListener {
@@ -417,20 +432,25 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         }
 
         binding.btnTopClicks.setSafeOnClickListener {
-            if (canNavigate()) {
+            if (!canNavigate())  return@setSafeOnClickListener
+
+            if(isConnected){
                 retrofitRadioViewModel.getRadios("Top clicks", "300")
                 val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top clicks", "300")
                 findNavController().navigate(action) //   NavHostFragment.findNavController(requireParentFragment()).navigate(action)
             }
-
+            else warningToast(requireContext(), getString(R.string.verify_connection))
         }
 
         binding.btnTopVotes.setSafeOnClickListener {
-            if (canNavigate()) {
+            if (!canNavigate())  return@setSafeOnClickListener
+
+            if(isConnected){
                 retrofitRadioViewModel.getRadios("Top Votes", "300")
                 val action = MainFragmentDirections.actionMainFragmentToRadiosFragment("Top Votes", "300")
                 findNavController().navigate(action) //  NavHostFragment.findNavController(requireParentFragment()).navigate(action)
             }
+            else warningToast(requireContext(), getString(R.string.verify_connection))
 
         }
         binding.btnRecodedFiles.setSafeOnClickListener {
@@ -448,11 +468,14 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
          */
         binding.tagsTxtVw.setSafeOnClickListener {
-            if (canNavigate()) {
+            if (!canNavigate())  return@setSafeOnClickListener
+
+            if(isConnected){
                 retrofitRadioViewModel.getListRadios(getString(R.string.tags))
                 val action = MainFragmentDirections.actionMainFragmentToListRadioFragment(getString(R.string.tags))
                 findNavController().navigate(action) //    NavHostFragment.findNavController(requireParentFragment()).navigate(action)
             }
+            else warningToast(requireContext(), getString(R.string.verify_connection))
 
         }
     }

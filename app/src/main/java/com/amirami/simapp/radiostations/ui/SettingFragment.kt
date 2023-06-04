@@ -35,6 +35,7 @@ import com.amirami.simapp.radiostations.databinding.FragmentSettingBinding
 import com.amirami.simapp.radiostations.model.FavoriteFirestore
 import com.amirami.simapp.radiostations.model.Status
 import com.amirami.simapp.radiostations.model.ThemeMode
+import com.amirami.simapp.radiostations.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiostations.utils.exhaustive
 import com.amirami.simapp.radiostations.viewmodel.FavoriteFirestoreViewModel
 import com.amirami.simapp.radiostations.viewmodel.InfoViewModel
@@ -59,6 +60,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     private val dataViewModel: DataViewModel by activityViewModels()
     private val retrofitRadioViewModel: RetrofitRadioViewModel by activityViewModels()
     private val favoriteFirestoreViewModel: FavoriteFirestoreViewModel by activityViewModels()
+    private val networkViewModel: NetworkViewModel by activityViewModels()
 
 
     private val signInLauncher = registerForActivityResult(
@@ -138,8 +140,16 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         infoViewModel.putTitleText(getString(R.string.Settings))
 
 
+        collectLatestLifecycleFlow(lifecycleOwner = this,networkViewModel.isConnected) { isConnected ->
+            conectDisconnectBtn(isConnected)
 
-        conectDisconnectBtn()
+            binding.deleteAccountTxVw.setSafeOnClickListener {
+                if(!isConnected) errorToast(requireContext(), getString(R.string.verify_connection))
+                goToDeleteUserDialog()
+            }
+
+        }
+
         /*    if(getuserid()!="no_user"){
                 userTxtVwVisibiity(true)
             }*/
@@ -256,9 +266,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
 
 
-        binding.deleteAccountTxVw.setSafeOnClickListener {
-            goToDeleteUserDialog()
-        }
 
         binding.syncFavTxVw.setSafeOnClickListener {
             infoViewModel.deleteAll("")
@@ -337,8 +344,8 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
     }
 
-    private fun checkEmailExistsOrNot() {
-        if (FirebaseAuth.getInstance().currentUser != null) {
+    private fun checkEmailExistsOrNot(isConnected : Boolean) {
+        if (FirebaseAuth.getInstance().currentUser != null && isConnected) {
             FirebaseAuth.getInstance()
                 .fetchSignInMethodsForEmail(FirebaseAuth.getInstance().currentUser!!.email!!)
                 .addOnCompleteListener { task ->
@@ -368,10 +375,15 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         }
     }
 
-    private fun conectDisconnectBtn() {
-        checkEmailExistsOrNot()
+    private fun conectDisconnectBtn(isConnected : Boolean = true) {
+
+        checkEmailExistsOrNot(isConnected)
         // getuserid()!= "no_user"
         binding.signinOutItxVw.setSafeOnClickListener {
+            if(!isConnected) {
+                errorToast(requireContext(), getString(R.string.verify_connection))
+                return@setSafeOnClickListener
+            }
             if (binding.signinOutItxVw.text.toString() == resources.getString(R.string.Déconnecter)) {
                 goToLogOutDialog()
             } else createSignInIntent()
