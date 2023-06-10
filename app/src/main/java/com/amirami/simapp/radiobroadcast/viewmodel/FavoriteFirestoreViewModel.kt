@@ -1,0 +1,43 @@
+package com.amirami.simapp.radiobroadcast.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import com.amirami.simapp.radiobroadcast.RadioFunction
+import com.amirami.simapp.radiobroadcast.firestore.ProductFirestoreRepository
+import com.amirami.simapp.radiobroadcast.model.FavoriteFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
+
+@HiltViewModel
+class FavoriteFirestoreViewModel @Inject constructor(
+    private val repository: ProductFirestoreRepository
+) : ViewModel() {
+    //  private val _dataState: MutableLiveData<RoomDataState<List<Product>>> = MutableLiveData()
+
+    val getAllRadioFavoriteListFromFirestore = liveData(Dispatchers.IO) {
+        emit(repository.getAllRadioFavoriteListFromFirestore())
+    }
+
+    fun addFavoriteRadioidinArrayFirestore(product: String, lastmodified: Long) = liveData(Dispatchers.IO) {
+        if (RadioFunction.getuserid() != "no_user") {
+             emit(repository.addFavoriteRadioidInArrayFirestore(product, lastmodified))
+
+
+        }
+    }
+
+    fun deleteFavoriteRadioFromArrayinFirestore(radioUid: String) = liveData(Dispatchers.IO) {
+        if (RadioFunction.getuserid() != "no_user") {
+            emit(repository.deleteFavoriteRadioFromArrayInFirestore(radioUid))
+        }
+    }
+
+    fun addUserDocumentInFirestore(favoriteFirestore: FavoriteFirestore) = liveData(Dispatchers.IO) {
+        emit(repository.adduserDocumentInFirestore(favoriteFirestore))
+    }
+
+    fun deleteUserDocumentinFirestore(id: String) = liveData(Dispatchers.IO) {
+        emit(repository.deleteUserDocumentInFirestore(id))
+    }
+}

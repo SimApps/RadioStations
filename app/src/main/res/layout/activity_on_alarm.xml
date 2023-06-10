@@ -13,7 +13,7 @@
 
         <variable
             name="calculatorProblem"
-            type="com.amirami.simapp.radiostations.pairalarm.model.CalculatorProblem" />
+            type="com.amirami.simapp.radiobroadcast.pairalarm.model.CalculatorProblem" />
     </data>
 
     <LinearLayout

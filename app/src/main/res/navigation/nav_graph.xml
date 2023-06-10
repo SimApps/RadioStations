@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.amirami.simapp.radiostations.ui.MainFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.MainFragment"
         android:label="Home"
         tools:layout="@layout/fragment_main">
 
@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/fragmentSetting"
-        android:name="com.amirami.simapp.radiostations.ui.SettingFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" >
         <action
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/favoriteRadioFragment"
-        android:name="com.amirami.simapp.radiostations.ui.FavoriteRadioFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.FavoriteRadioFragment"
         android:label="content_favorite"
         tools:layout="@layout/fragment_favorite">
 
@@ -72,7 +72,7 @@
 
     <fragment
         android:id="@+id/listRadioFragment"
-        android:name="com.amirami.simapp.radiostations.ui.ListRadioFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.ListRadioFragment"
         android:label="ListRadioFragment" >
 
     <argument
@@ -92,7 +92,7 @@
     </fragment>
     <fragment
         android:id="@+id/radiosFragment"
-        android:name="com.amirami.simapp.radiostations.ui.RadiosFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.RadiosFragment"
         android:label="content_radios"
         tools:layout="@layout/fragment_radios" >
 
@@ -113,7 +113,7 @@
 
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.amirami.simapp.radiostations.ui.SearchFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.SearchFragment"
         android:label="SearchFragment" >
 
         <action
@@ -122,13 +122,13 @@
     </fragment>
     <dialog
         android:id="@+id/statisticBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.ui.StatisticBottomSheetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.StatisticBottomSheetFragment"
         android:label="StatisticBottomSheetFragment" />
 
 
     <dialog
         android:id="@+id/infoBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.ui.InfoBottomSheetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.InfoBottomSheetFragment"
         android:label="InfoBottomSheetFragment" >
     <argument
         android:name="title"
@@ -150,7 +150,7 @@
 
     <dialog
         android:id="@+id/chooseDefBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.ui.ChooseDefBottomSheetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.ChooseDefBottomSheetFragment"
         android:label="ChooseDefBottomSheetFragment" >
         <argument
             android:name="msg"
@@ -160,7 +160,7 @@
 
     <dialog
         android:id="@+id/moreBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.ui.MoreBottomSheetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.MoreBottomSheetFragment"
         android:label="MoreBottomSheetFragment" >
 
         <action
@@ -174,7 +174,7 @@
     </dialog>
     <dialog
         android:id="@+id/addDialogueBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.ui.AddDialogueBottomSheetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.AddDialogueBottomSheetFragment"
         android:label="AddDialogueBottomSheetFragment">
     <argument
         android:name="addDouwnload"
@@ -184,7 +184,7 @@
 
     <dialog
         android:id="@+id/setTimerBottomSheetFragment"
-        android:name="com.amirami.simapp.radiostations.ui.SetTimerBottomSheetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.ui.SetTimerBottomSheetFragment"
         android:label="SetTimerBottomSheetFragment" />
 
 
@@ -192,7 +192,7 @@
 
     <fragment
         android:id="@+id/normalAlarmSetFragment"
-        android:name="com.amirami.simapp.radiostations.pairalarm.ui.fragment.NormalAlarmSetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.pairalarm.ui.fragment.NormalAlarmSetFragment"
         android:label="NormalAlarmSetFragment"  >
     <argument
         android:name="alarmCode"
@@ -202,7 +202,7 @@
 
     <fragment
         android:id="@+id/alarmFragment"
-        android:name="com.amirami.simapp.radiostations.pairalarm.ui.fragment.AlarmFragment"
+        android:name="com.amirami.simapp.radiobroadcast.pairalarm.ui.fragment.AlarmFragment"
         android:label="AlarmFragment" >
         <action
             android:id="@+id/action_alarmFragment_to_normalAlarmSetFragment"
@@ -217,11 +217,11 @@
 
     <fragment
         android:id="@+id/settingAlarmFragment"
-        android:name="com.amirami.simapp.radiostations.pairalarm.ui.fragment.SettingAlarmFragment"
+        android:name="com.amirami.simapp.radiobroadcast.pairalarm.ui.fragment.SettingAlarmFragment"
         android:label="SettingAlarmFragment" />
     <fragment
         android:id="@+id/simpleAlarmSetFragment"
-        android:name="com.amirami.simapp.radiostations.pairalarm.ui.fragment.SimpleAlarmSetFragment"
+        android:name="com.amirami.simapp.radiobroadcast.pairalarm.ui.fragment.SimpleAlarmSetFragment"
         android:label="SimpleAlarmSetFragment" >
         <argument
             android:name="alarmCode"

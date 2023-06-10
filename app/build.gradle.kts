@@ -25,11 +25,11 @@ plugins {
 android {
     compileSdk = 33
     defaultConfig {
-        applicationId = "com.amirami.simapp.radiostations"
+        applicationId = "com.amirami.simapp.radiobroadcast"
 
         minSdk = 24//21 ALARM LIB
         targetSdk = 33
-        versionCode = 66
+        versionCode = 2
         versionName = "@string/version"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -56,7 +56,7 @@ android {
         viewBinding =  true
         dataBinding=  true
     }
-    namespace =  "com.amirami.simapp.radiostations"
+    namespace =  "com.amirami.simapp.radiobroadcast"
 }
 
 dependencies {
@@ -77,7 +77,7 @@ dependencies {
     //implementation project(path:(":downloader"))
     implementation(project(":downloader"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
     implementation("androidx.hilt:hilt-work:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
@@ -178,7 +178,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.0-alpha01")
 
     // Coroutine Lifecycle Scopes
-    implementation("androidx.fragment:fragment-ktx:1.5.7")
+    implementation("androidx.fragment:fragment-ktx:1.6.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
    // implementation("androidx.lifecycle:lifecycle-extensions-ktx:2.5.1")
@@ -209,7 +209,7 @@ dependencies {
 
 
 
-    implementation("com.airbnb.android:lottie:6.0.0")
+    implementation("com.airbnb.android:lottie:6.0.1")
 
 
 
@@ -245,7 +245,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.21-1.0.11")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.22-1.0.11")
 
 
 }

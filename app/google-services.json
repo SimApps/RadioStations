@@ -1,56 +1,46 @@
 {
   "project_info": {
-    "project_number": "872978178105",
-    "firebase_url": "https://radio-proadcast.firebaseio.com",
-    "project_id": "radio-proadcast",
-    "storage_bucket": "radio-proadcast.appspot.com"
+    "project_number": "492116254757",
+    "project_id": "radio-fm-am-d58c0",
+    "storage_bucket": "radio-fm-am-d58c0.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:872978178105:android:100d768837274688",
+        "mobilesdk_app_id": "1:492116254757:android:d20037887896822718dfcc",
         "android_client_info": {
-          "package_name": "com.amirami.simapp.radiostations"
+          "package_name": "com.amirami.simapp.radiobroadcast"
         }
       },
       "oauth_client": [
         {
-          "client_id": "872978178105-dji2t0tpfles0lgt9cjtuq4rmmbpejlk.apps.googleusercontent.com",
+          "client_id": "492116254757-qh1mr96c8bq4pnmomva67lupodg350uh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.amirami.simapp.radiostations",
-            "certificate_hash": "e14833e348077dac191ff64aa8ef695cc019909f"
+            "package_name": "com.amirami.simapp.radiobroadcast",
+            "certificate_hash": "5eb945aee60818a23473ec4141b5b72c7dd14d1e"
           }
         },
         {
-          "client_id": "872978178105-tjtab4gml0htgflb7qic5j1d7rd8rfn2.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.amirami.simapp.radiostations",
-            "certificate_hash": "1891b9be7da42670c00dcf0a4c10f1b1da471421"
-          }
-        },
-        {
-          "client_id": "872978178105-a38m0201ada4e80p695q6if2eduu5k87.apps.googleusercontent.com",
+          "client_id": "492116254757-p06l6kdu5h46tl013dnf9vqcf7ks9b2j.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC8xLmGgBLGSbAfkQum331tQqbHN3ewDNA"
+          "current_key": "AIzaSyAa-gUvdGN40AxREalCccx6qHSz4N4wIRU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "872978178105-a38m0201ada4e80p695q6if2eduu5k87.apps.googleusercontent.com",
+              "client_id": "492116254757-p06l6kdu5h46tl013dnf9vqcf7ks9b2j.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         }
-      },
-      "admob_app_id": "ca-app-pub-5900899997553420~1771300993"
+      }
     }
   ],
   "configuration_version": "1"
