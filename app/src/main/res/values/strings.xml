@@ -248,13 +248,14 @@
     <string name="https">https</string>
 
 
-    <string name="interstial_tappx">pub-58728-android-5176</string> <!--pub-58728-android-5176-->
+    <string name="interstial_tappx">pub-74759-android-5515</string> <!--pub-58728-android-5176-->
 
 
-    <string name="interstial_adUnitId">ca-app-pub-5900899997553420/5887052662</string>//real intertial
-    <string name="native_Advanced_adUnitId">ca-app-pub-5900899997553420/8708850645</string> //real native
+    <string name="interstial_adUnitId">ca-app-pub-5900899997553420/6682173162</string>//real intertial
+    <string name="native_Advanced_small_adUnitId">ca-app-pub-5900899997553420/9339329934</string> //real native
+    <string name="native_Advanced_big_adUnitId">ca-app-pub-5900899997553420/3064747383</string> //real native
     <string name="Mediationadaptive_banner_adUnitId">ca-app-pub-5900899997553420/8940316671</string> //real mediation
-    <string name="adaptive_banner_adUnitId">ca-app-pub-5900899997553420/6212289636</string>//Real smart banner
+    <string name="adaptive_banner_adUnitId">ca-app-pub-5900899997553420/4107184555</string>//Real smart banner
 
 
     <string name="title_activity_settings">Settings</string>

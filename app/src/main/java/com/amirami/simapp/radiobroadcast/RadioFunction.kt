@@ -853,7 +853,7 @@ import java.util.Locale
             val builder = AdLoader.Builder(
                 context,
                 context.resources.getString(
-                    R.string.native_Advanced_adUnitId
+                    R.string.native_Advanced_small_adUnitId
                 )/*"ca-app-pub-5900899997553420/8708850645"*/
             )
 

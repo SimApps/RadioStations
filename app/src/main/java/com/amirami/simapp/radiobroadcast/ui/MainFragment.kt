@@ -307,7 +307,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
             val builder = AdLoader.Builder(
                 requireContext(),
-                resources.getString(R.string.native_Advanced_adUnitId)/*"ca-app-pub-5900899997553420/8708850645"*/
+                resources.getString(R.string.native_Advanced_big_adUnitId)/*"ca-app-pub-5900899997553420/8708850645"*/
             )
 
             builder.forNativeAd { unifiedNativeAd ->
