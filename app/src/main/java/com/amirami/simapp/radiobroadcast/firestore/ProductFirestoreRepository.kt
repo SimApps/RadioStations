@@ -1,6 +1,7 @@
 package com.amirami.simapp.radiobroadcast.firestore
 
 import android.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiobroadcast.RadioFunction.getuserid
 import com.amirami.simapp.radiobroadcast.data.DataOrException
 import com.amirami.simapp.radiobroadcast.model.FavoriteFirestore
@@ -12,7 +13,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
+@UnstableApi @Singleton
 class ProductFirestoreRepository @Inject constructor(
     private val db: FirebaseFirestore
 ) {
@@ -111,7 +112,8 @@ class ProductFirestoreRepository @Inject constructor(
 
     private fun disableOfflineMode(enableoffline: Boolean/* app crush when change enable offline from true to false*/): FirebaseFirestore {
         val settings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
+          //  .setPersistenceEnabled(false)
+          //  .setLocalCacheSettings(PersistentCacheSettings(1000L))
             .build()
         db.firestoreSettings = settings
 
