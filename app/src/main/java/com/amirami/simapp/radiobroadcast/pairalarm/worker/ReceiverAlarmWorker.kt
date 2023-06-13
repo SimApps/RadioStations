@@ -77,8 +77,6 @@ class ReceiverAlarmWorker @AssistedInject constructor(
 
 fun openOnAlarmActivity(context: Context, alarmCode: String) {
 
-
-
     val onAlarmActivity = Intent(context, OnAlarmActivity::class.java)
     onAlarmActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     onAlarmActivity.putExtra(ALARM_CODE_TEXT, alarmCode)

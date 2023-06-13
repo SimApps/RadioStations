@@ -34,7 +34,7 @@ fun setAlarmOnBroadcast(context: Context, alarmCode: Int, hour: Int, min: Int) {
     val intent = Intent(context.packageName)
     intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
     intent.component =
-        ComponentName(context.packageName, "com.amirami.simapp.radiostations.pairalarm.broadcast.AlarmReceiver")
+        ComponentName(context.packageName, context.packageName+".pairalarm.broadcast.AlarmReceiver")
     intent.putExtra(ALARM_CODE_TEXT, "$alarmCode")
 
     val pendingIntent = PendingIntent.getBroadcast(

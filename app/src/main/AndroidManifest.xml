@@ -87,7 +87,7 @@
             android:value="true" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5900899997553420~1771300993" /> <!-- android:theme="@style/AppTheme.BrandedLaunch" -->
+            android:value="ca-app-pub-5900899997553420~3192739892" /> <!-- android:theme="@style/AppTheme.BrandedLaunch" -->
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.App.Starting"
@@ -132,8 +132,13 @@
         </receiver>
 
         <!-- AdActivity from Google Play Services, needed by Tappx -->
-        <activity android:name="com.google.android.gms.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:theme="@android:style/Theme.Translucent" />
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
 
 

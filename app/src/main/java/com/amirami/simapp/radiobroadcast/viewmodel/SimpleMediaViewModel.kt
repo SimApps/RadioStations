@@ -8,6 +8,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.LoopingMediaSource
 import com.amirami.player_service.service.PlayerEvent
 import com.amirami.player_service.service.PlayerState
 import com.amirami.player_service.service.SimpleMediaServiceHandler
@@ -189,7 +190,7 @@ class SimpleMediaViewModel @Inject constructor(
         }
     }
 
-    fun loadData(radio: List<RadioEntity>) {
+    fun loadData(radio: List<RadioEntity>, isRingtone : Boolean = false) {
 
 
 
@@ -211,6 +212,7 @@ class SimpleMediaViewModel @Inject constructor(
             val mediaItem = MediaItem.Builder()
                 .setUri(radio[0].streamurl)
                 .setMediaId(radio[0].stationuuid)
+
                 .setMediaMetadata(
                     MediaMetadata.Builder()
                         .setFolderType(MediaMetadata.FOLDER_TYPE_NONE)
@@ -222,6 +224,8 @@ class SimpleMediaViewModel @Inject constructor(
 
                         .build()
                 ).build()
+          if(isRingtone)  player.repeatMode = Player.REPEAT_MODE_ALL
+
             simpleMediaServiceHandler.addMediaItem(mediaItem)
         }
         else {

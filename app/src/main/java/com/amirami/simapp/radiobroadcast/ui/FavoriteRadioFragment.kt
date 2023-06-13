@@ -50,33 +50,15 @@ class FavoriteRadioFragment :
     private lateinit var binding: FragmentFavoriteBinding
     private lateinit var radioFavoriteAdapterVertical: RadioFavoriteAdapterVertical
 
-    lateinit var appUpdateManager: AppUpdateManager
-    private val REQUEST_APP_UPDATE = 560
-    private var installStateUpdatedListener: InstallStateUpdatedListener? = null
 
     lateinit var filterredList: MutableList<RadioEntity>
 
-    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
 
-        if (result.resultCode == REQUEST_APP_UPDATE) {
-            if (result.resultCode == RESULT_CANCELED) {
-                errorToast(requireContext(), "Update canceled!")
-                //  checkUpdate()
-            } else if (result.resultCode != RESULT_IN_APP_UPDATE_FAILED) {
-                errorToast(requireContext(), result.resultCode.toString())
-                checkUpdate()
-            } else if (result.resultCode != RESULT_OK) {
-                errorToast(requireContext(), result.resultCode.toString())
-                checkUpdate()
-            }
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFavoriteBinding.bind(view)
 
-        appUpdateManager = AppUpdateManagerFactory.create(requireContext())
 
         infoViewModel.putTitleText(getString(R.string.Favoris))
         setupRadioLisRV()
@@ -176,89 +158,6 @@ class FavoriteRadioFragment :
         this@FavoriteRadioFragment.findNavController().navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment) //      NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_favoriteRadioFragment_to_moreBottomSheetFragment)
     }
 
-    private fun checkUpdate() {
-        // appUpdateManager = AppUpdateManagerFactory.create(requireContext())
-
-        /*
-// Returns an intent object that you use to check for an update.
-        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-
-// Checks that the platform will allow the specified type of update.
-        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            //   DynamicToast.makeWarning(requireContext(),  appUpdateInfo.updateAvailability().toString(), 9).show()
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                // This example applies an immediate update. To apply a flexible update
-                // instead, pass in AppUpdateType.FLEXIBLE
-                //   && (appUpdateInfo.clientVersionStalenessDays() ?: -1) >=0// DAYS_FOR_FLEXIBLE_UPDATE
-                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
-            ) {
-                // Request the update.
-
-                appUpdateManager.startUpdateFlowForResult(
-                    // Pass the intent that is returned by 'getAppUpdateInfo()'.
-                    appUpdateInfo,
-                    // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
-                    // AppUpdateType.IMMEDIATE,
-                    AppUpdateType.FLEXIBLE,
-                    // The current activity making the update request.
-                    requireActivity() /* Functions.unwrap(context)*/,
-                    // Include a request code to later monitor this update request.
-                    1)
-
-                appUpdateManager.registerListener(listener)
-            }
-            else {
-                appUpdateManager.unregisterListener(listener)
-                Log.d(ContentValues.TAG, "No Update available")
-            }
-        }
-
-*/
-
-        installStateUpdatedListener = InstallStateUpdatedListener { state ->
-            when {
-                state.installStatus() == InstallStatus.DOWNLOADED -> {
-                    appUpdateManager.completeUpdate()
-                }
-                state.installStatus() == InstallStatus.INSTALLED -> {
-                    // if (appUpdateManager != null) {
-                    appUpdateManager.unregisterListener(installStateUpdatedListener!!)
-                    // }
-                }
-                else -> {
-                    //  Log.i(TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
-                }
-            }
-        }
-
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo: AppUpdateInfo ->
-            //    Log.d("TAG", "here")
-            // Checks that the platform will allow the specified type of update.
-            if ((
-                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
-                ) ||
-                (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)
-            ) {
-                // Request the update.
-                try {
-                    //    Log.d("TAG", "here")
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        AppUpdateType.IMMEDIATE,
-                        requireActivity(),
-                        REQUEST_APP_UPDATE
-                    )
-
-                    startForResult.launch(Intent(requireContext(), FavoriteRadioFragment::class.java))
-                } catch (e: IntentSender.SendIntentException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        appUpdateManager.registerListener(installStateUpdatedListener!!)
-    }
 
   /*  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_APP_UPDATE) {
@@ -275,24 +174,8 @@ class FavoriteRadioFragment :
         }
     }
 */
-    override fun onStop() {
-        super.onStop()
-        appUpdateManager.unregisterListener(installStateUpdatedListener!!)
-    }
-    override fun onResume() {
-        super.onResume()
-        checkUpdate()
 
-    /*    appUpdateManager
-            .appUpdateInfo
-            .addOnSuccessListener { appUpdateInfo ->
 
-                // If the update is downloaded but not installed,
-                // notify the user to complete the update.
-                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                    appUpdateManager.completeUpdate()                }
-            }*/
-    }
 
 
 

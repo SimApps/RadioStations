@@ -1,12 +1,17 @@
 package com.amirami.simapp.radiobroadcast.pairalarm.ui.fragment
 
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
@@ -30,19 +35,24 @@ import com.amirami.simapp.radiobroadcast.pairalarm.util.resetAllAlarms
 import com.amirami.simapp.radiobroadcast.pairalarm.util.setAlarmOnBroadcast
 import com.amirami.simapp.radiobroadcast.pairalarm.viewModel.AlarmViewModel
 import com.amirami.simapp.radiobroadcast.pairalarm.worker.NextAlarmWorker
+import com.amirami.simapp.radiobroadcast.utils.connectivity.internet.NetworkViewModel
 import com.amirami.simapp.radiobroadcast.viewmodel.SimpleMediaViewModel
 import com.amirami.simapp.radiobroadcast.viewmodel.UIEvent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
 
-@AndroidEntryPoint
+
+@UnstableApi @AndroidEntryPoint
 class OnAlarmActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOnAlarmBinding
     private val alarmViewModel: AlarmViewModel by viewModels()
     private val simpleMediaViewModel: SimpleMediaViewModel by viewModels()
+    private val networkViewModel: NetworkViewModel by viewModels()
+
     lateinit var calculatorProblem: CalculatorProblem
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,21 +87,42 @@ class OnAlarmActivity : AppCompatActivity() {
             handler.post(handlerTask)
             lifecycleScope.launch {
                 goesOffAlarmData.first { alarmData ->
-                    simpleMediaViewModel.loadData(listOf(alarmData.radio) as MutableList<RadioEntity>)
-                    simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+
                     binding.hour.setText(getCurrentHourDoubleDigitWithString())
                     binding.min.setText(getCurrentMinuteDoubleDigitWithString())
                     calculatorProblem = alarmViewModel.getRandomNumberForCalculator()
                     binding.calculatorProblem = calculatorProblem
                     binding.showCalculatorProblem = alarmData.mode == AlarmModeType.CALCULATE.mode
-                    binding.alarmName.text = alarmData.name + " Radio : "+ alarmData.radio.name
+
+                    collectLatestLifecycleFlow(lifecycleOwner = this@OnAlarmActivity,networkViewModel.isConnected) { isConnected ->
+                       if(isConnected){
+                           simpleMediaViewModel.loadData(listOf(alarmData.radio) as MutableList<RadioEntity>)
+                           simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+                       }
+                        else {
+                           val defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this@OnAlarmActivity, RingtoneManager.TYPE_RINGTONE)
+
+                           simpleMediaViewModel.loadData(listOf(RadioEntity(
+                               stationuuid = "uuu12Z",
+                               streamurl = defaultRingtoneUri.toString()
+                           )) as MutableList<RadioEntity>,
+                               isRingtone = true)
+                           simpleMediaViewModel.onUIEvent(UIEvent.PlayPause)
+                       }
+
+
+
+
+                    }
+                    binding.alarmName.text = alarmData.name + " Radio : " + alarmData.radio.name
 
                     if (alarmData.quick) {
                         alarmViewModel.deleteAlarmData(alarmData)
                     }
 
                     // 삭제하거나 변경된 알람들을 반영한다(Noti 등)
-                    val alarmTimeWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<NextAlarmWorker>().build()
+                    val alarmTimeWorkRequest: WorkRequest =
+                        OneTimeWorkRequestBuilder<NextAlarmWorker>().build()
                     WorkManager.getInstance(this@OnAlarmActivity)
                         .enqueueUniqueWork(
                             NEXT_ALARM_WORKER,
@@ -145,6 +176,7 @@ class OnAlarmActivity : AppCompatActivity() {
                             // TODO: 정답 맞추면 dialog로 정답인거 알려주고 ok 누르면 액티비티랑 같이 꺼지게 하기
                             finish()
                         }
+
                         it.length > 3 -> {
                             alarmViewModel.answer.value = ""
                             doShortVibrateOnce()
@@ -153,6 +185,7 @@ class OnAlarmActivity : AppCompatActivity() {
                                 getString(R.string.toast_wrong_calculator_answer)
                             )
                         }
+
                         else -> binding.problemAnswer.text = it
                     }
                 }
@@ -206,6 +239,20 @@ class OnAlarmActivity : AppCompatActivity() {
             errorToast(this, getString(R.string.on_alarm_error))
             finish()
         }
+    }
+
+
+    fun <T> collectLatestLifecycleFlow(
+        lifecycleOwner: LifecycleOwner,
+        flow: Flow<T>,
+        collect: suspend (T) -> Unit
+    ) {
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                flow.collectLatest(collect)
+            }
+        }
+
     }
 }
 

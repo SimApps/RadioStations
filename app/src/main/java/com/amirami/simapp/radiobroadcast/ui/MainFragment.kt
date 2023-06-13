@@ -1,8 +1,15 @@
 package com.amirami.simapp.radiobroadcast.ui
 
+import android.app.Activity
+import android.content.Intent
+import android.content.IntentSender
+import android.media.RingtoneManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.util.UnstableApi
@@ -37,9 +44,17 @@ import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 import java.util.*
+
 
 @UnstableApi @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.OnItemClickListener, TagsAdapterHorizantal.OnItemClickListener, RadioFavoriteAdapterHorizantal.OnItemClickListener {
@@ -61,8 +76,31 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
     private val networkViewModel: NetworkViewModel by activityViewModels()
 
 
+
     private lateinit var radioAdapterLastPlayedRadioHorizantal: RadioFavoriteAdapterHorizantal
     private lateinit var tagsAdapterHorizantal: TagsAdapterHorizantal
+
+    lateinit var appUpdateManager: AppUpdateManager
+
+    private val REQUEST_APP_UPDATE = 560
+    private var installStateUpdatedListener: InstallStateUpdatedListener? = null
+
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+
+        if (result.resultCode == REQUEST_APP_UPDATE) {
+            if (result.resultCode == Activity.RESULT_CANCELED) {
+                RadioFunction.errorToast(requireContext(), "Update canceled!")
+                //  checkUpdate()
+            } else if (result.resultCode != com.google.android.play.core.install.model.ActivityResult.RESULT_IN_APP_UPDATE_FAILED) {
+                RadioFunction.errorToast(requireContext(), result.resultCode.toString())
+                checkUpdate()
+            } else if (result.resultCode != Activity.RESULT_OK) {
+                RadioFunction.errorToast(requireContext(), result.resultCode.toString())
+                checkUpdate()
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
@@ -79,6 +117,7 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
         setUpTagsRv()
         getRadioList()
 
+        appUpdateManager = AppUpdateManagerFactory.create(requireContext())
 
     }
     private fun setUpTagsRv() {
@@ -610,7 +649,98 @@ class MainFragment : Fragment(R.layout.fragment_main), RadioAdapterHorizantal.On
 
 
 
+    private fun checkUpdate() {
+        // appUpdateManager = AppUpdateManagerFactory.create(requireContext())
 
+        /*
+// Returns an intent object that you use to check for an update.
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
 
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            //   DynamicToast.makeWarning(requireContext(),  appUpdateInfo.updateAvailability().toString(), 9).show()
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                // This example applies an immediate update. To apply a flexible update
+                // instead, pass in AppUpdateType.FLEXIBLE
+                //   && (appUpdateInfo.clientVersionStalenessDays() ?: -1) >=0// DAYS_FOR_FLEXIBLE_UPDATE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                // Request the update.
+
+                appUpdateManager.startUpdateFlowForResult(
+                    // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                    appUpdateInfo,
+                    // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                    // AppUpdateType.IMMEDIATE,
+                    AppUpdateType.FLEXIBLE,
+                    // The current activity making the update request.
+                    requireActivity() /* Functions.unwrap(context)*/,
+                    // Include a request code to later monitor this update request.
+                    1)
+
+                appUpdateManager.registerListener(listener)
+            }
+            else {
+                appUpdateManager.unregisterListener(listener)
+                Log.d(ContentValues.TAG, "No Update available")
+            }
+        }
+
+*/
+
+        installStateUpdatedListener = InstallStateUpdatedListener { state ->
+            when {
+                state.installStatus() == InstallStatus.DOWNLOADED -> {
+                    appUpdateManager.completeUpdate()
+                }
+                state.installStatus() == InstallStatus.INSTALLED -> {
+                    // if (appUpdateManager != null) {
+                    appUpdateManager.unregisterListener(installStateUpdatedListener!!)
+                    // }
+                }
+                else -> {
+                    //  Log.i(TAG, "InstallStateUpdatedListener: state: " + state.installStatus())
+                }
+            }
+        }
+
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo: AppUpdateInfo ->
+            //    Log.d("TAG", "here")
+            // Checks that the platform will allow the specified type of update.
+            if ((
+                        appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+                        ) ||
+                (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)
+            ) {
+                // Request the update.
+                try {
+                    //    Log.d("TAG", "here")
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE,
+                        requireActivity(),
+                        REQUEST_APP_UPDATE
+                    )
+
+                    startForResult.launch(Intent(requireContext(), FavoriteRadioFragment::class.java))
+                } catch (e: IntentSender.SendIntentException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        appUpdateManager.registerListener(installStateUpdatedListener!!)
+    }
+
+    override fun onResume() {
+        checkUpdate()
+        super.onResume()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        appUpdateManager.unregisterListener(installStateUpdatedListener!!)
+    }
 
 }

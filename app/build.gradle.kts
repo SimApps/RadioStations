@@ -29,7 +29,7 @@ android {
 
         minSdk = 24//21 ALARM LIB
         targetSdk = 33
-        versionCode = 3
+        versionCode = 4
         versionName = "@string/version"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
