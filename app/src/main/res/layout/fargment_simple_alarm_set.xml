@@ -6,7 +6,7 @@
 
         <variable
             name="alarmData"
-            type="com.amirami.simapp.radiobroadcast.pairalarm.database.table.AlarmData" />
+            type="com.amirami.simapp.radiobroadcastpro.pairalarm.database.table.AlarmData" />
     </data>
 
     <ScrollView

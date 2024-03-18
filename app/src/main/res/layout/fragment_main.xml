@@ -140,7 +140,7 @@
             android:layout_marginBottom="20dp"
             app:cardBackgroundColor="@color/violet"
             app:cardCornerRadius="12dp"
-            app:layout_constraintBottom_toTopOf="@id/ads_frame"
+            app:layout_constraintBottom_toTopOf="@id/recentrecentlyplayedTxV"
             app:layout_constraintDimensionRatio="2:1"
             app:layout_constraintEnd_toStartOf="@id/btn_Top_Votes"
             app:layout_constraintStart_toStartOf="parent"
@@ -167,7 +167,7 @@
             android:layout_marginBottom="20dp"
             app:cardBackgroundColor="@color/redish"
             app:cardCornerRadius="12dp"
-            app:layout_constraintBottom_toTopOf="@id/ads_frame"
+            app:layout_constraintBottom_toTopOf="@id/recentrecentlyplayedTxV"
             app:layout_constraintDimensionRatio="2:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_Top_Clicks"
@@ -185,17 +185,7 @@
         </androidx.cardview.widget.CardView>
 
 
-        <FrameLayout
-            android:id="@+id/ads_frame"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
-            android:background="@color/transparents"
-            android:paddingTop="12dp"
-            app:layout_constraintBottom_toTopOf="@id/recentrecentlyplayedTxV"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_Top_Votes" />
+
 
         <TextView
             android:id="@+id/recentrecentlyplayedTxV"
@@ -214,7 +204,7 @@
             app:layout_constraintBottom_toTopOf="@id/last_played_radio_rv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ads_frame" />
+            app:layout_constraintTop_toBottomOf="@id/btn_Top_Votes" />
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -260,22 +250,12 @@
             android:layout_marginTop="12dp"
             android:background="@color/transparents"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@id/ads_frames"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tagsTxtVw" />
 
 
-        <FrameLayout
-            android:id="@+id/ads_frames"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:background="@color/transparents"
 
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/local_popular_tags_recycle_view" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

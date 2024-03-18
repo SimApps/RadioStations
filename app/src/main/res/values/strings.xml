@@ -1,11 +1,11 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Radio FM AM</string>
-    <string name="RateRadioFMAM">Rate Radio FM AM</string>
+    <string name="app_name">Radio FM AM Pro</string>
+    <string name="RateRadioFMAM">Rate Radio FM AM Pro</string>
 
 
-    <string name="choosefilemanager">Select a file manager Then GO to : Download/Radio FM AM</string>
-    <string name="IfyouenjoyusingRadioFMAM">If you enjoy using Radio FM AM, please take a moment to rate it. Thanks for your support!</string>
-    <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : Download/Radio FM AM </string>
+    <string name="choosefilemanager">Select a file manager Then GO to : Download/Radio FM AM Pro</string>
+    <string name="IfyouenjoyusingRadioFMAM">If you enjoy using Radio FM AM Pro, please take a moment to rate it. Thanks for your support!</string>
+    <string name="recordmessage">Some devices wont allow to directly access record folder so you have to Select a file manager and go to this address  : Download/Radio FM AM Pro </string>
 
     <string name="app_version_settings">Version : 0.1.05</string>
 
@@ -42,8 +42,8 @@
     <string name="shutdown">Stop playing after : </string>
     <string name="fab_content_desc">Add custom stream.</string>
 
-    <string name="appversion">Version : 1.0.2</string>
-    <string name="version">1.0.2</string>
+    <string name="appversion">Version : 2.4.3</string>
+    <string name="version">2.4.3</string>
 
 
 
@@ -218,7 +218,7 @@
     <string name="Pause">Pause</string>
     <string name="playpause">Play / Pause</string>
     <string name="hint">Enter your default countrie</string>
-    <string name="nav_header_title">Radio FM AM</string>
+    <string name="nav_header_title">Radio FM AM Pro</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

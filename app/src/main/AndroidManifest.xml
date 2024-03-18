@@ -123,25 +123,6 @@
 
 
 
-
-
-        <receiver
-            android:name="com.tappx.sdk.android.TrackInstallReceiver"
-            android:exported="false"> <!-- see if there is proble if yes change it to true -->
-
-        </receiver>
-
-        <!-- AdActivity from Google Play Services, needed by Tappx -->
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
-
-
         <service android:name="com.amirami.player_service.service.SimpleMediaService" />
 
 

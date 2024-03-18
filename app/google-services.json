@@ -1,46 +1,48 @@
 {
   "project_info": {
-    "project_number": "492116254757",
-    "project_id": "radio-fm-am-d58c0",
-    "storage_bucket": "radio-fm-am-d58c0.appspot.com"
+    "project_number": "518204712766",
+    "firebase_url": "https://radio-broadcast-pro.firebaseio.com",
+    "project_id": "radio-broadcast-pro",
+    "storage_bucket": "radio-broadcast-pro.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:492116254757:android:d20037887896822718dfcc",
+        "mobilesdk_app_id": "1:518204712766:android:8e55cf1de2ccb4bb47ae6f",
         "android_client_info": {
-          "package_name": "com.amirami.simapp.radiobroadcast"
+          "package_name": "com.amirami.simapp.radiobroadcastpro"
         }
       },
       "oauth_client": [
         {
-          "client_id": "492116254757-qh1mr96c8bq4pnmomva67lupodg350uh.apps.googleusercontent.com",
+          "client_id": "518204712766-po00b71e0i640s7mplv8auar3ltmb6uu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.amirami.simapp.radiobroadcast",
-            "certificate_hash": "5eb945aee60818a23473ec4141b5b72c7dd14d1e"
+            "package_name": "com.amirami.simapp.radiobroadcastpro",
+            "certificate_hash": "e32a4a299c6ba638c3e0f92bf0e445b19345221b"
           }
         },
         {
-          "client_id": "492116254757-p06l6kdu5h46tl013dnf9vqcf7ks9b2j.apps.googleusercontent.com",
+          "client_id": "518204712766-iksl04qt2rppsqfa3uq7pqjade66pbs0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAa-gUvdGN40AxREalCccx6qHSz4N4wIRU"
+          "current_key": "AIzaSyBpr986t4iuO_LlvTGgj1cPvmUoa3orp2U"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "492116254757-p06l6kdu5h46tl013dnf9vqcf7ks9b2j.apps.googleusercontent.com",
+              "client_id": "518204712766-iksl04qt2rppsqfa3uq7pqjade66pbs0.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-5900899997553420~9985927819"
     }
   ],
   "configuration_version": "1"

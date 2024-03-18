@@ -175,16 +175,6 @@
             </androidx.media3.ui.AspectRatioFrameLayout>
 
 
-
-            <FrameLayout
-                android:id="@+id/ads_frame"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@color/transparents">
-
-            </FrameLayout>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fav_radio_player_rv"
                 android:layout_width="match_parent"

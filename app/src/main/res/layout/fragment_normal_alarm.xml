@@ -7,11 +7,11 @@
 
         <variable
             name="alarmData"
-            type="com.amirami.simapp.radiobroadcast.pairalarm.database.table.AlarmData" />
+            type="com.amirami.simapp.radiobroadcastpro.pairalarm.database.table.AlarmData" />
 
         <variable
             name="weekend"
-            type="com.amirami.simapp.radiobroadcast.pairalarm.database.table.Weekend" />
+            type="com.amirami.simapp.radiobroadcastpro.pairalarm.database.table.Weekend" />
 
         <variable
             name="manualChangeForHour"
