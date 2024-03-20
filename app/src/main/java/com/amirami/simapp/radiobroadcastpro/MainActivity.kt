@@ -1145,7 +1145,7 @@ Log.d("iikjnhb",state.radioState.isRec.toString())
     override fun onDestroy() {
         super.onDestroy()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-         //   stopService(Intent(this, SimpleMediaService::class.java))
+        //  stopService(Intent(this, SimpleMediaService::class.java))
 
         }
 

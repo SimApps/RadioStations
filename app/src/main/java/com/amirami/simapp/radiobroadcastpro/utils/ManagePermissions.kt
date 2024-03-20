@@ -3,9 +3,11 @@ package com.amirami.simapp.radiobroadcastpro.utils
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.media3.common.util.UnstableApi
 import com.amirami.simapp.radiobroadcastpro.RadioFunction
 
 class ManagePermissions(val activity: Activity, val list: List<String>, val code: Int) {
@@ -52,7 +54,7 @@ class ManagePermissions(val activity: Activity, val list: List<String>, val code
     }
 
     // Request the permissions at run time
-    private fun requestPermissions() {
+    @OptIn(UnstableApi::class) private fun requestPermissions() {
         val permission = deniedPermission()
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
             // Show an explanation asynchronously

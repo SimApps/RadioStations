@@ -22,7 +22,7 @@ class SimpleMediaServiceHandler @Inject constructor(
     val simpleMediaState = _simpleMediaState.asStateFlow()
 
 
-    private val _radioState = MutableStateFlow<RadioEntity>(RadioEntity())
+    private val _radioState = MutableStateFlow(RadioEntity())
     val radioState = _radioState.asStateFlow()
 
      
@@ -65,7 +65,6 @@ class SimpleMediaServiceHandler @Inject constructor(
                 }
             }
             is  PlayerEvent.Stop -> {
-                Log.d("jnppllk","cccc!")
 
                 stopProgressUpdate()
                 player.stop()
@@ -95,7 +94,6 @@ class SimpleMediaServiceHandler @Inject constructor(
         when (playbackState) {
             ExoPlayer.STATE_IDLE // The player does not have any media to play.
             -> {
-                Log.d("jnppllk","1")
                 _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
                 if(_radioState.value.icyState !="OoOps! Try another station!")
                     _radioState.value =     _radioState.value.copy(icyState="")
@@ -104,7 +102,6 @@ class SimpleMediaServiceHandler @Inject constructor(
             ExoPlayer.STATE_BUFFERING // The player needs to load media before playing.
             -> {
                 _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.BUFFERING)
-                Log.d("jnppllk","2")
                 _radioState.value =   _radioState.value.copy(icyState="Buffering")
 
                 _simpleMediaState.value = SimpleMediaState.Buffering(player.currentPosition)
@@ -113,7 +110,6 @@ class SimpleMediaServiceHandler @Inject constructor(
             ExoPlayer.STATE_READY // The player is able to immediately play from its current position.
             -> {
                 _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.PLAYING)
-                Log.d("jnppllk","3")
               //  _icyState.value = ""
                 if(_radioState.value.icyState =="Buffering")
                 _radioState.value =   _radioState.value.copy(icyState="")
@@ -122,14 +118,12 @@ class SimpleMediaServiceHandler @Inject constructor(
             ExoPlayer.STATE_ENDED // The player has finished playing the media.
             -> {
                 _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
-                Log.d("jnppllk","4")
                 _radioState.value =   _radioState.value.copy(icyState="")
 
             }
             else -> {
                 _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = PlayerState.STOPED)
 
-                Log.d("jnppllk","5")
               //  MainActivity.GlobalstateString = "UNKNOWN_STATE"
                 _radioState.value =   _radioState.value.copy(icyState="")
             }
