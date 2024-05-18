@@ -11,7 +11,7 @@ buildscript {
 
 
     dependencies {
-        classpath ("com.android.tools.build:gradle:8.3.0")
+        classpath ("com.android.tools.build:gradle:8.4.0")
         classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
         classpath ("com.google.gms:google-services:4.4.1")
        // classpath 'io.fabric.tools:gradle:1.31.0'  // Crashlytics plugin
@@ -21,7 +21,7 @@ buildscript {
 
         // Add the dependency for the Performance Monitoring plugin
         classpath ("com.google.firebase:perf-plugin:1.4.2")  // Performance Monitoring plugin
-        classpath ("com.google.firebase:firebase-crashlytics-gradle:2.9.9")
+        classpath ("com.google.firebase:firebase-crashlytics-gradle:3.0.1")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 
@@ -29,9 +29,9 @@ buildscript {
 
 
         //Dager hilt
-        classpath ("com.google.dagger:hilt-android-gradle-plugin:2.51")
+        classpath ("com.google.dagger:hilt-android-gradle-plugin:2.51.1")
 
-        classpath ("org.jetbrains.kotlin:kotlin-serialization:1.9.23")
+        classpath ("org.jetbrains.kotlin:kotlin-serialization:1.9.24")
 
 
         // licence info
@@ -45,7 +45,7 @@ buildscript {
 }
 
 plugins {
-    id("com.google.devtools.ksp") version "1.9.23-1.0.19" apply false
+    id("com.google.devtools.ksp") version "1.9.24-1.0.20" apply false
 }
 
 allprojects {
