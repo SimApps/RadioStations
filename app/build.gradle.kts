@@ -66,9 +66,9 @@ dependencies {
 
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     //implementation (project(path:(":player-service"))
@@ -77,15 +77,15 @@ dependencies {
     //implementation project(path:(":downloader"))
     implementation(project(":downloader"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.10")
     implementation("androidx.hilt:hilt-work:1.2.0")
 
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
     // kotlin serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 
 
     //reetrofit
@@ -100,32 +100,32 @@ dependencies {
  //   implementation("com.google.android.play:app-update-ktx:2.0.0")
 
     //COIL
-    implementation("io.coil-kt:coil:2.6.0")
-    implementation("io.coil-kt:coil-gif:2.6.0")
-    implementation("io.coil-kt:coil-svg:2.6.0")
+    implementation("io.coil-kt:coil:2.7.0")
+    implementation("io.coil-kt:coil-gif:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 
 
-    implementation("androidx.media3:media3-ui:1.3.1")
-    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-ui:1.4.0")
+    implementation("androidx.media3:media3-exoplayer:1.4.0")
     // For DASH playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.4.0")
     // For HLS playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-hls:1.3.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.4.0")
 // For RTSP playback support with ExoPlayer
-    implementation("androidx.media3:media3-exoplayer-rtsp:1.3.1")
+    implementation("androidx.media3:media3-exoplayer-rtsp:1.4.0")
 // For exposing and controlling media sessions
-    implementation("androidx.media3:media3-session:1.3.1")
+    implementation("androidx.media3:media3-session:1.4.0")
 
 
 
 
 
 
-    implementation("com.google.android.gms:play-services-base:18.4.0")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
 
 
     // Import the BoM for the Firebase platform
-    implementation (platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.1.2"))
 
     // Add the Firebase Crashlytics SDK.
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -153,7 +153,7 @@ dependencies {
 
 
     //custom toast
-    implementation("com.pranavpandey.android:dynamic-toasts:4.2.1")
+    implementation("com.pranavpandey.android:dynamic-toasts:4.3.0")
 
     //RecyclerView-FastScroll
     implementation("com.simplecityapps:recyclerview-fastscroll:2.0.1")
@@ -168,22 +168,22 @@ dependencies {
 
 
     // this line below because a wierd warning about viewbinding
-    compileOnly("com.android.databinding:viewbinding:8.4.0")
+    compileOnly("com.android.databinding:viewbinding:8.5.2")
 
 // Navigation Component dependencies
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 
     // Coroutine Lifecycle Scopes
-    implementation("androidx.fragment:fragment-ktx:1.7.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
    // implementation("androidx.lifecycle:lifecycle-extensions-ktx:2.5.1")
 
 
     //dager hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.52")
+    kapt("com.google.dagger:hilt-compiler:2.52")
 
     kapt("androidx.hilt:hilt-compiler:1.2.0")
     
@@ -206,7 +206,7 @@ dependencies {
 
 
 
-    implementation("com.airbnb.android:lottie:6.4.0")
+    implementation("com.airbnb.android:lottie:6.5.0")
 
 
 
@@ -225,7 +225,7 @@ dependencies {
 
 
     // Kotlin + coroutines
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     implementation ("androidx.viewpager2:viewpager2:1.1.0")
     implementation ("io.github.nikartm:fit-button:2.0.0")
@@ -239,10 +239,10 @@ dependencies {
   //  implementation ("com.carterchen247:alarm-scheduler:2.0.0") CURRENT ONE
 
 // GET LICENSE INFO
-    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
 
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.9.24-1.0.20")
+    implementation("com.google.devtools.ksp:symbol-processing-api:2.0.10-1.0.24")
 
 
 }
